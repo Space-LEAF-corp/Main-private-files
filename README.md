@@ -96,6 +96,39 @@ print(sock.recv(1024).decode())
 sock.close()
 ```
 
+Code Validation & Fibonacci Resequencing
+-----------------------------------------
+
+**CodeValidator** (`fibonacci_resequencer.py`)
+- Forward validation: parse Python code with AST
+- Backward validation: check reversibility heuristics
+- Both checks: combine forward and backward validation
+
+**FibonacciResequencer** (`fibonacci_resequencer.py`)
+- Split code into Fibonacci-sized chunks (21, 13, 8, 5, 3, 2, 1)
+- Resequence chunks in reverse or forward order
+- Analyze chunk structure and statistics
+
+**Quick test**
+```python
+from fibonacci_resequencer import CodeValidator, FibonacciResequencer
+
+code = """def hello():
+    print('world')
+# ... more lines ..."""
+
+# Validate
+validator = CodeValidator(code)
+ok, msg = validator.validate_both()
+print(msg)
+
+# Split and resequence
+reseq = FibonacciResequencer(code)
+resequenced, chunks = reseq.split_and_resequence(reverse=True)
+analysis = reseq.analyze_chunks()
+print(f"Chunks: {analysis['chunk_sizes']}")
+```
+
 Notes
 - The `ErebusSync` class is a placeholder. Replace with your real integration.
 - Memory can be saved as CSV (default) or JSON using `--format json`.
