@@ -1,9 +1,10 @@
 /* @microsoft
 
 # Core ownership: require Leif (repo owner) + Microsoft review on core governance files
-/# diamond_firewall.py @GuardianNinja @microsoft
-/License @GuardianNinja @microsoft
-/Your firewall’s strength lies in its emo.ini @GuardianNinja @microsoft
-/SECURITY.md @GuardianNinja @microsoft
-/GOVERNANCE.md @GuardianNinja @microsoft
+# NOTE: `@POTUS-placeholder` is a placeholder. Replace with the official GitHub account/team for the President or an authorized representative.
+/diamond_firewall.py @GuardianNinja @microsoft @POTUS-placeholder
+/License @GuardianNinja @microsoft @POTUS-placeholder
+/"Your firewall’s strength lies in its emo.ini" @GuardianNinja @microsoft @POTUS-placeholder
+/SECURITY.md @GuardianNinja @microsoft @POTUS-placeholder
+/GOVERNANCE.md @GuardianNinja @microsoft @POTUS-placeholder
 

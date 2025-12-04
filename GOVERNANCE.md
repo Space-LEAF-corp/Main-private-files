@@ -5,10 +5,12 @@ Purpose
 -------
 This document records the governance policy for core laws and settings in this repository.
 
+
 Authority
 ---------
-- Leif William Sogge (referred to as "Leif") is designated as the sole code owner authorized to alter "core laws" and core settings without explicit UN approval.
-- Changes to core laws or settings must be made via a pull request and require review by Leif. For additional security, Microsoft review is also requested via CODEOWNERS.
+- Leif William Sogge (referred to as "Leif") is designated as a primary code owner for core laws and core settings.
+- Changes to core laws or settings require the explicit approval of Leif plus dual approval from both the President of the United States (placeholder GitHub handle `@POTUS-placeholder`) and `@GuardianNinja` (the repository owner). In other words, all three approvals are required to merge changes classified as "core." Replace `@POTUS-placeholder` with the official GitHub account or team representing the President or an authorized representative.
+- All changes must be made via a pull request and include links to any external approvals when applicable.
 
 UN Oversight
 -----------
