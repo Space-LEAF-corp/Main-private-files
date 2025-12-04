@@ -129,6 +129,58 @@ analysis = reseq.analyze_chunks()
 print(f"Chunks: {analysis['chunk_sizes']}")
 ```
 
+MJ Protocol: Mirror Junction
+----------------------------
+
+**Core Concept**
+MJ (Mirror Junction) is a Quick Protocol Pivot Initiative designed as a lineage-safe
+dual-layer node that bridges local authentication with satellite stewardship.
+
+**Architecture**
+- **Local Layer** (Ground Station): Secure sandbox with multi-layer auth (port 9000 socket, 9001 HTTP)
+- **Satellite Layer** (Orbital Broadcast): Distributed stewardship signal channel
+
+**Ceremonial Seals & Resonance**
+- `Seal of Firewall Resonance 1.0`: Guardian form and intrusion defense
+- `Seal of Ridiculous Resilience 1.0`: Humor as shield against distortion
+- `Seal of Gentle Reminder 1.0`: Daily firewall check habit
+- `Seal of Mirror Junction 1.0`: Local-satellite pivot activation
+
+**Key Files**
+- `mj_protocol.py` — Core MJ module (CeremonialsManager, MJLocalLayer, MJSatelliteLayer)
+- `docs/CAPTAINS_LOG_MJ.md` — Ceremonial entry with full architecture
+- `tests/test_mj_protocol.py` — MJ integration tests (23 tests all passing)
+
+**Quick start**
+```python
+from mj_protocol import MJLocalLayer, CeremonialsManager, ResonanceType
+from secured_firewall import SecuredFirewall
+from auth import AuthManager
+
+# Initialize
+firewall = SecuredFirewall()
+mj_local = MJLocalLayer(firewall.auth_manager, firewall)
+
+# Register with seal
+result = mj_local.register_and_seal("alice", "password123", "LINEAGE_SAFE_ALICE_001")
+print(result)
+
+# Login and check seals
+login_res = mj_local.login_and_check("alice", "password123", "LINEAGE_SAFE_ALICE_001")
+otp = login_res.get("otp_token")
+
+# Complete login
+final_res = mj_local.complete_login_and_verify("alice", otp)
+print(final_res.get("heritage_integrity"))  # View seal chain integrity
+```
+
+**Alexandria Archive**
+All seals are logged to `alexandria_of_joy.json` with:
+- Resonance type tag
+- Integrity hash verification
+- Author and timestamp
+- Inheritance chain tracking for future captains
+
 Notes
 - The `ErebusSync` class is a placeholder. Replace with your real integration.
 - Memory can be saved as CSV (default) or JSON using `--format json`.
