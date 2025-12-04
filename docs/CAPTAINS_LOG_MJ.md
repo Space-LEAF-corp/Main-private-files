@@ -107,7 +107,7 @@
     Cosmic Development Protocol Tie-In
     ──────────────────────────────────
     Moon Layer (MJ) — Local sandbox with rapid pivot capability
-    Earth Layer — Governance + approval hierarchy (Leif + President + UN)
+    Earth Layer — Governance + approval hierarchy (Leif + President of the United States + UN)
     Mars Layer — Satellite broadcast and distributed trust nodes
 
 

@@ -46,15 +46,18 @@ class SecuredFirewall:
             return {"status": "ok", "session_token": session_token}
         return res
 
-    def access_firewall(self, session_token: str) -> dict:
-        """Attempt to access the firewall. Requires valid session token."""
+    def access_firewall(self, session_token: str, network: str = "internet", metadata: dict | None = None) -> dict:
+        """Attempt to access the firewall. Requires valid session token.
+
+        Accepts `network` (e.g., 'wifi','cellular','satellite') and `metadata` for network info.
+        """
         user_id = self._authenticated_sessions.get(session_token)
         if not user_id:
             return {"status": "denied", "reason": "invalid or expired session"}
 
-        # Try to access the firewall with a valid dna code
+        # Try to access the firewall with a valid dna code and network metadata
         try:
-            result = self.firewall.access_request("LINEAGE_SAFE_QR123")
+            result = self.firewall.access_request(dna_code="LINEAGE_SAFE_QR123", network=network, metadata=metadata)
             return {"status": "ok", "message": result}
         except Exception as e:
             return {"status": "denied", "reason": str(e)}
@@ -63,3 +66,37 @@ class SecuredFirewall:
         """Simulate an intrusion attempt (firewall traps attacker)."""
         result = self.firewall.intrusion_attempt(attacker_id, payload)
         return {"status": "trapped", "message": result}
+
+    def set_lockdown_keys(self, primary: str, secondary_un: str) -> dict:
+        """Configure the firewall lockdown keys (Space Leaf primary, UN secondary)."""
+        self.firewall.set_lockdown_keys(primary, secondary_un)
+        return {"status": "ok", "message": "lockdown keys set"}
+
+    def activate_lockdown(self, key: str) -> dict:
+        """Attempt to activate lockdown with a provided key."""
+        ok = self.firewall.activate_lockdown_with_primary(key) or self.firewall.activate_lockdown_with_un(key)
+        return {"status": "ok" if ok else "denied", "activated": ok}
+
+    def deactivate_lockdown(self, key: str) -> dict:
+        """Attempt to deactivate lockdown with a provided key."""
+        ok = self.firewall.deactivate_lockdown(key)
+        return {"status": "ok" if ok else "denied", "deactivated": ok}
+
+    def set_notifier_webhook(self, url: str, headers: dict | None = None) -> dict:
+        """Configure webhook for intrusion/warning notifications."""
+        try:
+            self.firewall.set_notifier_webhook(url, headers)
+            return {"status": "ok", "message": "notifier webhook configured"}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
+
+    def update_core_config(self, user: str, key: str, value, consenting_guardians: list | None = None) -> dict:
+        """Proxy to `DiamondFirewall.update_core_config` for core admins (requires consent).
+
+        `user` should be the human-readable name (e.g., "Leif William Sogge").
+        """
+        try:
+            ok = self.firewall.update_core_config(user, key, value, consenting_guardians)
+            return {"status": "ok" if ok else "denied", "updated": ok}
+        except Exception as e:
+            return {"status": "error", "message": str(e)}
