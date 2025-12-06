@@ -1,0 +1,61 @@
+# Retrying without py3Dmol to generate 2D visualization of Si-C-O-Au molecular structure
+import matplotlib.pyplot as plt
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem import rdDepictor
+
+# Define a hypothetical molecule using MolBlock format
+mol_block = """
+  Mrv2014 12112215342D          
+
+ 18 17  0  0  0  0            999 V2000
+    0.0000    0.0000    0.0000 Si  0  0  0  0  0  0  0  0  0  0  0  0
+    1.5000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    2.0000    1.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.0000   -1.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.5000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.0000    1.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+   -2.0000   -1.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    2.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -2.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    3.0000    0.0000    0.0000 *   0  0  0  0  0  0  0  0  0  0  0  0
+   -3.0000    0.0000    0.0000 *   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    3.0000    0.0000 *   0  0  0  0  0  0  0  0  0  0  0  0
+    1.5000    2.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    1.5000   -2.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.5000    2.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.5000   -2.5000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    4.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -4.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0
+  1  2  1  0
+  2  3  2  0
+  2  4  1  0
+  1  5  1  0
+  5  6  2  0
+  5  7  1  0
+  1  8  1  0
+  1  9  1  0
+  3 13 1  0
+  4 14 1  0
+  6 15 1  0
+  7 16 1  0
+  8 17 1  0
+  9 18 1  0
+  3 10 1  0
+  6 11 1  0
+  8 12 1  0
+M  END
+"""
+
+# Read molecule from MolBlock
+mol = Chem.MolFromMolBlock(mol_block, sanitize=False)
+rdDepictor.Compute2DCoords(mol)
+
+# Generate 2D image
+img = Draw.MolToImage(mol, size=(400, 400))
+
+# Save image
+output_path = "/mnt/data/silicon_gold_structure.png"
+img.save(output_path)
+
+print("Generated 2D visualization of a hypothetical Si-C-O-Au molecular structure and saved as silicon_gold_structure.png")
