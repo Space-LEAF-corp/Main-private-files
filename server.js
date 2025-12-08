@@ -13,12 +13,16 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 app.post("/backup", (req, res) => {
   const bundle = req.body;
   if (bundle?.type !== "chalk-bundle" || !bundle?.integrity) {
-    return res.status(400).json({ ok:false, error:"Invalid bundle" });
+    return res.status(400).json({ ok: false, error: "Invalid bundle" });
   }
-  const stamp = new Date().toISOString().replace(/[:.]/g,"-");
-  const file = path.join(DATA_DIR, `eternal-chalkboard-${stamp}.chalk.json`);
-  fs.writeFileSync(file, JSON.stringify(bundle, null, 2), "utf8");
-  return res.json({ ok:true, file });
+  try {
+    const stamp = new Date().toISOString().replace(/[:.]/g,"-");
+    const file = path.join(DATA_DIR, `eternal-chalkboard-${stamp}.chalk.json`);
+    fs.writeFileSync(file, JSON.stringify(bundle, null, 2), "utf8");
+    return res.json({ ok: true, file });
+  } catch (error) {
+    return res.status(500).json({ ok: false, error: "Failed to write backup file" });
+  }
 });
 
 app.listen(8787, () => console.log("Backup server on http://localhost:8787"));
