@@ -42,12 +42,19 @@ export async function buildBundle(): Promise<BackupBundle> {
 /**
  * Backs up data to the remote server
  * Sends the bundle via POST request to the backup endpoint
+ * @throws Error if the backup server is unavailable or returns an error
  */
 export async function backupToServer(): Promise<void> {
   const bundle = await buildBundle();
-  await fetch("http://localhost:8787/backup", {
+  const response = await fetch("http://localhost:8787/backup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(bundle),
   });
+
+  if (!response.ok) {
+    throw new Error(
+      `Backup failed with status ${response.status}: ${response.statusText}`
+    );
+  }
 }

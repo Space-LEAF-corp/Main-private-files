@@ -34,11 +34,13 @@ class BackupHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(result).encode("utf-8"))
 
             except Exception as e:
-                # Send error response
+                # Log the actual error for debugging
+                print(f"[Backup Server Error] {str(e)}")
+                # Send generic error response to avoid leaking sensitive information
                 self.send_response(500)
                 self.send_header("Content-Type", "application/json")
                 self.end_headers()
-                error_response = {"error": str(e), "status": "failed"}
+                error_response = {"error": "Internal server error", "status": "failed"}
                 self.wfile.write(json.dumps(error_response).encode("utf-8"))
         else:
             # Unknown path
