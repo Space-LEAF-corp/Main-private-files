@@ -101,6 +101,13 @@ class TestTimeKeeperMatrixOperations(unittest.TestCase):
         self.assertEqual(encrypted.shape, (3, 3))
         self.assertIsInstance(encrypted, np.ndarray)
 
+    def test_kaleidoscope_encrypt_invalid_size(self):
+        tk = TimeKeeper()
+        data = [1, 2, 3, 4, 5]  # Not 9 elements
+        with self.assertRaises(ValueError) as context:
+            tk.kaleidoscope_encrypt(data)
+        self.assertIn("exactly 9 elements", str(context.exception))
+
     def test_process_in_orbit(self):
         tk = TimeKeeper()
         # Create a simple cube with identity-like matrices

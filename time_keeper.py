@@ -69,7 +69,10 @@ class TimeKeeper:
 
     def kaleidoscope_encrypt(self, data):
         """Encrypt data using kaleidoscope-like transformations."""
-        data_matrix = np.array(data).reshape(3, 3)  # Reshaping input to a 3x3 matrix
+        data_array = np.array(data)
+        if data_array.size != 9:
+            raise ValueError("Data must contain exactly 9 elements for 3x3 matrix transformation")
+        data_matrix = data_array.reshape(3, 3)  # Reshaping input to a 3x3 matrix
         encrypted_matrix = self.rotate_matrix(self.flip_matrix(data_matrix))
         return encrypted_matrix
 
