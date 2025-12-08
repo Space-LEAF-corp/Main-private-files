@@ -1,4 +1,3 @@
-"""
 ═══════════════════════════════════════════════════════════════════════════════
                       ⚔️  CAPTAIN'S LOG - DIGITAL ARK  ⚔️
                            Entry System Documentation
@@ -230,4 +229,3 @@ Use Captain's Log entries to document major MJ Protocol milestones, such as:
                                  Captain's Mark
                                December 8, 2025
 ═══════════════════════════════════════════════════════════════════════════════
-"""

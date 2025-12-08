@@ -29,8 +29,12 @@ function saveEntry(entryObj) {
   console.log(`Saved entry to ${LOG_FILE}`);
 }
 
-// Example usage: ark-001 - The university became a moving ship
-const entry = {
+// Export for use as module
+export { saveEntry };
+
+// Example usage when run directly: ark-001 - The university became a moving ship
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const entry = {
   artifactId: 'ark-001',
   title: 'The university became a moving ship',
   timestamp: new Date().toISOString(),
@@ -65,6 +69,7 @@ const entry = {
     externalAuthority: 'God',
     localSealApplied: false
   }
-};
+  };
 
-saveEntry(entry);
+  saveEntry(entry);
+}
