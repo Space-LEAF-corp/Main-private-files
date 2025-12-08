@@ -1,5 +1,12 @@
 // server.js — private minimal backup for chalk bundles
 // Run: node server.js
+// 
+// SECURITY NOTE: This is a minimal backup server for private use.
+// For production deployment, consider adding:
+// - Rate limiting (e.g., express-rate-limit) to prevent DoS attacks
+// - Authentication/authorization for the /backup endpoint
+// - Disk space monitoring to prevent filling up storage
+// - HTTPS/TLS for encrypted communication
 import express from "express";
 import fs from "fs";
 import path from "path";
