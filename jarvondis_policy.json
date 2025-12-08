@@ -1,0 +1,8 @@
+{
+  "owner_id": "leif.w.sogge",
+  "admin_secret": "CHANGE_ME_TO_A_STRONG_SECRET",
+  "lockdown_active": true,
+  "allowlist_clients": ["captains-log", "eternal-chalkboard", "leif-personal-device", "dimitri"],
+  "audit_enabled": true,
+  "max_skew_seconds": 60
+}
