@@ -39,17 +39,16 @@ class TestJarvondis3Core(unittest.TestCase):
 
     def test_admin_command_with_signature(self):
         """Test admin command execution with signature"""
-        command = "/JARVONDIS_SYS_DIAGNOSTICS"
+        command = "/JARVONDIS_SYS_UPDATE"  # Non-sensitive command
         signature = self.interface.tamper.sign_command(command)
         
         result = self.interface.request(
             user_role="admin",
             command=command,
-            admin_signature=signature,
-            mfa_code="JBSWY3DPEHPK3PXP"  # Use secret as code for testing
+            admin_signature=signature
         )
         
-        self.assertIn("DIAGNOSTICS", result)
+        self.assertIn("UPDATE", result)
 
     def test_operator_access_denied_without_emergency(self):
         """Test that operators are denied access without emergency mode"""
@@ -64,15 +63,17 @@ class TestJarvondis3Core(unittest.TestCase):
 
     def test_emergency_mode_lifecycle(self):
         """Test emergency mode activation and revocation"""
-        # Grant emergency access
+        # Grant emergency access with MFA
         grant_sig = self.interface.tamper.sign_command("EMERGENCY_GRANT")
-        result = self.interface.grant_emergency_access(grant_sig)
+        mfa_code = self.interface.totp.now() if self.interface.totp else "000000"
+        result = self.interface.grant_emergency_access(grant_sig, mfa_code)
         self.assertIn("EMERGENCY_ACTIVATED", result)
         self.assertTrue(self.interface.emergency_mode)
         
-        # Revoke emergency access
+        # Revoke emergency access with MFA
         revoke_sig = self.interface.tamper.sign_command("EMERGENCY_REVOKE")
-        result = self.interface.revoke_emergency_access(revoke_sig)
+        mfa_code = self.interface.totp.now() if self.interface.totp else "000000"
+        result = self.interface.revoke_emergency_access(revoke_sig, mfa_code)
         self.assertIn("EMERGENCY_REVOKED", result)
         self.assertFalse(self.interface.emergency_mode)
 
@@ -81,14 +82,13 @@ class TestJarvondis3Core(unittest.TestCase):
         initial_hash = self.interface.last_hash
         self.assertEqual(initial_hash, "GENESIS")
         
-        # Execute a command to trigger provenance
+        # Execute a non-sensitive command to trigger provenance
         command = "/JARVONDIS_SYS_UPDATE"
         signature = self.interface.tamper.sign_command(command)
         self.interface.request(
             user_role="admin",
             command=command,
-            admin_signature=signature,
-            mfa_code="JBSWY3DPEHPK3PXP"
+            admin_signature=signature
         )
         
         # Check that hash changed
@@ -96,18 +96,17 @@ class TestJarvondis3Core(unittest.TestCase):
 
     def test_audit_log_export(self):
         """Test audit log viewing"""
-        command = "/JARVONDIS_SYS_BACKUP"
+        command = "/JARVONDIS_SYS_UPDATE"  # Non-sensitive command
         signature = self.interface.tamper.sign_command(command)
         self.interface.request(
             user_role="admin",
             command=command,
-            admin_signature=signature,
-            mfa_code="JBSWY3DPEHPK3PXP"
+            admin_signature=signature
         )
         
         audit_log = self.interface.view_audit_log()
         self.assertIn("AUDIT_HEADER", audit_log)
-        self.assertIn("BACKUP", audit_log)
+        self.assertIn("UPDATE", audit_log)
 
     def test_compliance_snapshot(self):
         """Test compliance snapshot export"""
@@ -129,6 +128,29 @@ class TestJarvondis3Core(unittest.TestCase):
         # Clear consensus
         self.interface.clear_consensus()
         self.assertEqual(len(self.interface.consensus_signatures), 0)
+
+    def test_sensitive_command_requires_mfa(self):
+        """Test that sensitive commands require MFA"""
+        command = "/JARVONDIS_SYS_SHUTDOWN"
+        signature = self.interface.tamper.sign_command(command)
+        
+        # Without MFA code, should fail
+        result = self.interface.request(
+            user_role="admin",
+            command=command,
+            admin_signature=signature
+        )
+        self.assertIn("MFA", result)
+        
+        # With MFA code, should succeed
+        mfa_code = self.interface.totp.now() if self.interface.totp else "000000"
+        result = self.interface.request(
+            user_role="admin",
+            command=command,
+            admin_signature=signature,
+            mfa_code=mfa_code
+        )
+        self.assertIn("SHUTDOWN", result)
 
 
 class TestJarvondis3Gaming(unittest.TestCase):
@@ -198,13 +220,14 @@ class TestJarvondis3AgentHarness(unittest.TestCase):
 
     def test_agent_access_with_emergency(self):
         """Test agent can access non-sensitive commands in emergency mode"""
-        # Grant emergency access
+        # Grant emergency access with MFA
         grant_sig = self.interface.tamper.sign_command("EMERGENCY_GRANT")
-        self.interface.grant_emergency_access(grant_sig)
+        mfa_code = self.interface.totp.now() if self.interface.totp else "000000"
+        self.interface.grant_emergency_access(grant_sig, mfa_code)
         
         # Agent can now access non-sensitive commands
-        result = self.agent.act("/JARVONDIS_SYS_DIAGNOSTICS")
-        self.assertIn("DIAGNOSTICS", result)
+        result = self.agent.act("/JARVONDIS_SYS_UPDATE")
+        self.assertIn("UPDATE", result)
 
 
 class TestJarvondis3Crypto(unittest.TestCase):

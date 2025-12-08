@@ -154,7 +154,9 @@ class Jarvondis3GlobalInterface:
     ):
         # For backward compatibility with HMAC-based tamper proofing
         if admin_key is None:
-            admin_key = b"default_admin_key_change_me"
+            # Generate a random admin key if not provided
+            import secrets
+            admin_key = secrets.token_bytes(32)
         self.tamper = Jarvondis3TamperProofing(admin_key)
         self.commands = Jarvondis3GlobalCommands()
         self.log: List[str] = []
@@ -251,7 +253,9 @@ class Jarvondis3GlobalInterface:
             return f"{milestone_banner('SIGNATURE_INVALID')} Invalid administrator signature."
 
         if command_literal in self.sensitive_commands:
-            if mfa_code and not self.verify_mfa(mfa_code):
+            if not mfa_code:
+                return f"{milestone_banner('MFA_REQUIRED')} MFA code required for sensitive command."
+            if not self.verify_mfa(mfa_code):
                 return f"{milestone_banner('MFA_REQUIRED')} MFA verification failed."
             if self.consensus_threshold > 0 and not self._consensus_met():
                 return f"{milestone_banner('CONSENSUS_REQUIRED')} Consensus threshold not met."
@@ -267,7 +271,9 @@ class Jarvondis3GlobalInterface:
             return f"{milestone_banner('SIGNATURE_INVALID')} Invalid administrator signature."
 
         if command_literal in self.sensitive_commands:
-            if mfa_code and not self.verify_mfa(mfa_code):
+            if not mfa_code:
+                return f"{milestone_banner('MFA_REQUIRED')} MFA code required for sensitive command."
+            if not self.verify_mfa(mfa_code):
                 return f"{milestone_banner('MFA_REQUIRED')} MFA verification failed."
             if self.consensus_threshold > 0 and not self._consensus_met():
                 return f"{milestone_banner('CONSENSUS_REQUIRED')} Consensus threshold not met."
@@ -293,20 +299,18 @@ class Jarvondis3GlobalInterface:
             self._append_entry(entry)
             return entry
 
-        is_sensitive = command in self.sensitive_commands or command in {
-            "/JARVONDIS_SYS_SHUTDOWN",
-            "/JARVONDIS_SYS_REBOOT",
-            "/JARVONDIS_SYS_PROTOCOL_OVERRIDE",
-            "/JARVONDIS_SYS_ACCESS_GRANT",
-            "/JARVONDIS_SYS_ACCESS_REVOKE",
-        }
+        is_sensitive = command in self.sensitive_commands
 
         if is_sensitive:
             if not admin_signature or not self.tamper.verify_signature(command, admin_signature):
                 entry = f"[{timestamp}] {milestone_banner('SIGNATURE_INVALID')} Admin signature required for sensitive command."
                 self._append_entry(entry)
                 return entry
-            if mfa_code and not self.verify_mfa(mfa_code):
+            if not mfa_code:
+                entry = f"[{timestamp}] {milestone_banner('MFA_REQUIRED')} MFA code required for sensitive command."
+                self._append_entry(entry)
+                return entry
+            if not self.verify_mfa(mfa_code):
                 entry = f"[{timestamp}] {milestone_banner('MFA_REQUIRED')} MFA verification failed."
                 self._append_entry(entry)
                 return entry
