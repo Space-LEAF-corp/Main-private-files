@@ -298,11 +298,11 @@
         <p class="subtitle">People's Protection and Privacy - Local-First Secure System</p>
         
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('oath')">Captain's Oath</button>
-            <button class="tab" onclick="switchTab('register')">Register/Sign-In</button>
-            <button class="tab" onclick="switchTab('laws')">Core Laws (0/50)</button>
-            <button class="tab" onclick="switchTab('guardians')">Guardian Quorum</button>
-            <button class="tab" onclick="switchTab('seals')">Seal Registry</button>
+            <button class="tab active" onclick="switchTab('oath', this)">Captain's Oath</button>
+            <button class="tab" onclick="switchTab('register', this)">Register/Sign-In</button>
+            <button class="tab" onclick="switchTab('laws', this)">Core Laws (0/50)</button>
+            <button class="tab" onclick="switchTab('guardians', this)">Guardian Quorum</button>
+            <button class="tab" onclick="switchTab('seals', this)">Seal Registry</button>
         </div>
         
         <!-- Oath Tab -->
@@ -613,7 +613,7 @@
         function hexToBuffer(hex) {
             const bytes = new Uint8Array(hex.length / 2);
             for (let i = 0; i < hex.length; i += 2) {
-                bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+                bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
             }
             return bytes;
         }
@@ -685,7 +685,10 @@
             const initSeal = storage.get('init_seal');
             if (!initSeal) {
                 const timestamp = new Date().toISOString();
-                const hash = Date.now().toString(36) + Math.random().toString(36).substr(2);
+                // Use cryptographically secure random values
+                const randomBytes = new Uint8Array(16);
+                crypto.getRandomValues(randomBytes);
+                const hash = bufferToHex(randomBytes);
                 const seal = { timestamp, hash };
                 storage.set('init_seal', seal);
                 document.getElementById('init-timestamp').textContent = timestamp;
@@ -697,10 +700,12 @@
         }
 
         // Tab switching
-        function switchTab(tabName) {
+        function switchTab(tabName, clickedElement) {
             // Update tab buttons
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
             
             // Update tab content
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
