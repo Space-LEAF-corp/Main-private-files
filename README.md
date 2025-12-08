@@ -185,6 +185,41 @@ Notes
 - The `ErebusSync` class is a placeholder. Replace with your real integration.
 - Memory can be saved as CSV (default) or JSON using `--format json`.
 - Auth data is stored in `auth_users.json` (atomic JSON writes).
+
+Tesla AI Acceleration Safety Protocol
+--------------------------------------
+
+**No-Joy Acceleration Policy** (`tesla_ai_safety.py`)
+- Ensures AI never accelerates for entertainment purposes
+- Intent classification: whitelist (safety) vs blacklist (entertainment)
+- Context-aware speed caps: kid zones (25 km/h), residential (50 km/h), highway (100 km/h)
+- Acceleration envelopes: conservative, moderate, performance (condition-dependent)
+- Emergency verification: multi-sensor corroboration required
+- Kid/sanctuary protection: maximum safety when children present
+- Performance mode: dual confirmation (guardian + driver) required
+- Privacy-first logging: audit trail without PII
+
+**Quick Start**
+```python
+from tesla_ai_safety import TeslaSafetyProtocol, Context
+
+protocol = TeslaSafetyProtocol()
+response = protocol.request_acceleration("Need to merge with traffic", context)
+```
+
+**Demo and Testing**
+```bash
+# Interactive demo
+python demo_tesla_ai_safety.py
+
+# Run tests (45 tests)
+python -m unittest tests.test_tesla_ai_safety -v
+```
+
+**Documentation**
+- Quick start guide: `TESLA_AI_QUICKSTART.md`
+- Full documentation: `docs/TESLA_AI_SAFETY.md`
+
 # Main-private-files
 Big or small
 taking a step into becoming a professional developer and creating a new type of product for secure and impregnable purposes.
