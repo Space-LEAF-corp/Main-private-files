@@ -466,7 +466,9 @@ class TeslaSafetyProtocol:
         Args:
             command_text: Natural language command
             context: Current environmental context
-            driver_input: Optional driver pedal input
+            driver_input: Optional driver pedal input with accel_request (m/s²) and pedal_position.
+                         If None, uses default moderate acceleration (2.0 m/s²).
+                         Driver requests are always constrained to safe envelopes.
             
         Returns:
             Response with status, message, and acceleration/speed values

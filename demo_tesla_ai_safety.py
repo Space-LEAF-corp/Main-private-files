@@ -132,7 +132,7 @@ def main():
         driver_input
     )
     print_response("Need to merge (driver requesting high acceleration)", response)
-    print(f"  Note: Requested 8.0 m/s², AI limited to safe envelope")
+    print(f"  Note: Requested {driver_input.accel_request:.1f} m/s², AI limited to safe envelope")
     
     # Demo 5: Emergency verification
     print_section("DEMO 5: Emergency Verification")

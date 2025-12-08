@@ -3,17 +3,25 @@ Unit tests for Tesla AI Acceleration Safety Protocol
 """
 
 import unittest
+
+# Core classes
 from tesla_ai_safety import (
     TeslaSafetyProtocol,
     IntentClassifier,
     ContextAnalyzer,
     EmergencyVerifier,
     SafetyLogger,
+)
+
+# Data structures
+from tesla_ai_safety import (
     Context,
     DriverInput,
-    Intent,
-    AccelerationEnvelope
+    AccelerationEnvelope,
 )
+
+# Enums
+from tesla_ai_safety import Intent
 
 
 class TestIntentClassifier(unittest.TestCase):
