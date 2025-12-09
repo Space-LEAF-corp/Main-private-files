@@ -138,9 +138,37 @@ class TimeKeeper:
         """
         for idx, facet in enumerate(cube):
             print(f"[The Time Keeper]: Processing through facet {idx + 1}.")
+            # Validate shape compatibility for np.dot
+            facet_shape = np.shape(facet)
+            data_shape = np.shape(data)
+            # For 2D arrays, check facet.shape[1] == data.shape[0]
+            if len(facet_shape) == 2 and len(data_shape) == 2:
+                if facet_shape[1] != data_shape[0]:
+                    raise ValueError(
+                        f"Incompatible shapes for np.dot: facet {facet_shape}, data {data_shape} at facet {idx + 1}"
+                    )
+            # For 2D facet and 1D data, check facet.shape[1] == data.shape[0]
+            elif len(facet_shape) == 2 and len(data_shape) == 1:
+                if facet_shape[1] != data_shape[0]:
+                    raise ValueError(
+                        f"Incompatible shapes for np.dot: facet {facet_shape}, data {data_shape} at facet {idx + 1}"
+                    )
+            # For 1D facet and 2D data, check facet.shape[0] == data.shape[0]
+            elif len(facet_shape) == 1 and len(data_shape) == 2:
+                if facet_shape[0] != data_shape[0]:
+                    raise ValueError(
+                        f"Incompatible shapes for np.dot: facet {facet_shape}, data {data_shape} at facet {idx + 1}"
+                    )
+            # For 1D facet and 1D data, check facet.shape[0] == data.shape[0]
+            elif len(facet_shape) == 1 and len(data_shape) == 1:
+                if facet_shape[0] != data_shape[0]:
+                    raise ValueError(
+                        f"Incompatible shapes for np.dot: facet {facet_shape}, data {data_shape} at facet {idx + 1}"
+                    )
+            # Otherwise, let np.dot raise its own error
             data = np.dot(facet, data)  # Apply transformation at each cube face
             # Only rotate if data is 2D matrix
-            if data.ndim == 2:
+            if hasattr(data, "ndim") and data.ndim == 2:
                 data = self.rotate_matrix(data)  # Add rotation for gyroscopic flow
         return data
 
