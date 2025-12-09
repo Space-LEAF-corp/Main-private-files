@@ -21,7 +21,9 @@ def ensure_dir(d):
 
 def add_checksum(entry):
     """Add SHA-256 checksum to entry for integrity verification."""
-    s = json.dumps(entry, sort_keys=True)
+    # Create a copy without the checksum field to compute hash
+    entry_copy = {k: v for k, v in entry.items() if k != "checksum_sha256"}
+    s = json.dumps(entry_copy, sort_keys=True)
     entry["checksum_sha256"] = hashlib.sha256(s.encode("utf-8")).hexdigest()
     return entry
 
