@@ -86,7 +86,32 @@ class TimeKeeper:
         return encrypted_matrix
 
     def process_in_orbit(self, cube, data):
-        """Gyroscopic flow: Orbit data through cube faces."""
+        """
+        Gyroscopic flow: Orbit data through cube faces.
+
+        Parameters
+        ----------
+        cube : list or array-like of 2D numpy arrays
+            A sequence of 2D matrices (each of shape NxN) representing the cube's facets.
+        data : numpy array or matrix
+            A matrix or vector compatible with matrix multiplication with each facet in `cube`.
+
+        Returns
+        -------
+        numpy array
+            The transformed data after orbiting through all cube facets and applying rotations.
+
+        Raises
+        ------
+        ValueError
+            If the input matrices are not compatible for multiplication.
+
+        Notes
+        -----
+        - `cube` should be a list or array of 2D numpy arrays (e.g., [np.array, ...]).
+        - `data` should have a shape compatible with the facets in `cube` for matrix multiplication.
+        - The output shape depends on the transformations applied by the cube facets.
+        """
         for idx, facet in enumerate(cube):
             print(f"[The Time Keeper]: Processing through facet {idx + 1}.")
             data = np.dot(facet, data)  # Apply transformation at each cube face
