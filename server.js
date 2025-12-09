@@ -19,13 +19,38 @@ if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 
 app.post("/backup", (req, res) => {
   const bundle = req.body;
-  if (bundle?.type !== "chalk-bundle" || !bundle?.integrity) {
-    return res.status(400).json({ ok: false, error: "Invalid bundle" });
+  // Validate bundle is a plain object, not null, not array
+  if (
+    typeof bundle !== "object" ||
+    bundle === null ||
+    Array.isArray(bundle)
+  ) {
+    return res.status(400).json({ ok: false, error: "Bundle must be a plain object" });
+  }
+  // Validate required fields and types
+  if (
+    typeof bundle.type !== "string" ||
+    bundle.type !== "chalk-bundle" ||
+    typeof bundle.integrity !== "string"
+  ) {
+    return res.status(400).json({ ok: false, error: "Invalid bundle fields" });
+  }
+  // Only allow expected properties (type, integrity, data)
+  const allowedProps = ["type", "integrity", "data"];
+  for (const key of Object.keys(bundle)) {
+    if (!allowedProps.includes(key)) {
+      return res.status(400).json({ ok: false, error: "Unexpected bundle property: " + key });
+    }
+  }
+  // Check serialized size (max 5mb, but be strict)
+  const jsonStr = JSON.stringify(bundle, null, 2);
+  if (Buffer.byteLength(jsonStr, "utf8") > 5 * 1024 * 1024) {
+    return res.status(413).json({ ok: false, error: "Bundle too large" });
   }
   try {
     const stamp = new Date().toISOString().replace(/[:.]/g,"-");
     const file = path.join(DATA_DIR, `eternal-chalkboard-${stamp}.chalk.json`);
-    fs.writeFileSync(file, JSON.stringify(bundle, null, 2), "utf8");
+    fs.writeFileSync(file, jsonStr, "utf8");
     return res.json({ ok: true, file });
   } catch (error) {
     return res.status(500).json({ ok: false, error: "Failed to write backup file" });
