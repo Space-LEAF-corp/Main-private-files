@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json({ limit: "5mb" }));
 
 const DATA_DIR = path.resolve("chalk_backups");
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
+fs.mkdirSync(DATA_DIR, { recursive: true });
 
 app.post("/backup", (req, res) => {
   const bundle = req.body;
