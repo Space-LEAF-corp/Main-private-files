@@ -79,17 +79,17 @@ class AdministrativeLockdown:
     # --- Privacy protection: block other AIs & unauthorized clients ---
     def is_client_allowed(self, client_id: str, user_agent: Optional[str]) -> bool:
         # Explicit allowlist overrides; during lockdown, only allowlisted clients pass
-        if self.policy.lockdown_active and client_id not in self.policy.allowlist_clients:
-            self._audit("block_client_not_allowlisted", {"client_id": client_id})
-            return False
-
-        # Heuristic block: known AI agent fingerprints in the user-agent
-        if user_agent:
-            ua_l = user_agent.lower()
-            if any(fp in ua_l for fp in AI_AGENT_FINGERPRINTS):
-                self._audit("block_ai_agent", {"client_id": client_id, "user_agent": user_agent})
+        if self.policy.lockdown_active:
+            if client_id not in self.policy.allowlist_clients:
+                self._audit("block_client_not_allowlisted", {"client_id": client_id})
                 return False
 
+            # Heuristic block: known AI agent fingerprints in the user-agent
+            if user_agent:
+                ua_l = user_agent.lower()
+                if any(fp in ua_l for fp in AI_AGENT_FINGERPRINTS):
+                    self._audit("block_ai_agent", {"client_id": client_id, "user_agent": user_agent})
+                    return False
         return True
 
     # --- Jarvondis response gate ---
