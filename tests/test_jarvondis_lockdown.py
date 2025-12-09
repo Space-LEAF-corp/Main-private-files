@@ -7,6 +7,8 @@ class TestLockdownPolicy(unittest.TestCase):
     def setUp(self):
         self.policy = LockdownPolicy(
             owner_id="leif.w.sogge",
+            # NOTE: This is a hardcoded test secret for unit testing only.
+            #       Never use this value in production code.
             admin_secret="test_secret_123",
             lockdown_active=True,
             allowlist_clients={"captains-log", "eternal-chalkboard", "leif-personal-device", "dimitri"},
