@@ -1,6 +1,11 @@
 # Jarvondis 2.0 Investigation
 
 ## Description
+
+This is a work-in-progress investigation and repro scaffolding for Jarvondis 2.0.
+
+## References
+
 This is a work-in-progress investigation and repro scaffolding for Jarvondis 2.0.
 
 ## References
@@ -8,6 +13,7 @@ This is a work-in-progress investigation and repro scaffolding for Jarvondis 2.0
 - **Sub-issue:** PLACEHOLDER
 
 ## Investigation Checklist
+
 - [ ] Reproduce the failing behavior and capture logs
 - [ ] Isolate the failing module/component
 - [ ] Create a minimal failing test or example
@@ -17,6 +23,22 @@ This is a work-in-progress investigation and repro scaffolding for Jarvondis 2.0
 
 ## Reproduction Steps and Failures
 
+<!-- Paste logs, error messages, or failing test output here -->
+
+```
+[Logs will be added during investigation]
+```
+
+## Environment
+
+- **OS:** 
+- **Runtime(s):** 
+- **Branch(es):** 
+- **Additional notes:** 
+
+---
+
+**Status:** Investigation in progress
 ### Test Output / Logs
 ```
 (Paste failing test output or logs here)
