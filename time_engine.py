@@ -131,6 +131,9 @@ class ExponentialLearningCurve:
     where P is progress, L is learning limit, r is rate, t is time.
     """
     
+    # Small margin to maintain asymptotic behavior (never quite reaching limit)
+    ASYMPTOTIC_MARGIN = 0.9999999
+    
     @staticmethod
     def learning_progress(hours: float, rate: float = 0.1, limit: float = 1.0) -> float:
         """Calculate learning progress using exponential curve.
@@ -149,8 +152,8 @@ class ExponentialLearningCurve:
         # Exponential learning: P(t) = L(1 - e^(-rt))
         # Cap at slightly below limit to ensure asymptotic behavior
         progress = limit * (1 - math.exp(-rate * hours))
-        # Ensure we never quite reach the limit (leave a tiny margin)
-        return min(progress, limit * 0.9999999)
+        # Ensure we never quite reach the limit (leave a tiny margin for asymptotic behavior)
+        return min(progress, limit * ExponentialLearningCurve.ASYMPTOTIC_MARGIN)
     
     @staticmethod
     def accelerated_growth(base_progress: float, acceleration: float = 1.2) -> float:
@@ -295,7 +298,7 @@ class TimeEngine:
         """Get items that are due for review.
         
         Args:
-            max_count: Maximum number of items to return
+            max_count: Maximum number of items to return (default 10)
             
         Returns:
             List of items due for review, sorted by urgency
@@ -343,8 +346,8 @@ class TimeEngine:
             self.total_learning_time
         )
         
-        # Count items due for review
-        items_due = len(self.get_next_reviews(max_count=9999))
+        # Count items due for review (use total item count to avoid arbitrary limit)
+        items_due = len(self.get_next_reviews(max_count=len(self.items)))
         
         return {
             "total_items": len(self.items),
