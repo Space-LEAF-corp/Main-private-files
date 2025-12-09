@@ -48,7 +48,7 @@ app.post("/backup", (req, res) => {
     return res.status(413).json({ ok: false, error: "Bundle too large" });
   }
   try {
-    const stamp = new Date().toISOString().replace(/[:.]/g,"-");
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-");
     const file = path.join(DATA_DIR, `eternal-chalkboard-${stamp}.chalk.json`);
     fs.writeFileSync(file, jsonStr, "utf8");
     return res.json({ ok: true, file });
