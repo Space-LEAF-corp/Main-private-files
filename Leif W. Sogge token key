@@ -1,0 +1,14 @@
+OWNER=GuardianNinja
+REPO=Main-private-files
+BRANCH=main
+
+# Full JSON
+gh api /repos/$OWNER/$REPO/branches/$BRANCH/protection
+
+# Condensed summary
+gh api /repos/$OWNER/$REPO/branches/$BRANCH/protection --jq '{
+  status_checks: .required_status_checks,
+  reviews: .required_pull_request_reviews,
+  enforce_admins: .enforce_admins,
+  restrictions: .restrictions
+}'

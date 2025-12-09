@@ -222,11 +222,114 @@ curl -X POST http://localhost:8787/backup \
 - `server.js` — Express backup server
 - `package.json` — Node.js dependencies and scripts
 - `.gitignore` — Excludes `node_modules/` and `chalk_backups/`
+Playground: Interactive Testing Environment
+-------------------------------------------
+
+**Playground Module** (`playground.py`)
+- Interactive sandbox for experimenting with security features
+- Isolated mode with temporary files for safe testing
+- Guided tutorials for learning authentication flows
+- Custom experiment support for advanced users
+
+**Quick start**
+```python
+from playground import Playground
+
+# Start the guided tutorial
+playground = Playground(isolated=True)
+tutorial = playground.start_tutorial()
+print(tutorial)
+
+# Progress through steps
+step1 = playground.tutorial_next()  # Registration demo
+step2 = playground.tutorial_next()  # Login demo
+step3 = playground.tutorial_next()  # Firewall access demo
+step4 = playground.tutorial_next()  # Intrusion detection demo
+
+# Or run individual demos
+reg = playground.demo_registration("alice")
+login = playground.demo_login("alice")
+access = playground.demo_firewall_access("alice")
+
+# Custom experiments
+experiment = playground.custom_experiment(
+    user_id="test_user",
+    password="MyPass123!",
+    dna_code="LINEAGE_SAFE_TEST_001",
+    test_intrusion=True
+)
+
+# Clean up when done
+playground.cleanup()
+```
+
+**Run quick start demo**
+```bash
+python playground.py
+```
+
+Science Lab: Security Education & Analysis
+------------------------------------------
+
+**Science Lab Module** (`science_lab.py`)
+- Educational demonstrations of cryptographic concepts
+- Network security experiments and simulations
+- Authentication protocol analysis
+- Security metrics and performance benchmarks
+
+**Categories**
+- **CryptoLab**: Hashing, PBKDF2, HMAC, token generation, password strength
+- **NetworkSecurityLab**: Firewall analysis, intrusion scenarios, latency measurement
+- **AuthenticationProtocolLab**: 2FA, session management, QR-DNA binding
+- **SecurityMetricsLab**: Entropy calculation, performance comparison
+
+**Quick start**
+```python
+from science_lab import ScienceLab
+
+lab = ScienceLab()
+
+# Cryptography experiments
+hashing = lab.crypto.demo_hashing("Hello World")
+pbkdf2 = lab.crypto.demo_pbkdf2("MyPassword")
+strength = lab.crypto.analyze_password_strength("MyP@ssw0rd123")
+
+# Network security experiments
+firewall = lab.network.analyze_firewall_config(
+    guardians=["G1", "G2", "G3"],
+    captains=["C1", "C2", "C3"]
+)
+scenarios = lab.network.simulate_intrusion_scenarios()
+latency = lab.network.measure_authentication_latency()
+
+# Authentication protocol explanations
+two_fa = lab.auth.explain_two_factor_auth()
+sessions = lab.auth.explain_session_management()
+qr_dna = lab.auth.analyze_qr_dna_binding()
+
+# Security metrics
+entropy = lab.metrics.calculate_entropy("MyPassword123!")
+performance = lab.metrics.compare_hashing_performance()
+
+# Run all experiments
+all_results = lab.run_all_experiments()
+
+# Get experiment catalog
+catalog = lab.get_experiment_catalog()
+```
+
+**Run quick experiments**
+```bash
+python science_lab.py
+```
 
 Notes
 - The `ErebusSync` class is a placeholder. Replace with your real integration.
 - Memory can be saved as CSV (default) or JSON using `--format json`.
 - Auth data is stored in `auth_users.json` (atomic JSON writes).
+- Playground uses isolated mode by default for safe experimentation.
+- Science Lab provides educational content without modifying system state.
+
 # Main-private-files
 Big or small
 taking a step into becoming a professional developer and creating a new type of product for secure and impregnable purposes.

@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Captain's Oath - QR-DNA Secure Sign-In</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .oath-section {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .oath-text {
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .charter-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .charter-list li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .charter-list li:before {
+            content: "•";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #5568d3;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        
+        .status-message.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            display: block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .seal-display {
+            background: #e8f4f8;
+            border: 2px solid #667eea;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        
+        .guardian-list {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .law-slot {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .law-slot.filled {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .slot-number {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 60px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: #666;
+            transition: all 0.3s;
+            margin: 0;
+            border-radius: 0;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            color: #667eea;
+            font-style: italic;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Captain's Oath & QR-DNA Registry</h1>
+        <p class="subtitle">People's Protection and Privacy - Local-First Secure System</p>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('oath', this)">Captain's Oath</button>
+            <button class="tab" onclick="switchTab('register', this)">Register/Sign-In</button>
+            <button class="tab" onclick="switchTab('laws', this)">Core Laws (0/50)</button>
+            <button class="tab" onclick="switchTab('guardians', this)">Guardian Quorum</button>
+            <button class="tab" onclick="switchTab('seals', this)">Seal Registry</button>
+        </div>
+        
+        <!-- Oath Tab -->
+        <div id="oath-tab" class="tab-content active">
+            <h2>Captain's Oath for People's Protection and Privacy</h2>
+            <div class="oath-section">
+                <div class="oath-text">
+                    I, <strong>Leif William Sogge</strong>, swear that power exists to protect dignity, privacy, 
+                    and the joy of children. I will never abuse my power. I will submit myself to communal testing 
+                    when asked, accept correction, and anchor every act in transparency and consent. I will leave 
+                    clear paths for succession and ensure the next captain is tested by the people and crew as I 
+                    have been. I seal this oath as a living covenant, witnessed by community, for the People's 
+                    protection and privacy.
+                </div>
+            </div>
+            
+            <h2>People's Protection and Privacy Charter</h2>
+            <ul class="charter-list">
+                <li><strong>Purpose:</strong> The cloak exists to protect people's privacy, dignity, and child safety—never to surveil, coerce, or exploit.</li>
+                <li><strong>Consent:</strong> All participation is voluntary, revocable, and audit-friendly; no data leaves the device without explicit consent.</li>
+                <li><strong>Minimal data:</strong> Only necessary signals are processed; private contents remain encrypted and local by default.</li>
+                <li><strong>Transparency:</strong> Every action is logged with human-readable seals and timestamps for communal validation.</li>
+                <li><strong>Accountability:</strong> Multi-party oversight (children's councils, community stewards, and crew) can challenge, pause, or revoke any module.</li>
+            </ul>
+            
+            <h2>Next Captain Testing Protocol</h2>
+            <div class="info-box">
+                <strong>Eligibility:</strong> Community nomination plus crew affirmation; no self-appointment without public witnessing.
+            </div>
+            <div class="info-box">
+                <strong>Oath:</strong> Adopt and sign the Captain's oath; seal it with QR-DNA lineage and at least two guardian co-signatures.
+            </div>
+            <div class="info-box">
+                <strong>Trials:</strong>
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li><strong>Gentle Readiness Trial:</strong> Demonstrate restraint and consent-first decision-making under pressure.</li>
+                    <li><strong>Counterbalance Stewardship:</strong> Resolve a conflict prioritizing child safety and communal dignity over speed or profit.</li>
+                    <li><strong>Remembrance Trial:</strong> Record and publish an accountability reflection when corrected.</li>
+                </ul>
+            </div>
+            <div class="warning-box">
+                <strong>Revocation:</strong> Emergency Crew Gate can suspend captain powers with a 3-of-5 guardian quorum; restoration requires public review.
+            </div>
+        </div>
+        
+        <!-- Register/Sign-In Tab -->
+        <div id="register-tab" class="tab-content">
+            <h2>Register or Sign In</h2>
+            
+            <div class="form-group">
+                <label for="user-id">User ID / Captain Name:</label>
+                <input type="text" id="user-id" placeholder="Enter your unique identifier">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password (min 8 characters):</label>
+                <input type="password" id="password" placeholder="Enter secure password">
+            </div>
+            
+            <div class="form-group">
+                <label for="dna-code">QR-DNA Lineage Code:</label>
+                <input type="text" id="dna-code" placeholder="LINEAGE_SAFE_..." value="LINEAGE_SAFE_">
+                <small style="color: #666; display: block; margin-top: 5px;">Must start with LINEAGE_SAFE prefix</small>
+            </div>
+            
+            <div id="register-section">
+                <button onclick="registerUser()">Register New Captain</button>
+                <button class="btn-secondary" onclick="showSignIn()">Already Registered? Sign In</button>
+            </div>
+            
+            <div id="signin-section" class="hidden">
+                <button onclick="signInUser()">Sign In</button>
+                <button class="btn-secondary" onclick="showRegister()">New User? Register</button>
+            </div>
+            
+            <div id="otp-section" class="hidden">
+                <div class="form-group">
+                    <label for="otp-code">OTP Code (6 hex characters):</label>
+                    <input type="text" id="otp-code" placeholder="Enter OTP from challenge">
+                </div>
+                <button onclick="completeSignIn()">Complete Sign-In</button>
+            </div>
+            
+            <div id="oath-signing-section" class="hidden">
+                <h2>Seal Your Oath</h2>
+                <div class="warning-box">
+                    You are about to seal the Captain's Oath. This action requires guardian co-signatures.
+                </div>
+                <div class="form-group">
+                    <label for="oath-signature">Your Digital Signature:</label>
+                    <input type="text" id="oath-signature" placeholder="Type your full name to seal">
+                </div>
+                <div class="form-group">
+                    <label for="guardian1">Guardian Co-Signer 1 (User ID):</label>
+                    <input type="text" id="guardian1" placeholder="Guardian 1 User ID">
+                </div>
+                <div class="form-group">
+                    <label for="guardian2">Guardian Co-Signer 2 (User ID):</label>
+                    <input type="text" id="guardian2" placeholder="Guardian 2 User ID">
+                </div>
+                <button onclick="sealOath()">Seal Oath with Guardians</button>
+            </div>
+            
+            <div id="status-message" class="status-message"></div>
+        </div>
+        
+        <!-- Core Laws Tab -->
+        <div id="laws-tab" class="tab-content">
+            <h2>Open Core Law Slots (0/50)</h2>
+            <div class="info-box">
+                <strong>Invitation to the World:</strong> This cloak is open to all people—adults and children, 
+                nations and communities—to gift a law and name an AI companion for the Captain. The offering is 
+                encrypted, consent-led, and never used to control, only to protect.
+            </div>
+            
+            <div class="form-group">
+                <label for="law-slot-select">Select Slot (0-49):</label>
+                <select id="law-slot-select">
+                    <!-- Generated dynamically -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="law-title">Law Title:</label>
+                <input type="text" id="law-title" placeholder="Brief title for this core law">
+            </div>
+            
+            <div class="form-group">
+                <label for="law-content">Law Content:</label>
+                <textarea id="law-content" placeholder="Enter the law text or AI companion gift..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="law-author">Author/Contributor:</label>
+                <input type="text" id="law-author" placeholder="Your name or identifier">
+            </div>
+            
+            <button onclick="submitLaw()">Submit Law (Requires Auth)</button>
+            <button class="btn-secondary" onclick="refreshLawSlots()">Refresh Slots</button>
+            
+            <h3 style="margin-top: 30px;">Current Law Registry</h3>
+            <div id="law-slots-display">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+        
+        <!-- Guardian Quorum Tab -->
+        <div id="guardians-tab" class="tab-content">
+            <h2>Guardian Quorum & Emergency Crew Gate</h2>
+            
+            <div class="warning-box">
+                <strong>Emergency Crew Gate Protocol:</strong> A 3-of-5 guardian quorum can suspend captain powers. 
+                Restoration requires public review.
+            </div>
+            
+            <div class="guardian-list">
+                <h3>Registered Guardians:</h3>
+                <div id="guardians-list">
+                    <p style="color: #666; font-style: italic;">No guardians registered yet. Guardians must be designated by the captain.</p>
+                </div>
+            </div>
+            
+            <h3>Add Guardian (Captain Only)</h3>
+            <div class="form-group">
+                <label for="new-guardian-id">Guardian User ID:</label>
+                <input type="text" id="new-guardian-id" placeholder="User ID of guardian">
+            </div>
+            <div class="form-group">
+                <label for="guardian-role">Guardian Role:</label>
+                <select id="guardian-role">
+                    <option value="community-steward">Community Steward</option>
+                    <option value="children-council">Children's Council</option>
+                    <option value="crew-member">Crew Member</option>
+                    <option value="technical-overseer">Technical Overseer</option>
+                    <option value="ethics-advisor">Ethics Advisor</option>
+                </select>
+            </div>
+            <button onclick="addGuardian()">Add Guardian</button>
+            
+            <h3 style="margin-top: 30px;">Emergency Actions</h3>
+            <div class="warning-box">
+                <strong>Warning:</strong> Emergency actions require guardian signatures and create immutable audit logs.
+            </div>
+            <button class="btn-danger" onclick="initiateEmergencyGate()">Initiate Emergency Crew Gate</button>
+        </div>
+        
+        <!-- Seals Tab -->
+        <div id="seals-tab" class="tab-content">
+            <h2>Public Seal Registry</h2>
+            
+            <div class="info-box">
+                <strong>Transparency:</strong> All seals are published for community review. Private contents remain encrypted; 
+                only the seals (hashes, timestamps, and signatures) are visible.
+            </div>
+            
+            <div id="seals-display">
+                <div class="seal-display">
+                    <strong>System Initialization Seal</strong><br>
+                    Timestamp: <span id="init-timestamp"></span><br>
+                    Integrity Hash: <span id="init-hash"></span><br>
+                    Status: Active
+                </div>
+            </div>
+            
+            <h3>Seal Verification</h3>
+            <div class="form-group">
+                <label for="seal-verify-hash">Seal Hash to Verify:</label>
+                <input type="text" id="seal-verify-hash" placeholder="Enter seal hash">
+            </div>
+            <button onclick="verifySeal()">Verify Seal</button>
+            
+            <div id="seal-verify-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            MAX_LAW_SLOTS: 50,
+            MAX_SLOT_INDEX: 49,
+            PBKDF2_ITERATIONS: 200000, // Hardened from 150000
+            DNA_PREFIX: 'LINEAGE_SAFE',
+            STORAGE_KEY_PREFIX: 'captain_oath_',
+            MIN_PASSWORD_LENGTH: 8,
+            OTP_LENGTH: 6,
+            OTP_EXPIRY_MS: 300000, // 5 minutes
+            MIN_GUARDIAN_QUORUM: 3,
+            MAX_GUARDIANS: 5
+        };
+
+        // Local Storage Manager
+        class SecureStorage {
+            constructor() {
+                this.prefix = CONFIG.STORAGE_KEY_PREFIX;
+            }
+
+            get(key) {
+                const data = localStorage.getItem(this.prefix + key);
+                return data ? JSON.parse(data) : null;
+            }
+
+            set(key, value) {
+                localStorage.setItem(this.prefix + key, JSON.stringify(value));
+            }
+
+            remove(key) {
+                localStorage.removeItem(this.prefix + key);
+            }
+
+            clear() {
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith(this.prefix)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+        }
+
+        const storage = new SecureStorage();
+
+        // Cryptographic utilities
+        async function hashPassword(password, salt) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const saltBuffer = typeof salt === 'string' ? hexToBuffer(salt) : salt;
+            
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw',
+                data,
+                'PBKDF2',
+                false,
+                ['deriveBits']
+            );
+            
+            const derivedBits = await crypto.subtle.deriveBits(
+                {
+                    name: 'PBKDF2',
+                    salt: saltBuffer,
+                    iterations: CONFIG.PBKDF2_ITERATIONS,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                256
+            );
+            
+            return bufferToHex(new Uint8Array(derivedBits));
+        }
+
+        function generateSalt() {
+            const salt = new Uint8Array(16);
+            crypto.getRandomValues(salt);
+            return bufferToHex(salt);
+        }
+
+        function generateOTP() {
+            const buffer = new Uint8Array(3);
+            crypto.getRandomValues(buffer);
+            return bufferToHex(buffer);
+        }
+
+        function bufferToHex(buffer) {
+            return Array.from(buffer)
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        function hexToBuffer(hex) {
+            const bytes = new Uint8Array(hex.length / 2);
+            for (let i = 0; i < hex.length; i += 2) {
+                bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
+            }
+            return bytes;
+        }
+
+        async function generateSeal(data) {
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(JSON.stringify(data));
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+            return bufferToHex(new Uint8Array(hashBuffer));
+        }
+
+        // Session management
+        let currentSession = {
+            userId: null,
+            sessionToken: null,
+            isAuthenticated: false,
+            pendingOtp: null,
+            otpExpiry: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeLawSlots();
+            displayInitialSeal();
+            checkExistingSession();
+            updateLawCount();
+        });
+
+        function checkExistingSession() {
+            const session = storage.get('session');
+            if (session && session.expiry > Date.now()) {
+                currentSession = session;
+                showStatus('Welcome back, ' + session.userId + '!', 'success');
+                document.getElementById('oath-signing-section').classList.remove('hidden');
+            }
+        }
+
+        function initializeLawSlots() {
+            const select = document.getElementById('law-slot-select');
+            for (let i = 0; i <= CONFIG.MAX_SLOT_INDEX; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Slot ${i}`;
+                select.appendChild(option);
+            }
+            displayLawSlots();
+        }
+
+        function displayLawSlots() {
+            const container = document.getElementById('law-slots-display');
+            const laws = storage.get('laws') || {};
+            
+            let html = '';
+            for (let i = 0; i <= CONFIG.MAX_SLOT_INDEX; i++) {
+                const law = laws[i];
+                const isFilled = law !== undefined;
+                html += `
+                    <div class="law-slot ${isFilled ? 'filled' : ''}">
+                        <span class="slot-number">Slot ${i}:</span>
+                        <span>${isFilled ? law.title + ' by ' + law.author : 'Available'}</span>
+                        ${isFilled ? '<small style="color: #666;">Sealed: ' + new Date(law.timestamp).toLocaleString() + '</small>' : ''}
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function displayInitialSeal() {
+            const initSeal = storage.get('init_seal');
+            if (!initSeal) {
+                const timestamp = new Date().toISOString();
+                // Use cryptographically secure random values
+                const randomBytes = new Uint8Array(16);
+                crypto.getRandomValues(randomBytes);
+                const hash = bufferToHex(randomBytes);
+                const seal = { timestamp, hash };
+                storage.set('init_seal', seal);
+                document.getElementById('init-timestamp').textContent = timestamp;
+                document.getElementById('init-hash').textContent = hash;
+            } else {
+                document.getElementById('init-timestamp').textContent = initSeal.timestamp;
+                document.getElementById('init-hash').textContent = initSeal.hash;
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName, clickedElement) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Update law count in tab label
+            if (tabName === 'laws') {
+                updateLawCount();
+            }
+        }
+
+        function updateLawCount() {
+            const laws = storage.get('laws') || {};
+            const count = Object.keys(laws).length;
+            const lawsTab = document.querySelectorAll('.tab')[2];
+            if (lawsTab) {
+                lawsTab.textContent = `Core Laws (${count}/50)`;
+            }
+        }
+
+        // Authentication functions
+        async function registerUser() {
+            const userId = document.getElementById('user-id').value.trim();
+            const password = document.getElementById('password').value;
+            const dnaCode = document.getElementById('dna-code').value.trim();
+            
+            // Validation
+            if (!userId) {
+                showStatus('User ID is required', 'error');
+                return;
+            }
+            
+            if (password.length < CONFIG.MIN_PASSWORD_LENGTH) {
+                showStatus('Password must be at least ' + CONFIG.MIN_PASSWORD_LENGTH + ' characters', 'error');
+                return;
+            }
+            
+            if (!dnaCode.startsWith(CONFIG.DNA_PREFIX)) {
+                showStatus('QR-DNA code must start with ' + CONFIG.DNA_PREFIX, 'error');
+                return;
+            }
+            
+            // Check if user exists
+            const users = storage.get('users') || {};
+            if (users[userId]) {
+                showStatus('User already exists. Please sign in instead.', 'error');
+                return;
+            }
+            
+            // Register user
+            const salt = generateSalt();
+            const passwordHash = await hashPassword(password, hexToBuffer(salt));
+            
+            users[userId] = {
+                userId,
+                passwordHash,
+                salt,
+                dnaCode,
+                registeredAt: new Date().toISOString(),
+                oathSigned: false
+            };
+            
+            storage.set('users', users);
+            
+            // Log registration seal
+            const seal = await generateSeal({
+                action: 'registration',
+                userId,
+                dnaCode,
+                timestamp: new Date().toISOString()
+            });
+            
+            logSeal({
+                type: 'registration',
+                userId,
+                seal,
+                timestamp: new Date().toISOString()
+            });
+            
+            showStatus('Registration successful! You can now sign in.', 'success');
+            document.getElementById('oath-signing-section').classList.remove('hidden');
+            
+            // Auto-login after registration
+            await signInUser();
+        }
+
+        async function signInUser() {
+            const userId = document.getElementById('user-id').value.trim();
+            const password = document.getElementById('password').value;
+            const dnaCode = document.getElementById('dna-code').value.trim();
+            
+            const users = storage.get('users') || {};
+            const user = users[userId];
+            
+            if (!user) {
+                showStatus('User not found', 'error');
+                return;
+            }
+            
+            // Verify password
+            const passwordHash = await hashPassword(password, hexToBuffer(user.salt));
+            if (passwordHash !== user.passwordHash) {
+                showStatus('Invalid credentials', 'error');
+                return;
+            }
+            
+            // Verify DNA code
+            if (dnaCode !== user.dnaCode) {
+                showStatus('DNA code mismatch', 'error');
+                return;
+            }
+            
+            // Generate OTP
+            const otp = generateOTP();
+            const otpExpiry = Date.now() + CONFIG.OTP_EXPIRY_MS;
+            
+            currentSession.userId = userId;
+            currentSession.pendingOtp = otp;
+            currentSession.otpExpiry = otpExpiry;
+            
+            // In a real system, this would be sent securely. For demo, we display it.
+            showStatus('OTP Challenge: ' + otp + ' (valid for 5 minutes)', 'info');
+            
+            document.getElementById('otp-section').classList.remove('hidden');
+            document.getElementById('register-section').classList.add('hidden');
+            document.getElementById('signin-section').classList.add('hidden');
+        }
+
+        function completeSignIn() {
+            const otpInput = document.getElementById('otp-code').value.trim();
+            
+            if (Date.now() > currentSession.otpExpiry) {
+                showStatus('OTP expired. Please sign in again.', 'error');
+                resetSignIn();
+                return;
+            }
+            
+            if (otpInput !== currentSession.pendingOtp) {
+                showStatus('Invalid OTP', 'error');
+                return;
+            }
+            
+            // Generate session token
+            const sessionToken = generateSalt();
+            currentSession.sessionToken = sessionToken;
+            currentSession.isAuthenticated = true;
+            currentSession.expiry = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+            
+            // Save session
+            storage.set('session', currentSession);
+            
+            showStatus('Sign-in successful! Welcome, ' + currentSession.userId, 'success');
+            document.getElementById('otp-section').classList.add('hidden');
+            document.getElementById('oath-signing-section').classList.remove('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('register-section').classList.remove('hidden');
+            document.getElementById('signin-section').classList.add('hidden');
+            document.getElementById('otp-section').classList.add('hidden');
+        }
+
+        function showSignIn() {
+            document.getElementById('register-section').classList.add('hidden');
+            document.getElementById('signin-section').classList.remove('hidden');
+            document.getElementById('otp-section').classList.add('hidden');
+        }
+
+        function resetSignIn() {
+            document.getElementById('register-section').classList.remove('hidden');
+            document.getElementById('signin-section').classList.add('hidden');
+            document.getElementById('otp-section').classList.add('hidden');
+            currentSession.pendingOtp = null;
+            currentSession.otpExpiry = null;
+        }
+
+        // Oath sealing
+        async function sealOath() {
+            if (!currentSession.isAuthenticated) {
+                showStatus('You must be signed in to seal an oath', 'error');
+                return;
+            }
+            
+            const signature = document.getElementById('oath-signature').value.trim();
+            const guardian1 = document.getElementById('guardian1').value.trim();
+            const guardian2 = document.getElementById('guardian2').value.trim();
+            
+            if (!signature) {
+                showStatus('Please provide your signature', 'error');
+                return;
+            }
+            
+            if (!guardian1 || !guardian2) {
+                showStatus('Two guardian co-signers are required', 'error');
+                return;
+            }
+            
+            const oathData = {
+                captain: currentSession.userId,
+                signature,
+                guardians: [guardian1, guardian2],
+                timestamp: new Date().toISOString(),
+                oathText: "I swear that power exists to protect dignity, privacy, and the joy of children..."
+            };
+            
+            const seal = await generateSeal(oathData);
+            
+            const users = storage.get('users') || {};
+            if (users[currentSession.userId]) {
+                users[currentSession.userId].oathSigned = true;
+                users[currentSession.userId].oathSeal = seal;
+                users[currentSession.userId].oathData = oathData;
+                storage.set('users', users);
+            }
+            
+            logSeal({
+                type: 'oath',
+                userId: currentSession.userId,
+                seal,
+                timestamp: oathData.timestamp,
+                guardians: [guardian1, guardian2]
+            });
+            
+            showStatus('Oath sealed successfully! Seal: ' + seal, 'success');
+        }
+
+        // Law submission
+        async function submitLaw() {
+            if (!currentSession.isAuthenticated) {
+                showStatus('You must be signed in to submit a law', 'error');
+                return;
+            }
+            
+            const slotIndex = parseInt(document.getElementById('law-slot-select').value);
+            const title = document.getElementById('law-title').value.trim();
+            const content = document.getElementById('law-content').value.trim();
+            const author = document.getElementById('law-author').value.trim();
+            
+            if (slotIndex < 0 || slotIndex > CONFIG.MAX_SLOT_INDEX) {
+                showStatus('Invalid slot index. Must be 0-' + CONFIG.MAX_SLOT_INDEX, 'error');
+                return;
+            }
+            
+            if (!title || !content || !author) {
+                showStatus('All fields are required', 'error');
+                return;
+            }
+            
+            const laws = storage.get('laws') || {};
+            
+            if (laws[slotIndex]) {
+                showStatus('Slot ' + slotIndex + ' is already filled', 'error');
+                return;
+            }
+            
+            const lawData = {
+                slotIndex,
+                title,
+                content,
+                author,
+                timestamp: new Date().toISOString(),
+                submittedBy: currentSession.userId
+            };
+            
+            const seal = await generateSeal(lawData);
+            lawData.seal = seal;
+            
+            laws[slotIndex] = lawData;
+            storage.set('laws', laws);
+            
+            logSeal({
+                type: 'law_submission',
+                slotIndex,
+                title,
+                seal,
+                timestamp: lawData.timestamp
+            });
+            
+            showStatus('Law submitted successfully to slot ' + slotIndex, 'success');
+            
+            // Clear form
+            document.getElementById('law-title').value = '';
+            document.getElementById('law-content').value = '';
+            document.getElementById('law-author').value = '';
+            
+            displayLawSlots();
+            updateLawCount();
+        }
+
+        function refreshLawSlots() {
+            displayLawSlots();
+            updateLawCount();
+            showStatus('Law slots refreshed', 'info');
+        }
+
+        // Guardian management
+        function addGuardian() {
+            if (!currentSession.isAuthenticated) {
+                showStatus('You must be signed in to add guardians', 'error');
+                return;
+            }
+            
+            const guardianId = document.getElementById('new-guardian-id').value.trim();
+            const role = document.getElementById('guardian-role').value;
+            
+            if (!guardianId) {
+                showStatus('Guardian User ID is required', 'error');
+                return;
+            }
+            
+            const guardians = storage.get('guardians') || [];
+            
+            if (guardians.length >= CONFIG.MAX_GUARDIANS) {
+                showStatus('Maximum ' + CONFIG.MAX_GUARDIANS + ' guardians allowed', 'error');
+                return;
+            }
+            
+            if (guardians.find(g => g.userId === guardianId)) {
+                showStatus('Guardian already registered', 'error');
+                return;
+            }
+            
+            guardians.push({
+                userId: guardianId,
+                role,
+                addedBy: currentSession.userId,
+                timestamp: new Date().toISOString()
+            });
+            
+            storage.set('guardians', guardians);
+            
+            showStatus('Guardian added successfully', 'success');
+            displayGuardians();
+            
+            document.getElementById('new-guardian-id').value = '';
+        }
+
+        function displayGuardians() {
+            const guardians = storage.get('guardians') || [];
+            const container = document.getElementById('guardians-list');
+            
+            if (guardians.length === 0) {
+                container.innerHTML = '<p style="color: #666; font-style: italic;">No guardians registered yet.</p>';
+                return;
+            }
+            
+            let html = '<ul style="list-style: none; padding: 0;">';
+            guardians.forEach((g, idx) => {
+                html += `
+                    <li style="padding: 10px; background: white; margin: 5px 0; border-radius: 4px; border: 1px solid #ddd;">
+                        <strong>${idx + 1}. ${g.userId}</strong> - ${g.role}<br>
+                        <small style="color: #666;">Added: ${new Date(g.timestamp).toLocaleString()}</small>
+                    </li>
+                `;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+
+        function initiateEmergencyGate() {
+            if (!currentSession.isAuthenticated) {
+                showStatus('You must be signed in to initiate emergency actions', 'error');
+                return;
+            }
+            
+            const guardians = storage.get('guardians') || [];
+            if (guardians.length < CONFIG.MIN_GUARDIAN_QUORUM) {
+                showStatus('Emergency Crew Gate requires at least ' + CONFIG.MIN_GUARDIAN_QUORUM + ' registered guardians', 'error');
+                return;
+            }
+            
+            const confirmed = confirm(
+                'WARNING: You are about to initiate the Emergency Crew Gate.\n\n' +
+                'This action will:\n' +
+                '- Create an immutable audit log\n' +
+                '- Require ' + CONFIG.MIN_GUARDIAN_QUORUM + ' guardian signatures\n' +
+                '- Potentially suspend captain powers\n\n' +
+                'Do you wish to proceed?'
+            );
+            
+            if (!confirmed) {
+                return;
+            }
+            
+            const emergencyData = {
+                initiatedBy: currentSession.userId,
+                timestamp: new Date().toISOString(),
+                guardians: guardians.map(g => g.userId),
+                status: 'pending_quorum'
+            };
+            
+            storage.set('emergency_gate', emergencyData);
+            
+            showStatus('Emergency Crew Gate initiated. Awaiting guardian quorum signatures.', 'info');
+        }
+
+        // Seal management
+        function logSeal(sealData) {
+            const seals = storage.get('seals') || [];
+            seals.push(sealData);
+            storage.set('seals', seals);
+            
+            // Update seals display
+            updateSealsDisplay();
+        }
+
+        function updateSealsDisplay() {
+            const seals = storage.get('seals') || [];
+            const container = document.getElementById('seals-display');
+            
+            let html = container.innerHTML; // Keep init seal
+            
+            seals.forEach(seal => {
+                html += `
+                    <div class="seal-display">
+                        <strong>${seal.type.toUpperCase()} Seal</strong><br>
+                        User: ${seal.userId || 'System'}<br>
+                        Timestamp: ${seal.timestamp}<br>
+                        Seal Hash: ${seal.seal}<br>
+                        ${seal.guardians ? 'Guardians: ' + seal.guardians.join(', ') + '<br>' : ''}
+                        Status: Verified ✓
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function verifySeal() {
+            const hashInput = document.getElementById('seal-verify-hash').value.trim();
+            
+            if (!hashInput) {
+                showStatus('Please enter a seal hash to verify', 'error');
+                return;
+            }
+            
+            const seals = storage.get('seals') || [];
+            const foundSeal = seals.find(s => s.seal === hashInput);
+            
+            const resultContainer = document.getElementById('seal-verify-result');
+            
+            if (foundSeal) {
+                resultContainer.innerHTML = `
+                    <div class="status-message success">
+                        <strong>✓ Seal Verified!</strong><br>
+                        Type: ${foundSeal.type}<br>
+                        Timestamp: ${foundSeal.timestamp}<br>
+                        User: ${foundSeal.userId || 'System'}
+                    </div>
+                `;
+            } else {
+                resultContainer.innerHTML = `
+                    <div class="status-message error">
+                        <strong>✗ Seal Not Found</strong><br>
+                        The provided seal hash does not match any registered seals.
+                    </div>
+                `;
+            }
+        }
+
+        // Utility functions
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message ' + type;
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                statusDiv.className = 'status-message';
+            }, 10000);
+        }
+
+        // Initialize guardians display on load
+        window.addEventListener('load', () => {
+            displayGuardians();
+        });
+    </script>
+</body>
+</html>
