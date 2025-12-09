@@ -100,14 +100,14 @@ class TimeKeeper:
         """Flip matrix horizontally."""
         return np.fliplr(matrix)
 
-    def kaleidoscope_encrypt(self, data):
-        """Encrypt data using kaleidoscope-like transformations."""
+    def kaleidoscope_transform(self, data):
+        """Apply kaleidoscope-like matrix transformation (flip + rotate) to data."""
         data_array = np.array(data)
         if data_array.size != 9:
             raise ValueError("Data must contain exactly 9 elements for 3x3 matrix transformation")
         data_matrix = data_array.reshape(3, 3)  # Reshaping input to a 3x3 matrix
-        encrypted_matrix = self.rotate_matrix(self.flip_matrix(data_matrix))
-        return encrypted_matrix
+        transformed_matrix = self.rotate_matrix(self.flip_matrix(data_matrix))
+        return transformed_matrix
 
     def process_in_orbit(self, cube, data):
         """
