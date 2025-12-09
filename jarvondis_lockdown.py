@@ -27,6 +27,11 @@ class LockdownPolicy:
     audit_log: list = field(default_factory=list)
     max_skew_seconds: int = 60  # signature freshness window
 
+    def __post_init__(self):
+        if self.admin_secret in ("CHANGE_ME_TO_A_STRONG_SECRET", "test", "password", "secret"):
+            raise ValueError("admin_secret must not be a placeholder value")
+        if len(self.admin_secret) < 16:
+            raise ValueError("admin_secret must be at least 16 characters")
 class AdministrativeLockdown:
     def __init__(self, policy: LockdownPolicy):
         self.policy = policy
