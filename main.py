@@ -1,13 +1,17 @@
 # main.py
 import json
+import os
 from jarvondis_lockdown import LockdownPolicy, AdministrativeLockdown
 
 def load_policy(path: str) -> LockdownPolicy:
     with open(path, "r") as f:
         cfg = json.load(f)
+    admin_secret = os.environ.get("JARVONDIS_ADMIN_SECRET")
+    if not admin_secret:
+        raise ValueError("JARVONDIS_ADMIN_SECRET environment variable not set")
     return LockdownPolicy(
         owner_id=cfg["owner_id"],
-        admin_secret=cfg["admin_secret"],
+        admin_secret=admin_secret,
         lockdown_active=cfg.get("lockdown_active", True),
         allowlist_clients=set(cfg.get("allowlist_clients", [])),
         audit_enabled=cfg.get("audit_enabled", True),
