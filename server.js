@@ -53,6 +53,7 @@ app.post("/backup", (req, res) => {
     fs.writeFileSync(file, jsonStr, "utf8");
     return res.json({ ok: true, file });
   } catch (error) {
+    console.error("Failed to write backup file:", error);
     return res.status(500).json({ ok: false, error: "Failed to write backup file" });
   }
 });
