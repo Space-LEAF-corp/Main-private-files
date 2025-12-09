@@ -49,7 +49,16 @@ class TimeKeeper:
         return True
 
     def encryption_layer(self, data):
-        """Apply dynamic encryption logic for critical data."""
+        """Apply dynamic encryption logic for critical data.
+        
+        Args:
+            data (str): The data to encrypt. Must be a string.
+        
+        Raises:
+            TypeError: If data is not a string.
+        """
+        if not isinstance(data, str):
+            raise TypeError(f"Data to encrypt must be a string, got {type(data).__name__}")
         encrypted = self.cipher.encrypt(data.encode())
         return encrypted
 
