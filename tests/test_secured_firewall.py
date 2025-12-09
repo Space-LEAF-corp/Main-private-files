@@ -44,9 +44,23 @@ class TestSecuredFirewall(unittest.TestCase):
         self.assertEqual(access.get("status"), "ok")
 
     def test_intrusion_attempt(self):
-        res = self.sf.intrude_attempt("hacker", "malicious_payload")
-        self.assertEqual(res.get("status"), "trapped")
-        self.assertIn("trapped in mirror layer", res.get("message"))
+        # First 3 attempts give warnings
+        res1 = self.sf.intrude_attempt("hacker", "malicious_payload")
+        self.assertEqual(res1.get("status"), "trapped")
+        self.assertIn("WARNING 1", res1.get("message"))
+        
+        res2 = self.sf.intrude_attempt("hacker", "malicious_payload")
+        self.assertEqual(res2.get("status"), "trapped")
+        self.assertIn("WARNING 2", res2.get("message"))
+        
+        res3 = self.sf.intrude_attempt("hacker", "malicious_payload")
+        self.assertEqual(res3.get("status"), "trapped")
+        self.assertIn("WARNING 3", res3.get("message"))
+        
+        # Fourth attempt traps in mirror layer
+        res4 = self.sf.intrude_attempt("hacker", "malicious_payload")
+        self.assertEqual(res4.get("status"), "trapped")
+        self.assertIn("trapped in mirror layer", res4.get("message"))
 
 
 if __name__ == "__main__":

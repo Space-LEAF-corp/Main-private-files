@@ -66,14 +66,42 @@ class JarvondisTimeIntegration:
     def get_learning_priority_topics(self, limit: int = 5) -> list:
         """Get topics most needing review, sorted by priority.
         
+        Returns all topics sorted by when they're due for review (soonest first),
+        including topics not yet due.
+        
         Returns:
             List of (topic, learning_item) tuples
         """
+        # First try to get items that are already due
         due_items = self.engine.get_next_reviews(limit * 2)
         
+        # If we have enough due items, use those
+        if len(due_items) >= limit:
+            result = []
+            for item in due_items[:limit]:
+                # Find topic from item_id
+                for topic, iid in self.topic_index.items():
+                    if iid == item.item_id:
+                        result.append((topic, item))
+                        break
+            return result
+        
+        # Otherwise, return all items sorted by time until next review
+        current_time = time.time()
+        all_items_with_priority = []
+        
+        for item_id, item in self.engine.items.items():
+            days_since = (current_time - item.last_review) / (24 * 3600)
+            # Priority is how close we are to the next review (negative = overdue)
+            days_until_review = item.interval_days - days_since
+            all_items_with_priority.append((days_until_review, item))
+        
+        # Sort by days_until_review (soonest/most overdue first)
+        all_items_with_priority.sort(key=lambda x: x[0])
+        
+        # Convert to (topic, item) tuples
         result = []
-        for item in due_items[:limit]:
-            # Find topic from item_id
+        for _, item in all_items_with_priority[:limit]:
             for topic, iid in self.topic_index.items():
                 if iid == item.item_id:
                     result.append((topic, item))

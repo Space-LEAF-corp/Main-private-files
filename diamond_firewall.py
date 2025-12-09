@@ -191,14 +191,15 @@ class DiamondFirewall:
             msg = (
                 f"WARNING 2 to {attacker_id}: This is illegal activity. Stop now or be recorded."
             )
-        elif count >= 3:
+        elif count == 3:
             # Final warning and escalate
             msg = (
                 f"WARNING 3 to {attacker_id}: Authorities have been notified. Cease immediately."
             )
-            # Escalate to authorities and perform final trap actions
+            # Escalate to authorities
             self._escalate_to_authorities(attacker_id)
         else:
+            # count > 3, warnings exhausted, proceed to trap
             return None
 
         logger.warning(msg)
@@ -491,12 +492,7 @@ class DiamondFirewall:
         """
         metadata = metadata or {}
 
-        # First evaluate network policy; if it fails, deny
-        if not self._check_network_policy(network, {**metadata, **({"dna_code": dna_code} if dna_code else {})}):
-            logger.warning("Access denied by network policy for network=%s", network)
-            raise AccessDeniedError("Access denied by network policy")
-
-        # If lockdown active, require admin key matching primary or UN secondary
+        # If lockdown active, check admin keys first (they bypass network policy)
         if self.lockdown_active:
             admin_key = metadata.get("admin_key") if metadata else None
             if admin_key == self.lockdown_keys.get("primary"):
@@ -512,6 +508,11 @@ class DiamondFirewall:
                     return f"Access granted by UN secondary key for network={network}."
             logger.warning("Access denied due to active lockdown for network=%s", network)
             raise AccessDeniedError("Access denied due to active lockdown")
+
+        # Evaluate network policy; if it fails, deny
+        if not self._check_network_policy(network, {**metadata, **({"dna_code": dna_code} if dna_code else {})}):
+            logger.warning("Access denied by network policy for network=%s", network)
+            raise AccessDeniedError("Access denied by network policy")
 
         # If policy allows proceeding, perform dna check if provided
         if dna_code and self.dna_qr_check(dna_code):
