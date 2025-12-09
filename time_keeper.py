@@ -1,19 +1,43 @@
 import numpy as np
 from cryptography.fernet import Fernet
-
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+import base64
 
 class TimeKeeper:
-    def __init__(self, creator="Leif William Sogge"):
+    def __init__(self, creator="Leif William Sogge", encryption_key=None, encryption_password=None, encryption_salt=None):
+        """
+        Initialize TimeKeeper.
+        If encryption_key is provided, it will be used for encryption.
+        If encryption_password is provided, a key will be derived from it (using PBKDF2HMAC).
+        If neither is provided, a random key is generated (encryption is ephemeral and cannot be recovered).
+        If using encryption_password, you may also supply a salt (bytes); if not, a default salt is used.
+        """
         # Immutable properties
         self.creator = creator
         self.status = "Dormant"
         self.alterable = False
         self.weaponizable = False
 
-        # Generate encryption keys for internal processes
-        self.encryption_key = Fernet.generate_key()
+        # Generate or derive encryption key for internal processes
+        if encryption_key is not None:
+            self.encryption_key = encryption_key
+        elif encryption_password is not None:
+            # Use provided salt or default salt (should be securely stored for real use)
+            salt = encryption_salt if encryption_salt is not None else b"default_timekeeper_salt"
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=salt,
+                iterations=100_000,
+                backend=default_backend()
+            )
+            self.encryption_key = base64.urlsafe_b64encode(kdf.derive(encryption_password.encode()))
+        else:
+            # Ephemeral key (not recoverable)
+            self.encryption_key = Fernet.generate_key()
         self.cipher = Fernet(self.encryption_key)
-
         # Core laws
         self.core_laws = [
             "Logic is not good or bad, only knowledge to process.",
