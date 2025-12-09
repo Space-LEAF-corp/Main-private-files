@@ -9,7 +9,9 @@ Security:
     - Use environment variables or interactive input for production secrets
     - Generated signatures expire after 60 seconds (default freshness window)
 """
-import time, hashlib, hmac
+import time
+import hashlib
+import hmac
 
 def hmac_sha256(secret: str, message: str) -> str:
     return hmac.new(secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256).hexdigest()
