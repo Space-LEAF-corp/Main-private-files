@@ -1,4 +1,14 @@
-# sign_owner_command.py
+"""
+sign_owner_command.py - Generate HMAC-SHA256 signatures for Jarvondis owner commands
+
+Usage:
+    python sign_owner_command.py
+
+Security:
+    - Never commit real secrets to version control
+    - Use environment variables or interactive input for production secrets
+    - Generated signatures expire after 60 seconds (default freshness window)
+"""
 import time, hashlib, hmac
 
 def hmac_sha256(secret: str, message: str) -> str:
