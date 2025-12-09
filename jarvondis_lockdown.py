@@ -20,7 +20,7 @@ def _hmac_sha256(secret: bytes, message: bytes) -> str:
 @dataclass
 class LockdownPolicy:
     owner_id: str
-    admin_secret: str  # keep out of VCS if possible; or use env var
+    admin_secret: str  # SECURITY: Must use strong secret from environment variable. Never commit real secrets to VCS.
     lockdown_active: bool = True
     allowlist_clients: Set[str] = field(default_factory=set)
     audit_enabled: bool = True
