@@ -4,7 +4,6 @@ import json
 import tempfile
 import shutil
 import unittest
-from pathlib import Path
 
 # Add parent directory to path to import modules
 import sys
