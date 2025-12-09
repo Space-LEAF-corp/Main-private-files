@@ -17,7 +17,6 @@ from tesla_ai_safety import (
 from tesla_ai_safety import (
     Context,
     DriverInput,
-    AccelerationEnvelope,
 )
 
 # Enums
