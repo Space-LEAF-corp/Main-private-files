@@ -181,6 +181,47 @@ All seals are logged to `alexandria_of_joy.json` with:
 - Author and timestamp
 - Inheritance chain tracking for future captains
 
+Chalk Bundle Backup Server
+--------------------------
+
+**Node.js Express Server** (`server.js`)
+- Minimal backup service for chalk bundles
+- Listens on port 8787 (HTTP)
+- POST endpoint: `/backup`
+- Validates bundles must have `type: "chalk-bundle"` and `integrity` field
+- Saves backups to `chalk_backups/` directory with timestamped filenames
+
+**Quick start**
+```bash
+# Install dependencies
+npm install
+
+# Start server
+node server.js
+# Or use npm scripts
+npm start
+```
+
+**Example backup request**
+```bash
+curl -X POST http://localhost:8787/backup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "chalk-bundle",
+    "integrity": "sha256-abc123def456",
+    "content": "Your chalk board content",
+    "timestamp": "2025-12-08T22:51:42.427Z"
+  }'
+```
+
+**Response format**
+- Success: `{"ok": true, "file": "/path/to/backup.chalk.json"}`
+- Error: `{"ok": false, "error": "Invalid bundle"}`
+
+**Files**
+- `server.js` — Express backup server
+- `package.json` — Node.js dependencies and scripts
+- `.gitignore` — Excludes `node_modules/` and `chalk_backups/`
 Playground: Interactive Testing Environment
 -------------------------------------------
 
