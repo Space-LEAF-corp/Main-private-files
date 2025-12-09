@@ -181,6 +181,72 @@ All seals are logged to `alexandria_of_joy.json` with:
 - Author and timestamp
 - Inheritance chain tracking for future captains
 
+Backup System
+--------------
+
+**Overview**
+The backup system provides a complete solution for backing up system data with both client-side (TypeScript/JavaScript) and server-side (Python) components.
+
+**Key Components**
+- `src/backup.ts` — TypeScript client with `backupToServer()` and `buildBundle()` functions
+- `backup_server.py` — HTTP server on port 8787 for receiving backups
+- `tests/test_backup_server.py` — Comprehensive backup server tests
+- `BACKUP_README.md` — Detailed backup system documentation
+
+**Quick start (Client)**
+```bash
+npm install
+npm run build
+node -e "const {backupToServer} = require('./dist/backup'); backupToServer().then(() => console.log('Backup complete!'))"
+```
+
+**Quick start (Server)**
+```bash
+python backup_server.py
+```
+
+The server accepts POST requests at `/backup` and stores backups in the `backups/` directory with timestamped filenames.
+Chalk Bundle Backup Server
+--------------------------
+
+**Node.js Express Server** (`server.js`)
+- Minimal backup service for chalk bundles
+- Listens on port 8787 (HTTP)
+- POST endpoint: `/backup`
+- Validates bundles must have `type: "chalk-bundle"` and `integrity` field
+- Saves backups to `chalk_backups/` directory with timestamped filenames
+
+**Quick start**
+```bash
+# Install dependencies
+npm install
+
+# Start server
+node server.js
+# Or use npm scripts
+npm start
+```
+
+**Example backup request**
+```bash
+curl -X POST http://localhost:8787/backup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "chalk-bundle",
+    "integrity": "sha256-abc123def456",
+    "content": "Your chalk board content",
+    "timestamp": "2025-12-08T22:51:42.427Z"
+  }'
+```
+
+**Response format**
+- Success: `{"ok": true, "file": "/path/to/backup.chalk.json"}`
+- Error: `{"ok": false, "error": "Invalid bundle"}`
+
+**Files**
+- `server.js` — Express backup server
+- `package.json` — Node.js dependencies and scripts
+- `.gitignore` — Excludes `node_modules/` and `chalk_backups/`
 Playground: Interactive Testing Environment
 -------------------------------------------
 
@@ -286,6 +352,7 @@ Notes
 - The `ErebusSync` class is a placeholder. Replace with your real integration.
 - Memory can be saved as CSV (default) or JSON using `--format json`.
 - Auth data is stored in `auth_users.json` (atomic JSON writes).
+- Backup files are saved in JSON format with timestamps for easy recovery.
 - Playground uses isolated mode by default for safe experimentation.
 - Science Lab provides educational content without modifying system state.
 

@@ -77,6 +77,24 @@ class Jarvondis:
 
     def respond(self, input_str: str) -> str:
         return self.learn(input_str)
+    
+    def remember(self, input_str: str, response: str, topic: Optional[str] = None) -> None:
+        """Store a custom memory entry with input, response, and optional topic.
+        
+        Args:
+            input_str: The input text
+            response: The response text
+            topic: Optional topic/category for the memory
+        """
+        entry = {
+            "timestamp": datetime.now().isoformat(),
+            "input": input_str,
+            "response": response,
+            "tone": self.personality.tone,
+        }
+        if topic:
+            entry["topic"] = topic
+        self._memory.append(entry)
 
     # Persistence
     def save_memory(self, filename: Optional[str] = None) -> None:
