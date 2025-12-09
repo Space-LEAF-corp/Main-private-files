@@ -17,8 +17,8 @@ class TimeKeeper:
         # Immutable properties
         self.creator = creator
         self.status = "Dormant"
-        self.alterable = False
-        self.weaponizable = False
+        self.__alterable = False
+        self.__weaponizable = False
 
         # Generate or derive encryption key for internal processes
         if encryption_key is not None:
