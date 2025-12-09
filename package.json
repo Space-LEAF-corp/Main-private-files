@@ -1,4 +1,19 @@
 {
+  "name": "main-private-files-backup",
+  "version": "1.0.0",
+  "description": "Backup client for Main Private Files system",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/backup.test.js"
+  },
+  "keywords": ["backup", "security", "lineage-safe"],
+  "author": "GuardianNinja",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
   "name": "chalk-bundle-backup-server",
   "version": "1.0.0",
   "description": "Private minimal backup server for chalk bundles",

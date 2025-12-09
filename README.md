@@ -181,6 +181,31 @@ All seals are logged to `alexandria_of_joy.json` with:
 - Author and timestamp
 - Inheritance chain tracking for future captains
 
+Backup System
+--------------
+
+**Overview**
+The backup system provides a complete solution for backing up system data with both client-side (TypeScript/JavaScript) and server-side (Python) components.
+
+**Key Components**
+- `src/backup.ts` — TypeScript client with `backupToServer()` and `buildBundle()` functions
+- `backup_server.py` — HTTP server on port 8787 for receiving backups
+- `tests/test_backup_server.py` — Comprehensive backup server tests
+- `BACKUP_README.md` — Detailed backup system documentation
+
+**Quick start (Client)**
+```bash
+npm install
+npm run build
+node -e "const {backupToServer} = require('./dist/backup'); backupToServer().then(() => console.log('Backup complete!'))"
+```
+
+**Quick start (Server)**
+```bash
+python backup_server.py
+```
+
+The server accepts POST requests at `/backup` and stores backups in the `backups/` directory with timestamped filenames.
 Chalk Bundle Backup Server
 --------------------------
 
@@ -327,6 +352,7 @@ Notes
 - The `ErebusSync` class is a placeholder. Replace with your real integration.
 - Memory can be saved as CSV (default) or JSON using `--format json`.
 - Auth data is stored in `auth_users.json` (atomic JSON writes).
+- Backup files are saved in JSON format with timestamps for easy recovery.
 - Playground uses isolated mode by default for safe experimentation.
 - Science Lab provides educational content without modifying system state.
 

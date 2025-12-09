@@ -1,3 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# TypeScript
+*.tsbuildinfo
+dist/
+
+# Backup files
+backups/
+*.backup
+*.bak
 # Node.js
 node_modules/
 package-lock.json
@@ -62,6 +91,15 @@ ENV/
 *.swo
 *~
 
+# OS
+.DS_Store
+Thumbs.db
+
+# Auth and session data
+auth_users.json
+alexandria_of_joy.json
+jarvondis_memory.csv
+*.session
 # Testing
 .pytest_cache/
 .coverage
