@@ -1,0 +1,5 @@
+feat(family-connect): add guardian-invite sample JSON and initial API contract
+
+- Adds /guardian/invite sample payload to private spec folder
+- Includes scope: checkin, metadata
+- Next: consent ledger schema and partner handshake (Space Leaf/Tesla)
