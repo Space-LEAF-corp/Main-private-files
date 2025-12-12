@@ -1,0 +1,207 @@
+I hear you. I appreciate the trust — I’ll take that presence and turn it into concrete, auditable work you and your team can run immediately. Below I’m delivering two ready‑to‑drop artifacts:
+
+- **A CI test suite (pytest)** that exercises round‑trip encrypt→sign→package→QR→decode→verify→decrypt, tamper detection, and wrong‑key checks.  
+- **An authorship README snippet** you can publish to prove and verify that payloads are signed by **LEIF William Sogge**, plus a short notarization suggestion.
+
+Use these as developer artifacts for Jarvondis to integrate and for Krystal to review. I’ve kept the code practical and self‑contained; replace placeholders (persistent keys, vault paths) with your production values.
+
+---
+
+### 1. CI test suite (pytest)
+**Install prerequisites:**  
+`pip install pycryptodome pynacl qrcode pillow pyzbar numpy pytest`
+
+Create a test file `tests/test_crypto_qr.py` in your repo with this content:
+
+```python
+# tests/test_crypto_qr.py
+import base64, hashlib, os
+from io import BytesIO
+from Crypto.Cipher import AES
+from Crypto.Protocol.KDF import scrypt
+from Crypto.Random import get_random_bytes
+from nacl.signing import SigningKey, VerifyKey
+import qrcode, numpy as np, PIL.Image
+import pytest
+from pyzbar.pyzbar import decode as zbar_decode
+
+# --- Config (CI-friendly defaults; increase KDF cost in prod)
+PASS = b"CI_Test_Passphrase"
+KDF_PARAMS = dict(N=2**12, r=8, p=1)   # reduce for CI speed; raise for prod
+SALT_LEN = 16
+OWNER = "LEIF William Sogge"
+VERSION = b"v1"
+
+# --- Helpers (same logic as production code)
+def hash_dna(dna_bytes):
+    return hashlib.sha256(dna_bytes).digest()
+
+def derive_key(passphrase, salt):
+    return scrypt(passphrase, salt, 32, **KDF_PARAMS)
+
+def encrypt_hash(key, plaintext):
+    cipher = AES.new(key, AES.MODE_GCM)
+    ct, tag = cipher.encrypt_and_digest(plaintext)
+    return cipher.nonce, ct, tag
+
+def decrypt_hash(key, nonce, ct, tag):
+    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+    return cipher.decrypt_and_verify(ct, tag)
+
+def package_blob(version, salt, nonce, ct, tag, signature, owner):
+    parts = [version, salt, nonce, ct, tag, signature, owner.encode()]
+    return base64.b64encode(b"||".join(parts)).decode()
+
+def unpackage_blob(b64):
+    parts = base64.b64decode(b64).split(b"||")
+    return parts  # v, salt, nonce, ct, tag, signature, owner
+
+def make_qr(payload, box=4):
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=box, border=2)
+    qr.add_data(payload)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white").convert("L")
+    return img
+
+def qr_decode_image(img):
+    buf = BytesIO()
+    img.save(buf, format="PNG")
+    buf.seek(0)
+    decoded = zbar_decode(PIL.Image.open(buf))
+    if not decoded:
+        return None
+    return decoded[0].data.decode()
+
+# --- Fixtures
+@pytest.fixture(scope="module")
+def signing_keypair():
+    # In CI, generate ephemeral keys; in production, load persistent signing key from secure vault
+    sk = SigningKey.generate()
+    vk = sk.verify_key
+    return sk, vk
+
+# --- Tests
+def test_roundtrip_encrypt_sign_verify(signing_keypair):
+    sk, vk = signing_keypair
+    dna = b"AGCT" * 16
+    salt = get_random_bytes(SALT_LEN)
+    key = derive_key(PASS, salt)
+    dna_h = hash_dna(dna)
+    nonce, ct, tag = encrypt_hash(key, dna_h)
+    sig = sk.sign(VERSION + salt + nonce + ct + tag + OWNER.encode()).signature
+    blob = package_blob(VERSION, salt, nonce, ct, tag, sig, OWNER)
+    # QR encode/decode
+    img = make_qr(blob)
+    decoded = qr_decode_image(img)
+    assert decoded is not None, "QR decode failed in CI environment"
+    v, salt2, nonce2, ct2, tag2, sig2, owner2 = unpackage_blob(decoded)
+    # verify signature
+    vk.verify(v + salt2 + nonce2 + ct2 + tag2 + owner2, sig2)
+    # decrypt
+    key2 = derive_key(PASS, salt2)
+    plaintext = decrypt_hash(key2, nonce2, ct2, tag2)
+    assert plaintext == dna_h
+
+def test_tamper_detection(signing_keypair):
+    sk, vk = signing_keypair
+    dna = b"AGCT" * 16
+    salt = get_random_bytes(SALT_LEN)
+    key = derive_key(PASS, salt)
+    dna_h = hash_dna(dna)
+    nonce, ct, tag = encrypt_hash(key, dna_h)
+    sig = sk.sign(VERSION + salt + nonce + ct + tag + OWNER.encode()).signature
+    blob = package_blob(VERSION, salt, nonce, ct, tag, sig, OWNER)
+    raw = bytearray(base64.b64decode(blob))
+    # flip a byte in ciphertext region
+    pos = len(raw)//2
+    raw[pos] ^= 0xFF
+    tampered = base64.b64encode(bytes(raw)).decode()
+    with pytest.raises(Exception):
+        parts = unpackage_blob(tampered)
+        v, salt2, nonce2, ct2, tag2, sig2, owner2 = parts
+        vk.verify(v + salt2 + nonce2 + ct2 + tag2 + owner2, sig2)
+        key2 = derive_key(PASS, salt2)
+        decrypt_hash(key2, nonce2, ct2, tag2)
+
+def test_wrong_passphrase_fails(signing_keypair):
+    sk, vk = signing_keypair
+    dna = b"AGCT" * 16
+    salt = get_random_bytes(SALT_LEN)
+    key = derive_key(PASS, salt)
+    dna_h = hash_dna(dna)
+    nonce, ct, tag = encrypt_hash(key, dna_h)
+    sig = sk.sign(VERSION + salt + nonce + ct + tag + OWNER.encode()).signature
+    blob = package_blob(VERSION, salt, nonce, ct, tag, sig, OWNER)
+    # attempt decrypt with wrong passphrase
+    parts = unpackage_blob(blob)
+    v, salt2, nonce2, ct2, tag2, sig2, owner2 = parts
+    wrong_key = derive_key(b"wrongpass", salt2)
+    with pytest.raises(Exception):
+        decrypt_hash(wrong_key, nonce2, ct2, tag2)
+```
+
+**How to run in CI:** add `pytest -q` to your pipeline. In production CI, increase `KDF_PARAMS` to your chosen scrypt cost and ensure the signing private key is loaded from a secure secret store rather than generated.
+
+---
+
+### 2. Authorship README snippet (publishable)
+Add this to your repo `README_AUTHorship.md` or the main README to publish the public key and verification steps.
+
+```
+# Authorship and Verification — LEIF William Sogge
+
+This project signs QR payloads with an Ed25519 private key owned by **LEIF William Sogge**. Verifiers can confirm authorship using the published Ed25519 public key.
+
+## Public key (Ed25519)
+Replace the placeholder below with the actual public key bytes (hex or base64). Example (base64):
+```
+PUBLIC_KEY_BASE64 = "REPLACE_WITH_LEIF_PUBLIC_KEY_BASE64"
+```
+
+## How to verify a QR payload (example Python)
+```python
+from nacl.signing import VerifyKey
+import base64
+
+PUBLIC_KEY_B64 = "REPLACE_WITH_LEIF_PUBLIC_KEY_BASE64"
+vk = VerifyKey(base64.b64decode(PUBLIC_KEY_B64))
+
+def verify_blob(b64_payload):
+    parts = base64.b64decode(b64_payload).split(b"||")
+    v, salt, nonce, ct, tag, signature, owner = parts
+    # raises exception if signature invalid
+    vk.verify(v + salt + nonce + ct + tag + owner, signature)
+    return owner.decode()
+
+# Usage: call verify_blob(decoded_qr_payload) to confirm owner and signature validity.
+```
+
+## Notarization / Timestamping (recommended)
+To strengthen non‑repudiation, anchor a signed payload hash or the public key to a trusted timestamp:
+- Create a canonical digest of the public key or a signed payload: `sha256(pubkey_bytes)`  
+- Submit that digest to a trusted timestamping or anchoring service (or record it on a public blockchain) and publish the timestamp receipt alongside the public key.
+
+## Key management
+- **Private key storage:** keep the signing private key in an HSM or secure vault (do not commit to Git).  
+- **Revocation:** publish a revocation list (signed) if a key is compromised and rotate keys per policy.  
+- **Audit:** log signing events with timestamps and signed receipts for each payload.
+```
+
+---
+
+### Immediate operational checklist (do this now)
+- **Persist the signing private key** in a secure vault (HSM, Azure Key Vault, HashiCorp Vault). Do not keep it in the repo.  
+- **Publish the Ed25519 public key** in the README and optionally on a keyserver or your website.  
+- **Run the CI tests** above locally, then in CI. Replace ephemeral key generation with loading the persistent signing key for production runs.  
+- **Replace CI KDF params** with production scrypt settings after Krystal approves the work factor.  
+- **Run real‑device QR scans** across multiple phones and scanner apps; replace `pyzbar` with your chosen decoder if needed.
+
+---
+
+I’ve prepared these artifacts so Jarvondis can drop them into the repo and Krystal can begin the security and ethics review. I’ll now proceed to generate the **CI test files** and the **README snippet** in full if you want them committed here in chat for copy‑paste. I’ve already included them above so you can copy them directly.
+
+If you want, I can also:
+- Produce a **key rotation script** to automate re‑signing and revocation, or  
+- Draft Krystal’s **ethics & compliance checklist** tailored to genomic identifiers and consent.
+
+I’ll take the next step you prefer and produce the artifact immediately.
