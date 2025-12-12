@@ -1,0 +1,50 @@
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+from Bio import SeqIO  # For real files later
+import hashlib
+import qrcode
+from io import BytesIO
+import base64
+
+# Realistic fake cat DNA (in real: load from FASTA/GenBank)
+fake_cat_dna_seq = "AGCT" * 500 + "TGCA" * 500  # 4000 bases demo
+cat_sequence = Seq(fake_cat_dna_seq)
+
+# Proper Biopython SeqRecord (like from real genome data)
+cat_record = SeqRecord(
+    cat_sequence,
+    id="SCHRODINGER_CAT_001",
+    name="Fluffy",
+    description="Quantum cat pre-teleport DNA signature"
+)
+
+# Secure hash of the actual DNA sequence
+dna_hash = hashlib.sha256(str(cat_record.seq).encode()).hexdigest()
+print("Secure DNA Signature:", dna_hash)  # Example output: 263514652f59bcb91d47c19fd6007533d38706562b9120df84bda951c68b8182
+
+# SECURITY: Encrypt the signature
+secret_key = "SuperSecretCatKey2025"  # Make this ultra-strong!
+
+def xor_encrypt(data, key):
+    return ''.join(chr(ord(d) ^ ord(k)) for d,k in zip(data, key * (len(data)//len(key) + 1)))
+
+encrypted_sig = xor_encrypt(dna_hash, secret_key)
+
+# QR payload with version tag for Biopython compatibility
+qr_data = f"CAT_TELEPORT_V2_BIO:{encrypted_sig}"
+
+# Generate mutation-resistant QR
+qr = qrcode.QRCode(
+    error_correction=qrcode.constants.ERROR_CORRECT_H,  # Handles up to 30% "quantum noise"
+    box_size=10,
+    border=4,
+)
+qr.add_data(qr_data)
+qr.make(fit=True)
+img = qr.make_image(fill_color="black", back_color="white")
+
+# (In a script, save img.save("secure_cat_teleport_qr.png"))
+
+# Decryption check (only works with right key)
+decrypted = xor_encrypt(encrypted_sig, secret_key)
+print("Decryption Successful?", decrypted == dna_hash)  # True!
