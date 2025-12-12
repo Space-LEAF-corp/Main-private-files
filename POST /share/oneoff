@@ -1,0 +1,7 @@
+{
+  "sharer_id": "user_123",
+  "guardian_id": "guardian_456",
+  "content_id": "msg_555",
+  "snippet": "I need help with homework",
+  "scope": ["oneoff_share"]
+}
