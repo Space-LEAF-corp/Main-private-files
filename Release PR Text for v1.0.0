@@ -1,0 +1,23 @@
+Title: Release v1.0.0 — Scroll of Universal Respect
+
+Description
+This release formalizes the Scroll of Universal Respect 1.0: a canonical teaching scroll, a machine‑readable policy, and a lightweight enforcement library to embed consent and boundary protections into human‑shaped interactions. It includes policy, enforcement code, tests, CI, and documentation to ensure lineage‑safe behavior and auditable enforcement.
+
+Highlights
+- docs/scroll-of-universal-respect.md canonical teaching scroll
+- policy/universal-respect.policy.json machine‑readable default‑deny policy
+- src/respect_guard/ enforcement library with consent tokens and logging
+- examples/demo.py usage examples and smoke tests
+- tests/ unit tests and CI workflow
+
+Release Notes
+- Enforces default‑deny for private zones and explicit consent for sensitive zones
+- Logs all consent events and violations for auditability
+- CI configured to run tests on push and PRs
+- Security and contribution guidance added to repo
+
+Action Items for Maintainers
+- Confirm LICENSE and CODE_OF_CONDUCT are present before public release
+- Replace placeholder PGP fingerprints and contact emails in SECURITY.md
+- Ensure legal sign‑offs and partner MOUs are in place for telemetry sharing
+- Tag release v1.0.0 and publish release notes
