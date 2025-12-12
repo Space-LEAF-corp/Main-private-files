@@ -1,0 +1,6 @@
+{
+  "requester_id": "legal_audit_01",
+  "target_user_id": "user_123",
+  "from": "2025-01-01T00:00:00Z",
+  "to": "2025-12-31T23:59:59Z"
+}
