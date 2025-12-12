@@ -1,0 +1,7 @@
+POST /guardian/invite
+{
+  "requester_id":"user_123",
+  "guardian_contact":"parent@example.com",
+  "scope":["checkin","metadata"],
+  "expires_in_seconds":604800
+}
