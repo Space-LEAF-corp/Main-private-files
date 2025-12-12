@@ -1,0 +1,13 @@
+name: CI
+on: [pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON
+        run: |
+          npm install -g ajv-cli
+          ajv validate -s spec/schema/consent_ledger.json -d spec/samples/*.json
+      - name: Run SAST
+        uses: github/codeql-action/init@v2
