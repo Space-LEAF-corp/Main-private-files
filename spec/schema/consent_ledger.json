@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ConsentLedgerEntry",
+  "type": "object",
+  "required": ["entry_id","actor_id","actor_role","action","target_id","scope","timestamp","hash","signature_version"],
+  "properties": {
+    "entry_id": {
+      "type": "string",
+      "description": "UUID v4 for this ledger entry"
+    },
+    "actor_id": {
+      "type": "string",
+      "description": "Platform user id or system id that performed the action"
+    },
+    "actor_role": {
+      "type": "string",
+      "enum": ["user","guardian","parent","system","moderator","partner"],
+      "description": "Role of the actor"
+    },
+    "action": {
+      "type": "string",
+      "enum": ["invite_created","invite_accepted","invite_revoked","checkin_requested","checkin_responded","share_requested","share_approved","share_revoked","ageblock_set","ageblock_removed","purchase_approval_requested","purchase_approved","purchase_revoked","escalation_created","escalation_resolved","consent_revoked","export_requested","export_completed","ownership_requested","ownership_assigned"],
+      "description": "Canonical action type"
+    },
+    "target_id": {
+      "type": "string",
+      "description": "Primary object id affected (user id, invite id, content id)"
+    },
+    "scope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["checkin","metadata","oneoff_share","purchase_approval","presence","full_read"]
+      },
+      "description": "Scope granted or affected by the action"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Optional free-form metadata (minimal PII). Keep small.",
+      "additionalProperties": true
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of the action"
+    },
+    "hash": {
+      "type": "string",
+      "description": "SHA-256 hex of canonicalized entry payload (excluding this hash field)"
+    },
+    "signature_version": {
+      "type": "string",
+      "description": "Version of signing scheme used for this entry (e.g., v1)"
+    },
+    "witness_receipt": {
+      "type": ["object","null"],
+      "description": "Optional witness receipt object containing witness_id and witness_hash",
+      "properties": {
+        "witness_id": {"type":"string"},
+        "witness_hash": {"type":"string"},
+        "witness_timestamp": {"type":"string","format":"date-time"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
