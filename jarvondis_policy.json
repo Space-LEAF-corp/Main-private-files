@@ -1,0 +1,7 @@
+{
+  "owner_id": "leif.w.sogge",
+  "admin_secret": "",
+  "admin_secret_required": true,
+  "allowlist_clients": ["dimitri", "captains-log"],
+  "notes": "admin_secret must be provided via environment variable JARVONDIS_ADMIN_SECRET. Do NOT commit secrets to VCS."
+}
