@@ -1,0 +1,6 @@
+{
+  "invite_token": "inv_abc123",
+  "guardian_id": "guardian_456",
+  "verification_method": "phone_otp",
+  "verification_proof": "otp_987654"
+}
