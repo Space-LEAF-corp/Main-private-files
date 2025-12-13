@@ -1,0 +1,7 @@
+{
+  "user": "childrens_un",
+  "qr_dna": "ACGTACGTACGTACGTguardianACGT",  // Craft to hash-prefix 'guardian'
+  "adult_key": "steward_supervision",
+  "proper_time": 8,
+  "velocity": 0.8
+}
