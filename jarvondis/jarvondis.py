@@ -16,10 +16,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Dict, Optional
 
-try:
-    import pandas as pd
-except Exception:  # pragma: no cover - fallback behavior exercised in tests if needed
-    pd = None
+
 
 
 class ErebusSync:
@@ -145,14 +142,9 @@ class Jarvondis:
                 with open(filename, "r", encoding="utf-8") as f:
                     self._memory = json.load(f)
             else:
-                # prefer pandas if available for robust reading
-                if pd is not None:
-                    df = pd.read_csv(filename)
-                    self._memory = df.fillna("").to_dict(orient="records")
-                else:
-                    with open(filename, "r", encoding="utf-8", newline="") as f:
-                        reader = csv.DictReader(f)
-                        self._memory = [dict(row) for row in reader]
+                with open(filename, "r", encoding="utf-8", newline="") as f:
+                    reader = csv.DictReader(f)
+                    self._memory = [dict(row) for row in reader]
         except Exception:
             # on error, reset memory but don't raise to keep interactive loop robust
             self._memory = []
