@@ -184,7 +184,7 @@ class TimeEngine:
         self.items: Dict[str, LearningItem] = {}
         self.total_learning_time: float = 0.0  # Total hours
         self.session_start: Optional[float] = None
-        self.review_history: List[Dict] = []
+        self.review_history: List[Dict[str, object]] = []
     
     def add_item(self, item_id: str, content: str) -> LearningItem:
         """Add a new learning item.
@@ -200,7 +200,7 @@ class TimeEngine:
         self.items[item_id] = item
         return item
     
-    def start_session(self) -> Dict:
+    def start_session(self) -> Dict[str, object]:
         """Start a learning session.
         
         Returns:
@@ -212,7 +212,7 @@ class TimeEngine:
             "timestamp": self.session_start
         }
     
-    def end_session(self) -> Dict:
+    def end_session(self) -> Dict[str, object]:
         """End current learning session and update statistics.
         
         Returns:
@@ -225,7 +225,7 @@ class TimeEngine:
         session_hours = session_duration / 3600
         self.total_learning_time += session_hours
         
-        result = {
+        result: Dict[str, object] = {
             "status": "session_ended",
             "session_duration_hours": session_hours,
             "total_learning_time_hours": self.total_learning_time
@@ -234,7 +234,7 @@ class TimeEngine:
         self.session_start = None
         return result
     
-    def review_item(self, item_id: str, quality: int) -> Dict:
+    def review_item(self, item_id: str, quality: int) -> Dict[str, object]:
         """Review an item and update its spaced repetition parameters.
         
         Args:
@@ -276,7 +276,7 @@ class TimeEngine:
         item.review_count += 1
         
         # Log to history
-        review_record = {
+        review_record: Dict[str, object] = {
             "item_id": item_id,
             "timestamp": current_time,
             "quality": quality,
@@ -304,7 +304,7 @@ class TimeEngine:
             List of items due for review, sorted by urgency
         """
         current_time = time.time()
-        due_items = []
+        due_items: List[Tuple[float, LearningItem]] = []
         
         for item in self.items.values():
             # Calculate days since last review
@@ -316,11 +316,12 @@ class TimeEngine:
                 due_items.append((urgency, item))
         
         # Sort by urgency (most overdue first)
-        due_items.sort(key=lambda x: x[0], reverse=True)
+
+        due_items.sort(key=lambda x: x[0], reverse=True)  # type: ignore[no-untyped-call]
         
         return [item for _, item in due_items[:max_count]]
     
-    def learning_analytics(self) -> Dict:
+    def learning_analytics(self) -> Dict[str, object]:
         """Generate comprehensive learning analytics.
         
         Returns:
@@ -359,7 +360,7 @@ class TimeEngine:
             "average_ease": avg_ease
         }
     
-    def export_state(self) -> Dict:
+    def export_state(self) -> Dict[str, object]:
         """Export complete engine state for persistence.
         
         Returns:
