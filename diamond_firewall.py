@@ -10,7 +10,7 @@ import logging
 import threading
 import time
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("DiamondFirewall")
@@ -48,7 +48,7 @@ class DiamondFirewall:
         self._lock = threading.RLock()
         # Network policies (wifi, hifi, ethernet, cellular, satellite, internet)
         # Each policy is a dict with simple enforcement flags and thresholds.
-        self.network_policies: Dict[str, Dict] = {
+        self.network_policies: Dict[str, Dict[str, Any]] = {
             "wifi": {"require_qr": True, "require_mfa": True, "trusted_ssids": []},
             "hifi": {"require_qr": False, "require_mfa": False, "trusted_devices": []},
             "ethernet": {"require_qr": False, "require_mfa": False},
@@ -82,11 +82,11 @@ class DiamondFirewall:
         # Core admin controls: immutable core flag and core admins set
         # Leif William Sogge is a co-owner and core admin by default.
         self.immutable_core: bool = True
-        self.core_admins: set = {"Leif William Sogge"}
+        self.core_admins: set[str] = {"Leif William Sogge"}
         # number of guardian approvals required for core changes (besides a core admin)
         self.required_guardian_approvals: int = max(1, min(len(self.guardians), 1))
         # Blocklist of attacker ids
-        self.blocklist: set = set()
+        self.blocklist: set[str] = set()
         # Sponge service thread
         self._sponge_thread = None
         self._sponge_running = False
@@ -104,8 +104,7 @@ class DiamondFirewall:
         required = self.required_captains if required_captains is None else required_captains
         with self._lock:
             ok = (
-                isinstance(dna_code, str)
-                and dna_code.startswith("LINEAGE_SAFE")
+                dna_code.startswith("LINEAGE_SAFE")
                 and len(self.captains) >= required
                 and self.un_consent is True
                 and len(self.guardians) > 0
@@ -113,13 +112,13 @@ class DiamondFirewall:
             logger.debug("dna_qr_check result=%s", ok)
             return ok
 
-    def set_network_policy(self, network: str, policy: Dict) -> None:
+    def set_network_policy(self, network: str, policy: Dict[str, Any]) -> None:
         """Set or update policy for a named network type."""
         with self._lock:
             self.network_policies[network] = {**self.network_policies.get(network, {}), **policy}
             logger.info("Network policy updated for %s: %s", network, self.network_policies[network])
 
-    def _check_network_policy(self, network: str, metadata: Optional[Dict] = None) -> bool:
+    def _check_network_policy(self, network: str, metadata: Optional[Dict[str, object]] = None) -> bool:
         """Evaluate network-specific protections. Returns True if allowed to proceed to dna check."""
         metadata = metadata or {}
         policy = self.network_policies.get(network, self.network_policies.get("internet", {}))
@@ -132,7 +131,9 @@ class DiamondFirewall:
         # Wi-Fi specific checks: trusted SSID list
         if network == "wifi" and policy.get("trusted_ssids"):
             ssid = metadata.get("ssid")
-            if ssid and ssid in policy.get("trusted_ssids", []):
+            trusted_ssids = policy.get("trusted_ssids", [])
+            # Ensure trusted_ssids is a list, set, or tuple before using 'in'
+            if ssid and isinstance(trusted_ssids, (list, set, tuple)) and ssid in trusted_ssids:
                 logger.debug("Wi-Fi SSID %s is trusted", ssid)
                 return True
             # otherwise require further checks (dna/mfa)
@@ -143,9 +144,15 @@ class DiamondFirewall:
             if policy.get("uplink_strict", False):
                 allowed = policy.get("allowed_carriers") or policy.get("allowed_satellites")
                 carrier = metadata.get("carrier") or metadata.get("satellite_id")
-                if allowed and carrier and carrier not in allowed:
-                    logger.warning("Uplink denied for %s carrier %s", network, carrier)
-                    return False
+                # Ensure allowed is a list or set before using 'not in'
+                if allowed and carrier:
+                    if isinstance(allowed, (list, set, tuple)):
+                        if carrier not in allowed:
+                            logger.warning("Uplink denied for %s carrier %s", network, carrier)
+                            return False
+                    else:
+                        logger.warning("Allowed carriers/satellites is not a list/set/tuple: %s", allowed)
+                        return False
 
         return True
 
@@ -257,7 +264,7 @@ class DiamondFirewall:
         """Return True if `user` is a core admin (immutable core)."""
         return user in self.core_admins
 
-    def update_core_config(self, user: str, key: str, value, consenting_guardians: Optional[List[str]] = None) -> bool:
+    def update_core_config(self, user: str, key: str, value: object, consenting_guardians: Optional[List[str]] = None) -> bool:
         """Update a core configuration item.
 
         Rules:
@@ -302,27 +309,41 @@ class DiamondFirewall:
         logger.warning("Core config update denied for key=%s by user=%s: insufficient guardian consent", key, user)
         return False
 
-    def _apply_core_change(self, key: str, value) -> None:
+    def _apply_core_change(self, key: str, value: object) -> None:
         """Internal helper to apply allowed core changes."""
         if key == "lockdown_keys":
-            primary = value.get("primary")
-            secondary = value.get("secondary_un")
-            if primary is not None and secondary is not None:
-                self.set_lockdown_keys(primary, secondary)
+            if isinstance(value, dict):
+                from typing import cast
+                value_dict: Dict[str, Any] = cast(Dict[str, Any], value)
+                primary = value_dict.get("primary")
+                secondary = value_dict.get("secondary_un")
+                if primary is not None and secondary is not None:
+                    self.set_lockdown_keys(str(primary), str(secondary))
+            else:
+                logger.warning("lockdown_keys value must be a dict")
         elif key == "notification_recipients":
-            self.set_notification_recipients(
-                space_leaf=value.get("space_leaf"),
-                un=value.get("un"),
-                president_of_the_united_states=value.get("president_of_the_united_states"),
-            )
+            if isinstance(value, dict):
+                value_dict: Dict[str, Any] = dict(value.items())
+                def to_optional_str(val: Any) -> Optional[str]:
+                    if val is None:
+                        return None
+                    return str(val)
+                self.set_notification_recipients(
+                    space_leaf=to_optional_str(value_dict.get("space_leaf")),
+                    un=to_optional_str(value_dict.get("un")),
+                    president_of_the_united_states=to_optional_str(value_dict.get("president_of_the_united_states")),
+                )
+            else:
+                logger.warning("notification_recipients value must be a dict")
         elif key == "required_guardian_approvals":
             try:
-                n = int(value)
+                n = int(str(value))
                 self.required_guardian_approvals = max(1, n)
             except Exception:
                 logger.exception("Invalid value for required_guardian_approvals: %s", value)
 
-    def run_sponge_cycle(self) -> Dict:
+    from typing import Dict, List, Any
+    def run_sponge_cycle(self) -> Dict[str, Any]:
         """Run a single sponge/analysis cycle synchronously.
 
         This function safely inspects mirror_layer metadata (no payload exfiltration),
@@ -330,7 +351,7 @@ class DiamondFirewall:
         policies (e.g., increase strictness), and sends notifications via configured
         recipients and webhook/callbacks. Returns a summary dict.
         """
-        summary = {"processed": 0, "escalated": [], "blocked": []}
+        summary: Dict[str, Any] = {"processed": 0, "escalated": [], "blocked": []}  # type: ignore
         with self._lock:
             attackers = list(self.mirror_layer.keys())
 
@@ -435,6 +456,12 @@ class DiamondFirewall:
         import threading
         import urllib.request
 
+        # Ensure webhook URL is a non-empty string
+        webhook_url = self.notifier_webhook_url if self.notifier_webhook_url else None
+        if not webhook_url:
+            logger.warning("Webhook URL is not set or not a string; skipping webhook notification.")
+            return
+
         def _worker():
             try:
                 payload = json.dumps({
@@ -443,7 +470,7 @@ class DiamondFirewall:
                     "step": step,
                     "timestamp": time.time(),
                 }).encode("utf-8")
-                req = urllib.request.Request(self.notifier_webhook_url, data=payload, method="POST")
+                req = urllib.request.Request(webhook_url, data=payload, method="POST")
                 for k, v in self.notifier_webhook_headers.items():
                     req.add_header(k, v)
                 req.add_header("Content-Type", "application/json")
@@ -481,7 +508,12 @@ class DiamondFirewall:
         logger.info("Diamond firewall collapsed inward — shield renewed.")
         return "Diamond firewall collapsed inward, anomalies purged, shield renewed."
 
-    def access_request(self, dna_code: Optional[str] = None, network: str = "internet", metadata: Optional[Dict] = None) -> str:
+    def access_request(
+        self,
+        dna_code: Optional[str] = None,
+        network: str = "internet",
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> str:
         """
         Attempt to access true firewall. Supports network-aware checks.
         - dna_code: optional DNA QR string
@@ -494,7 +526,8 @@ class DiamondFirewall:
 
         # If lockdown active, check admin keys first (they bypass network policy)
         if self.lockdown_active:
-            admin_key = metadata.get("admin_key") if metadata else None
+            admin_key_raw = metadata.get("admin_key") if metadata else None
+            admin_key: str = str(admin_key_raw) if admin_key_raw is not None else ""
             if admin_key == self.lockdown_keys.get("primary"):
                 logger.info("Lockdown bypass granted to primary key for network=%s", network)
                 return f"Access granted by primary lockdown key for network={network}."
