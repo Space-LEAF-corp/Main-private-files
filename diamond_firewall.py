@@ -323,7 +323,8 @@ class DiamondFirewall:
                 logger.warning("lockdown_keys value must be a dict")
         elif key == "notification_recipients":
             if isinstance(value, dict):
-                value_dict: Dict[str, Any] = dict(value.items())
+                from typing import cast
+                value_dict: Dict[str, Any] = cast(Dict[str, Any], value)
                 def to_optional_str(val: Any) -> Optional[str]:
                     if val is None:
                         return None
