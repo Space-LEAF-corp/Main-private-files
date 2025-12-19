@@ -1,9 +1,7 @@
 {
   "user": "childrens_un",
-  "qr_dna": "ACGTguardianACGTACGT...",
-  "sound_frequency": 432.0,
-  "fingerprint_string": "ridge_pattern_guardian_hash...",
-  "body_gesture": "wave,clap,jump",
+  "qr_dna": "ACGTACGTACGTACGTguardianACGT",  // Craft to hash-prefix 'guardian'
   "adult_key": "steward_supervision",
-  "proper_time": 8
+  "proper_time": 8,
+  "velocity": 0.8
 }
