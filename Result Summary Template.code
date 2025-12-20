@@ -1,0 +1,14 @@
+Cycle: Track X, Iteration Y
+Environment: Baseline VM / Canary / Pilot
+Defects Injected: [List]
+
+Outcomes:
+- MTTR: [value], Δ vs control: [value]%
+- MTBF: [value], Δ vs control: [value]%
+- Replacement events: 0 (validated)
+- Labeling violations: 0 (validated)
+- Unauthorized changes blocked: [count], reasons logged
+- Latency/throughput delta: [values]
+
+Verdict: Pass / Conditional / Fail
+Notes: [edge cases, remediation]
