@@ -10,20 +10,15 @@ import hashlib
 
 
 
-# Robust import for TimeEngine: try relative, then absolute, then fallback
-from typing import TYPE_CHECKING
+
+
+# Robust import for TimeEngine: try relative import, fallback to dummy class if not found
 try:
     from .time_engine import TimeEngine  # type: ignore[reportMissingImports]
 except ImportError:
-    try:
-        from time_engine import TimeEngine  # type: ignore[reportMissingImports]
-    except ImportError:
-        # Could not import time_engine, define a dummy base class to avoid errors
-        class TimeEngine:
-            pass
-
-if TYPE_CHECKING:
-    pass
+    # Could not import time_engine, define a dummy base class to avoid errors
+    class TimeEngine:
+        pass
 
 # Your organic symbol definitions (circle counts + special roles)
 class OrganicSymbol:

@@ -6,10 +6,15 @@ grow in strength over time through spaced repetition.
 from __future__ import annotations
 
 import time
-from typing import Dict, Optional
+from typing import Dict
 from jarvondis.jarvondis import Jarvondis
 from time_engine import TimeEngine
 
+
+from typing import Protocol
+
+class HasItemId(Protocol):
+    item_id: str
 
 class JarvondisTimeIntegration:
     """Bridges Jarvondis memory system with TimeEngine learning curves."""
@@ -19,13 +24,14 @@ class JarvondisTimeIntegration:
         self.engine = time_engine
         self.topic_index: Dict[str, str] = {}  # topic -> item_id mapping
 
+    from typing import Any
     def track_interaction(
         self,
         topic: str,
         input_text: str,
         output_text: str,
         quality_rating: int = 4,
-    ) -> Dict:
+    ) -> Dict[str, Any]:
         """Track a Jarvondis interaction and register with TimeEngine.
         
         Args:
@@ -63,7 +69,8 @@ class JarvondisTimeIntegration:
             "learning_state": self.engine.learning_analytics(),
         }
 
-    def get_learning_priority_topics(self, limit: int = 5) -> list:
+    from typing import List, Tuple, Any
+    def get_learning_priority_topics(self, limit: int = 5) -> 'List[Tuple[str, Any]]':
         """Get topics most needing review, sorted by priority.
         
         Returns all topics sorted by when they're due for review (soonest first),
@@ -77,39 +84,42 @@ class JarvondisTimeIntegration:
         
         # If we have enough due items, use those
         if len(due_items) >= limit:
-            result = []
+            result: list[tuple[str, HasItemId]] = []
             for item in due_items[:limit]:
                 # Find topic from item_id
                 for topic, iid in self.topic_index.items():
-                    if iid == item.item_id:
+                    if iid == getattr(item, 'item_id', None):
                         result.append((topic, item))
                         break
             return result
         
         # Otherwise, return all items sorted by time until next review
         current_time = time.time()
-        all_items_with_priority = []
+        # Use the type of items in self.engine.items, assumed to be Any if not imported
+        all_items_with_priority: list[tuple[float, HasItemId]] = []
         
-        for item_id, item in self.engine.items.items():
+        for item in self.engine.items.values():
             days_since = (current_time - item.last_review) / (24 * 3600)
             # Priority is how close we are to the next review (negative = overdue)
             days_until_review = item.interval_days - days_since
             all_items_with_priority.append((days_until_review, item))
         
         # Sort by days_until_review (soonest/most overdue first)
-        all_items_with_priority.sort(key=lambda x: x[0])
+
+        all_items_with_priority.sort(key=lambda x: x[0])  # type: ignore[arg-type]
         
         # Convert to (topic, item) tuples
-        result = []
+        result: list[tuple[str, HasItemId]] = []
         for _, item in all_items_with_priority[:limit]:
             for topic, iid in self.topic_index.items():
-                if iid == item.item_id:
+                if iid == getattr(item, 'item_id', None):
                     result.append((topic, item))
                     break
         
         return result
 
-    def exponential_learning_report(self) -> Dict:
+    from typing import Any
+    def exponential_learning_report(self) -> Dict[str, Any]:
         """Generate exponential learning analysis."""
         analytics = self.engine.learning_analytics()
         
@@ -127,7 +137,7 @@ class JarvondisTimeIntegration:
             "engine_state": self.engine.export_state(),
         }
 
-    def suggest_next_learning_session(self) -> Dict:
+    def suggest_next_learning_session(self) -> Dict[str, Any]:
         """Suggest what to focus on in next learning session."""
         due_topics = self.get_learning_priority_topics(limit=3)
         
@@ -144,7 +154,8 @@ class JarvondisTimeIntegration:
             "learning_progress": self.engine.learning_analytics()["exponential_progress"],
         }
 
-    def export_integrated_state(self) -> Dict:
+    from typing import Any
+    def export_integrated_state(self) -> Dict[str, Any]:
         """Export complete integrated learning state."""
         return {
             "jarvondis_memory": {
