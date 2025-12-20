@@ -1,4 +1,15 @@
-immutable_label = {
+from typing import TypedDict
+
+class ImmutableLabel(TypedDict):
+    name: str
+    version: str
+    purpose: str
+    harm_prohibition: bool
+    repair_only: bool
+    warnings_target: str
+    covenant: str
+
+immutable_label: ImmutableLabel = {
     "name": "Federated Stewardship Runtime",
     "version": "1.4",
     "purpose": "Simultaneous improvement across teams via repair-only governance and transparent labeling",
