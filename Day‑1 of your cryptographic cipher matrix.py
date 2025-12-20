@@ -2,23 +2,25 @@
 # Cryptographic matrix cipher (Day-1)
 # Master strand: "CTTTTCTATCGA" duplicated to 24 bases
 
-def reshape_to_matrix(seq, rows, cols):
+def reshape_to_matrix(seq: str, rows: int, cols: int) -> list[list[str]]:
     return [list(seq[i*cols:(i+1)*cols]) for i in range(rows)]
 
-def flatten_matrix(matrix):
+def flatten_matrix(matrix: list[list[str]]) -> str:
     return ''.join(''.join(row) for row in matrix)
 
-def rotate_column_down(matrix, col, steps=1):
-    col_vals = [row[col] for row in matrix]
+def rotate_column_down(matrix: list[list[str]], col: int, steps: int = 1) -> None:
+    col_vals: list[str] = [row[col] for row in matrix]
     steps = steps % len(col_vals)
-    rotated = col_vals[-steps:] + col_vals[:-steps]
+    rotated: list[str] = col_vals[-steps:] + col_vals[:-steps]
     for i in range(len(matrix)):
         matrix[i][col] = rotated[i]
 
-def rotate_column_up(matrix, col, steps=1):
+def rotate_column_up(matrix: list[list[str]], col: int, steps: int = 1) -> None:
     rotate_column_down(matrix, col, -steps)
 
-def forward_cipher(seq, mask_cols, k, g1, g2):
+from typing import Iterable
+
+def forward_cipher(seq: str, mask_cols: Iterable[int], k: int, g1: int, g2: int) -> str:
     rows, cols = 4, 6
     matrix = reshape_to_matrix(seq, rows, cols)
     # Column stomp
@@ -30,7 +32,7 @@ def forward_cipher(seq, mask_cols, k, g1, g2):
         rotate_column_down(matrix, c, g2)
     return flatten_matrix(matrix)
 
-def inverse_cipher(cipher_seq, mask_cols, k, g1, g2):
+def inverse_cipher(cipher_seq: str, mask_cols: Iterable[int], k: int, g1: int, g2: int) -> str:
     rows, cols = 4, 6
     matrix = reshape_to_matrix(cipher_seq, rows, cols)
     # Global lifts
