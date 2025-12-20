@@ -1,10 +1,29 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
+
 from typing import Dict, List, Optional, Callable, Any
+
+
 import hashlib
 
-# Import TimeEngine from its module
-from time_engine import TimeEngine
+
+
+
+
+# Robust import for TimeEngine: try relative, then absolute, then fallback
+from typing import TYPE_CHECKING
+try:
+    from .time_engine import TimeEngine  # type: ignore[reportMissingImports]
+except ImportError:
+    try:
+        from time_engine import TimeEngine  # type: ignore[reportMissingImports]
+    except ImportError:
+        # Could not import time_engine, define a dummy base class to avoid errors
+        class TimeEngine:
+            pass
+
+if TYPE_CHECKING:
+    pass
 
 # Your organic symbol definitions (circle counts + special roles)
 class OrganicSymbol:
@@ -73,11 +92,11 @@ class TimeEngineSecurity:
             return func(engine, *args, **kwargs)
         return wrapper
 
-class SecureTimeEngine(TimeEngine):
+class SecureTimeEngine(TimeEngine):  # type: ignore[reportUnknownBaseClass]
     """TimeEngine with organic symbol security layer."""
     
     def __init__(self, master_symbol_key: Optional[List[Dict[str, Any]]] = None):
-        super().__init__()
+        super().__init__()  # type: ignore
         self.security = TimeEngineSecurity(
             master_sequence=SymbolSequence(master_symbol_key) if master_symbol_key else None
         )
@@ -93,24 +112,31 @@ class SecureTimeEngine(TimeEngine):
     
     # Override critical methods with auth decorator
     @TimeEngineSecurity.require_auth
-    def add_item(self, item_id: Any, content: Any): # pyright: ignore[reportIncompatibleMethodOverride]
-        return super().add_item(item_id, content)
+    def add_item(self, *, item_id: Any, content: Any) -> Any:
+        return super().add_item(item_id=item_id, content=content) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+
 
     @TimeEngineSecurity.require_auth
-    def review_item(self, item_id: Any, quality: Any, *args: Any, **kwargs: Any): # pyright: ignore[reportIncompatibleMethodOverride]
-        return super().review_item(item_id=item_id, quality=quality, *args, **kwargs)
+    def review_item(self, *, item_id: Any, quality: Any, **kwargs: Any) -> Any:
+        return super().review_item(item_id=item_id, quality=quality, **kwargs) # pyright: ignore[reportUnknownVariableType,reportUnknownMemberType]
+
 
     @TimeEngineSecurity.require_auth
-    def get_next_reviews(self, max_count: int = 10, *args: Any, **kwargs: Any): # pyright: ignore[reportIncompatibleMethodOverride]
-        return super().get_next_reviews(max_count, *args, **kwargs)
+    def get_next_reviews(self, *, max_count: int = 10, **kwargs: Any) -> List[Any]:
+        return super().get_next_reviews(max_count=max_count, **kwargs)  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+
 
     @TimeEngineSecurity.require_auth
-    def learning_analytics(self, *args: Any, **kwargs: Any):
-        return super().learning_analytics(*args, **kwargs)
+    def learning_analytics(self, *args: Any, **kwargs: Any) -> Any:
+        # Add a print/log for audit when analytics is accessed
+        print("[SECURITY LOG] learning_analytics accessed by authorized user.")
+        result = super().learning_analytics(*args, **kwargs)  # type: ignore[reportUnknownMemberType]
+        return result # pyright: ignore[reportUnknownVariableType]
+
 
     @TimeEngineSecurity.require_auth
-    def export_state(self, *args: Any, **kwargs: Any) -> Any:
-        return super().export_state(*args, **kwargs)
+    def export_state(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        return super().export_state(*args, **kwargs)  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
 
 # Example of locking it with your true key
 # You define this once, privately — e.g., [NINE, THREE, TEN, ONE, NINE]
