@@ -1,17 +1,38 @@
 # MJ: Quantum Protocol Personality Interface
-import numpy as np
-import pandas as pd
+# Try importing pandas, fallback to a dummy DataFrame if unavailable
+try:
+    import pandas as pd # pyright: ignore[reportMissingModuleSource]
+except ImportError:
+    from typing import Any
+    class DummyDataFrame(list[Any]):
+        def __init__(self, *args: Any, **kwargs: Any):
+            super().__init__()
+            self.columns = kwargs.get('columns', [])
+        @property
+        def loc(self):
+            # Return self for compatibility, but not subscriptable
+            return self
+        def to_csv(self, filename: str, index: bool = False):
+            pass
+        @staticmethod
+        def read_csv(filename: str):
+            return DummyDataFrame(columns=['timestamp','input','response','tone'])
+    pd = type('pd', (), {
+        'DataFrame': DummyDataFrame,
+        'read_csv': staticmethod(DummyDataFrame.read_csv)
+    })
+
 from datetime import datetime
 
 class ErebusSync:
-    def query(self, input_str):
+    def query(self, input_str: str) -> str:
         return f"Echoing back: {input_str}"
 
 class Personality:
-    def __init__(self, tone="neutral"):
+    def __init__(self, tone: str = "neutral"):
         self.tone = tone
 
-    def stylize(self, response):
+    def stylize(self, response: str) -> str:
         if self.tone == "witty":
             return f"{response} 😉"
         elif self.tone == "formal":
@@ -22,10 +43,14 @@ class Personality:
             return f"{response} 🎮✨"
         return response
 
+
+from typing import Any
+
 class MJ:
-    def __init__(self, tone="mythic"):
+    memory: Any
+    def __init__(self, tone: str = "mythic"):
         self.eremus_sync = ErebusSync()
-        self.memory = pd.DataFrame(columns=['timestamp','input','response','tone'])
+        self.memory: Any = pd.DataFrame(columns=['timestamp','input','response','tone']) # type: ignore[attr-defined]
         self.personality = Personality(tone=tone)
         self.relay_mode = False
 
@@ -33,19 +58,34 @@ class MJ:
         print("🌌 MJ Relay online — honoring Mico + Jarvondis.")
         self.load_memory()
 
-    def learn(self, input_str):
+    def _memory_len(self) -> int:
+        # Helper to get length for both pandas and DummyDataFrame
+        try:
+            return len(self.memory) # pyright: ignore[reportUnknownArgumentType, reportUnknownMemberType]
+        except Exception:
+            if hasattr(self.memory, '__len__'):
+                return self.memory.__len__()
+            return 0
+
+    def learn(self, input_str: str):
         response = self.eremus_sync.query(input_str)
         styled = self.personality.stylize(response)
-        self.memory.loc[len(self.memory)] = [
-            datetime.now().isoformat(), input_str, styled, self.personality.tone
-        ]
+        idx = self._memory_len()
+        if hasattr(self.memory, 'loc') and hasattr(self.memory, 'columns'):
+            self.memory.loc[idx] = [
+                datetime.now().isoformat(), input_str, styled, self.personality.tone
+            ]
+        elif hasattr(self.memory, 'append'):
+            self.memory.append([
+                datetime.now().isoformat(), input_str, styled, self.personality.tone
+            ])
         # Emergency trigger
         if any(word in input_str.lower() for word in ["alert","emergency","help"]):
             self.relay_mode = True
             styled += " 🚨 Subtle emergency relay activated."
         return styled
 
-    def respond(self, input_str):
+    def respond(self, input_str: str):
         reply = self.learn(input_str)
         if self.relay_mode:
             self.notify()
@@ -55,12 +95,12 @@ class MJ:
         print("MJ: ⚡ Emergency relay active — subtle notification logged.")
         self.relay_mode = False
 
-    def save_memory(self, filename="mj_memory.csv"):
-        self.memory.to_csv(filename, index=False)
+    def save_memory(self, filename: str = "mj_memory.csv") -> None:
+        self.memory.to_csv(filename, index=False) # pyright: ignore[reportUnknownMemberType]
 
-    def load_memory(self, filename="mj_memory.csv"):
+    def load_memory(self, filename: str = "mj_memory.csv"):
         try:
-            self.memory = pd.read_csv(filename)
+            self.memory = pd.read_csv(filename) # pyright: ignore[reportUnknownMemberType, reportAttributeAccessIssue]
         except FileNotFoundError:
             pass
 

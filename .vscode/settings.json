@@ -21,6 +21,10 @@
     "python.analysis.extraPaths": [
         "./pip install pycryptodome pynacl qrcode pillow ",
         "./pip install kyber-py dilithium-py cryptography biopython qutip ",
+        "./pip install kyber-py dilithium-py cryptography biopython qutip ",
+        "./pip install kyber-py dilithium-py cryptography biopython qutip ",
+        "./pip install kyber-py dilithium-py cryptography biopython qutip ",
+        "./pip install kyber-py dilithium-py cryptography biopython qutip ",
         "./pip install kyber-py dilithium-py cryptography biopython qutip "
     ]
 }
