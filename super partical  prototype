@@ -1,8 +1,7 @@
 # Retrying without py3Dmol to generate 2D visualization of Si-C-O-Au molecular structure
-import matplotlib.pyplot as plt
-from rdkit import Chem
-from rdkit.Chem import Draw
-from rdkit.Chem import rdDepictor
+import rdkit.Chem as Chem  # type: ignore
+from rdkit.Chem import Draw  # type: ignore
+from rdkit.Chem.AllChem import Compute2DCoords  # type: ignore
 
 # Define a hypothetical molecule using MolBlock format
 mol_block = """
@@ -47,15 +46,22 @@ mol_block = """
 M  END
 """
 
+
 # Read molecule from MolBlock
-mol = Chem.MolFromMolBlock(mol_block, sanitize=False)
-rdDepictor.Compute2DCoords(mol)
+mol = Chem.MolFromMolBlock(mol_block, sanitize=False)  # type: ignore
+Compute2DCoords(mol)
 
 # Generate 2D image
-img = Draw.MolToImage(mol, size=(400, 400))
+
+
+# Generate 2D image and ensure it's a PIL Image
+from PIL import Image  # type: ignore
+img = Draw.MolToImage(mol, size=(400, 400))  # type: ignore
+if not isinstance(img, Image.Image): # pyright: ignore[reportUnknownMemberType]
+  img = img.convert("RGB") # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
 
 # Save image
 output_path = "/mnt/data/silicon_gold_structure.png"
-img.save(output_path)
+img.save(output_path) # pyright: ignore[reportUnknownMemberType]
 
 print("Generated 2D visualization of a hypothetical Si-C-O-Au molecular structure and saved as silicon_gold_structure.png")
