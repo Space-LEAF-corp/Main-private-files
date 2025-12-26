@@ -116,7 +116,7 @@ def pseudo_sphincs_verify(message: bytes, sig: bytes, pub_seed: bytes = os.urand
 
 # Genome Prep
 human_dna_chunk = "ACGT" * 500000  # ~2MB
-human_sequence: Seq = Seq(human_dna_chunk)
+human_sequence: Seq = Seq(human_dna_chunk)  # type: ignore[valid-type]
 human_record = SeqRecord(human_sequence, id="HOMO_SAPIENS_QKD", name="You", description="QKD-secured teleport")
 
 raw_dna_str = str(human_record.seq)
