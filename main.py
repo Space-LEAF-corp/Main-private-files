@@ -4,11 +4,22 @@ import os
 from jarvondis_lockdown import LockdownPolicy, AdministrativeLockdown
 
 def load_policy(path: str) -> LockdownPolicy:
-    with open(path, "r") as f:
-        cfg = json.load(f)
+    try:
+        with open(path, "r") as f:
+            cfg = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Policy configuration file not found: {path}")
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in policy file {path}: {e}")
+    
+    # Validate required fields
+    if "owner_id" not in cfg:
+        raise ValueError("Policy configuration missing required field: owner_id")
+    
     admin_secret = os.environ.get("JARVONDIS_ADMIN_SECRET")
     if not admin_secret:
         raise ValueError("JARVONDIS_ADMIN_SECRET environment variable not set")
+    
     return LockdownPolicy(
         owner_id=cfg["owner_id"],
         admin_secret=admin_secret,

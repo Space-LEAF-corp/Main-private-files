@@ -9,7 +9,7 @@ class TestLockdownPolicy(unittest.TestCase):
             owner_id="leif.w.sogge",
             # NOTE: This is a hardcoded test secret for unit testing only.
             #       Never use this value in production code.
-            admin_secret="test_secret_123",
+            admin_secret="test_secret_123456",
             lockdown_active=True,
             allowlist_clients={"captains-log", "eternal-chalkboard", "leif-personal-device", "dimitri"},
             audit_enabled=True,
@@ -88,6 +88,16 @@ class TestLockdownPolicy(unittest.TestCase):
         result = self.guard.verify_owner_command(self.policy.owner_id, signature, payload, timestamp)
         self.assertFalse(result)
 
+    def test_signature_verification_invalid_signature(self):
+        """Test signature rejection with incorrect signature"""
+        timestamp = int(time.time())
+        payload = "set_lockdown:False"
+        # Use wrong signature
+        signature = "0" * 64  # Invalid hex signature
+        
+        result = self.guard.verify_owner_command(self.policy.owner_id, signature, payload, timestamp)
+        self.assertFalse(result)
+
     def test_set_lockdown_with_valid_signature(self):
         """Test changing lockdown state with valid signature"""
         timestamp = int(time.time())
@@ -98,6 +108,16 @@ class TestLockdownPolicy(unittest.TestCase):
         result = self.guard.set_lockdown(self.policy.owner_id, signature, timestamp, False)
         self.assertTrue(result)
         self.assertFalse(self.policy.lockdown_active)
+
+    def test_set_lockdown_with_invalid_signature(self):
+        """Test that lockdown state doesn't change with invalid signature"""
+        original_state = self.policy.lockdown_active
+        timestamp = int(time.time())
+        invalid_signature = "0" * 64
+        
+        result = self.guard.set_lockdown(self.policy.owner_id, invalid_signature, timestamp, not original_state)
+        self.assertFalse(result)
+        self.assertEqual(self.policy.lockdown_active, original_state)  # State unchanged
 
     def test_lockdown_mode_responses(self):
         """Test different response modes based on lockdown state"""
@@ -134,6 +154,27 @@ class TestLockdownPolicy(unittest.TestCase):
         result = self.guard.set_allowlist(self.policy.owner_id, signature, timestamp, new_clients)
         self.assertTrue(result)
         self.assertEqual(self.policy.allowlist_clients, new_clients)
+
+    def test_set_allowlist_with_invalid_signature(self):
+        """Test that allowlist doesn't change with invalid signature"""
+        original_allowlist = self.policy.allowlist_clients.copy()
+        timestamp = int(time.time())
+        new_clients = {"malicious-client"}
+        invalid_signature = "0" * 64
+        
+        result = self.guard.set_allowlist(self.policy.owner_id, invalid_signature, timestamp, new_clients)
+        self.assertFalse(result)
+        self.assertEqual(self.policy.allowlist_clients, original_allowlist)  # Unchanged
+
+    def test_none_user_agent_allowed(self):
+        """Test that None user agent doesn't block allowlisted clients"""
+        result = self.guard.respond("dimitri", None, "test")
+        self.assertEqual(result["status"], "ok")
+
+    def test_empty_user_agent_allowed(self):
+        """Test that empty user agent doesn't block allowlisted clients"""
+        result = self.guard.respond("dimitri", "", "test")
+        self.assertEqual(result["status"], "ok")
 
 
 if __name__ == "__main__":

@@ -39,3 +39,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.bak
+
+# Configuration files with secrets
+jarvondis_policy.json

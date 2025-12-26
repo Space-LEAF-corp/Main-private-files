@@ -22,8 +22,12 @@ def make_signature(owner_id: str, secret: str, payload: str) -> tuple:
     return hmac_sha256(secret, msg), ts
 
 if __name__ == "__main__":
+    import os
+    import getpass
+    
     owner_id = "leif.w.sogge"
-    secret = "CHANGE_ME_TO_A_STRONG_SECRET"
+    # Try environment variable first, then prompt interactively
+    secret = os.environ.get("JARVONDIS_ADMIN_SECRET") or getpass.getpass("Enter admin secret: ")
     payload = "set_lockdown:False"
     sig, ts = make_signature(owner_id, secret, payload)
     print({"signature": sig, "timestamp": ts})
