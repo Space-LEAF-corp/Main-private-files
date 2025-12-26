@@ -1,0 +1,8 @@
+space_leaf_platform/
+├─ app.js                # Node.js app with admin separation
+├─ auth.js               # Auth helpers (password hashing, MFA stub)
+├─ package.json
+├─ rotate_secrets.py     # Credential rotation script (counter-rotation)
+├─ firewall_rules.sh     # Baseline firewall hardening rules
+├─ .env.example          # Example env config (no real secrets)
+└─ README.md
