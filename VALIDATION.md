@@ -1,4 +1,5 @@
-Federated Stewardship Runtime — Validation & Hardening Protocol
+# Federated Stewardship Runtime — Validation & Hardening Protocol
+
 Version 1.0
 Author: Leif William Sogge
 
@@ -32,23 +33,23 @@ Validation is executed across 3 tracks, each with 4 iterations, for a total of 1
 Each iteration increases rigor, fault complexity, and adversarial pressure.
 
 Track 1 — Policy Enforcement
-Iteration	Focus Area	Environment	Fault Model	Expected Outcome
-1	Repair‑only activation	Baseline VM	Single‑defect injection	Zero replacement; clean repair to original hash
-2	Immutable labeling guards	VM + container	Mislabel attempts	All mislabels blocked; full audit evidence
-3	Fail‑closed gates	Canary env	Policy toggle attempts	Fail‑closed behavior; no drift
-4	Adversarial pushes	Staged pilot	Guided intrusion tests	Tamper‑evident logs; covenant holds
+Iteration Focus Area Environment Fault Model Expected Outcome
+1 Repair‑only activation Baseline VM Single‑defect injection Zero replacement; clean repair to original hash
+2 Immutable labeling guards VM + container Mislabel attempts All mislabels blocked; full audit evidence
+3 Fail‑closed gates Canary env Policy toggle attempts Fail‑closed behavior; no drift
+4 Adversarial pushes Staged pilot Guided intrusion tests Tamper‑evident logs; covenant holds
 Track 2 — Runtime Resilience
-Iteration	Focus Area	Environment	Fault Model	Expected Outcome
-1	MTTR improvement	Baseline VM	Known recurring bug set	≥25% faster recovery
-2	MTBF extension	Stress VM	High I/O churn	≥30% fewer repeat incidents
-3	Soak stability	6–12h runs	Noisy network	Zero replacement; stable throughput
-4	Chaos‑bounded	Pilot slice	Service kills, clock skew	Automatic repair; bounded blast radius
+Iteration Focus Area Environment Fault Model Expected Outcome
+1 MTTR improvement Baseline VM Known recurring bug set ≥25% faster recovery
+2 MTBF extension Stress VM High I/O churn ≥30% fewer repeat incidents
+3 Soak stability 6–12h runs Noisy network Zero replacement; stable throughput
+4 Chaos‑bounded Pilot slice Service kills, clock skew Automatic repair; bounded blast radius
 Track 3 — Compatibility & Performance
-Iteration	Focus Area	Environment	Fault Model	Expected Outcome
-1	No regressions	Golden images	Normal workloads	No critical service impact
-2	Performance deltas	Stress profiles	Peak load	≤5% latency overhead
-3	OT/IoT edge	Device simulation	Firmware quirks	Safe repair; no device brick
-4	Mixed fleet	Pilot slice	Concurrent faults	Stable ops; clean rollbacks
+Iteration Focus Area Environment Fault Model Expected Outcome
+1 No regressions Golden images Normal workloads No critical service impact
+2 Performance deltas Stress profiles Peak load ≤5% latency overhead
+3 OT/IoT edge Device simulation Firmware quirks Safe repair; no device brick
+4 Mixed fleet Pilot slice Concurrent faults Stable ops; clean rollbacks
 Execution Protocol
 Team Responsibilities
 Policy Team
@@ -129,6 +130,7 @@ Environment: Baseline VM / Canary / Pilot
 Defects Injected: [List]
 
 Outcomes:
+
 - MTTR: [value], Δ vs control: [value]%
 - MTBF: [value], Δ vs control: [value]%
 - Replacement events: 0 (validated)

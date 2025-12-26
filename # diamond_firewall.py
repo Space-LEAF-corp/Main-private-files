@@ -20,8 +20,7 @@ class AccessDeniedError(Exception):
     pass
 
 
-class 
-DiamondFirewall:
+class DiamondFirewall:
     """
     Minimal lineage-safe firewall simulation:
       - mirror_layer stores attacker traps (fake hashes)
@@ -61,8 +60,7 @@ DiamondFirewall:
         required = self.required_captains if required_captains is None else required_captains
         with self._lock:
             ok = (
-                isinstance(dna_code, str)
-                and dna_code.startswith("LINEAGE_SAFE")
+                dna_code.startswith("LINEAGE_SAFE")
                 and len(self.captains) >= required
                 and self.un_consent is True
                 and len(self.guardians) > 0
