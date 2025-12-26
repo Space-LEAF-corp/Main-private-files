@@ -4,6 +4,8 @@ from jarvondis_lockdown import LockdownPolicy, AdministrativeLockdown, _hmac_sha
 
 
 class TestLockdownPolicy(unittest.TestCase):
+    INVALID_SIGNATURE = "0" * 64  # Invalid hex signature for testing
+    
     def setUp(self):
         self.policy = LockdownPolicy(
             owner_id="leif.w.sogge",
@@ -92,10 +94,8 @@ class TestLockdownPolicy(unittest.TestCase):
         """Test signature rejection with incorrect signature"""
         timestamp = int(time.time())
         payload = "set_lockdown:False"
-        # Use wrong signature
-        signature = "0" * 64  # Invalid hex signature
         
-        result = self.guard.verify_owner_command(self.policy.owner_id, signature, payload, timestamp)
+        result = self.guard.verify_owner_command(self.policy.owner_id, self.INVALID_SIGNATURE, payload, timestamp)
         self.assertFalse(result)
 
     def test_set_lockdown_with_valid_signature(self):
@@ -113,9 +113,8 @@ class TestLockdownPolicy(unittest.TestCase):
         """Test that lockdown state doesn't change with invalid signature"""
         original_state = self.policy.lockdown_active
         timestamp = int(time.time())
-        invalid_signature = "0" * 64
         
-        result = self.guard.set_lockdown(self.policy.owner_id, invalid_signature, timestamp, not original_state)
+        result = self.guard.set_lockdown(self.policy.owner_id, self.INVALID_SIGNATURE, timestamp, not original_state)
         self.assertFalse(result)
         self.assertEqual(self.policy.lockdown_active, original_state)  # State unchanged
 
@@ -160,9 +159,8 @@ class TestLockdownPolicy(unittest.TestCase):
         original_allowlist = self.policy.allowlist_clients.copy()
         timestamp = int(time.time())
         new_clients = {"malicious-client"}
-        invalid_signature = "0" * 64
         
-        result = self.guard.set_allowlist(self.policy.owner_id, invalid_signature, timestamp, new_clients)
+        result = self.guard.set_allowlist(self.policy.owner_id, self.INVALID_SIGNATURE, timestamp, new_clients)
         self.assertFalse(result)
         self.assertEqual(self.policy.allowlist_clients, original_allowlist)  # Unchanged
 
