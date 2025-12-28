@@ -1,0 +1,13 @@
+
+## Documentation
+- CONTRIBUTING.md — rules for collaborators  
+- SECURITY.md — vulnerability reporting  
+- CODE_OF_CONDUCT.md — behavioral expectations  
+- LICENSE — legal protections and restrictions  
+
+## Disclaimer
+This project is a conceptual simulation suite.  
+It does not model real atomic physics and must not be used for harmful or weaponized applications.
+
+## Contact
+info@spaceleafcorp.org
