@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "giga-atom"
+version = "0.1.0"
+description = "Giga Atom — Space Leaf Corp internal simulation suite"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Space Leaf Corp Proprietary License 1.0" }
+authors = [
+  { name = "Leif William Sogge", email = "info@spaceleafcorp.org" }
+]
+keywords = ["simulation", "stability", "nanotech", "conceptual-model"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: Other/Proprietary License",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "matplotlib>=3.6",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+]
+
+[project.urls]
+Homepage = "https://spaceleafcorp.org"
+Source = "https://github.com/SpaceLeafCorp/giga-atom"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
