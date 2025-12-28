@@ -28,7 +28,13 @@ class LockdownPolicy:
     max_skew_seconds: int = 60  # signature freshness window
 
     def __post_init__(self):
-        if self.admin_secret in ("CHANGE_ME_TO_A_STRONG_SECRET", "test", "password", "secret"):
+        if self.admin_secret in (
+            "CHANGE_ME_TO_A_STRONG_SECRET",
+            "test",
+            "password",
+            "secret",
+            "test_secret_123456",
+        ):
             raise ValueError("admin_secret must not be a placeholder value")
         if len(self.admin_secret) < 16:
             raise ValueError("admin_secret must be at least 16 characters")
@@ -50,7 +56,8 @@ class AdministrativeLockdown:
     def verify_owner_command(self, owner_id: str, signature: str, payload: str, timestamp: int) -> bool:
         # freshness check
         now = int(time.time())
-        if abs(now - timestamp) > self.policy.max_skew_seconds:
+        future_tolerance_seconds = 5  # allow a small clock skew into the future
+        if timestamp > now + future_tolerance_seconds or (now - timestamp) > self.policy.max_skew_seconds:
             self._audit("reject_stale_signature", {"owner_id": owner_id, "timestamp": timestamp})
             return False
 
@@ -66,7 +73,7 @@ class AdministrativeLockdown:
 
     # --- Lockdown state controls (owner-only) ---
     def set_lockdown(self, owner_id: str, signature: str, timestamp: int, active: bool) -> bool:
-        payload = f"set_lockdown:{active}"
+        payload = f"set_lockdown:{'true' if active else 'false'}"
         if not self.verify_owner_command(owner_id, signature, payload, timestamp):
             return False
         self.policy.lockdown_active = active
@@ -77,24 +84,26 @@ class AdministrativeLockdown:
         payload = f"set_allowlist:{','.join(sorted(clients))}"
         if not self.verify_owner_command(owner_id, signature, payload, timestamp):
             return False
+        # Defensive copy: avoid external mutation of `clients` affecting policy state.
         self.policy.allowlist_clients = set(clients)
         self._audit("allowlist_updated", {"count": len(clients)})
         return True
 
     # --- Privacy protection: block other AIs & unauthorized clients ---
     def is_client_allowed(self, client_id: str, user_agent: Optional[str]) -> bool:
+        # Heuristic block: known AI agent fingerprints in the user-agent
+        if user_agent:
+            ua_l = user_agent.lower()
+            if any(fp in ua_l for fp in AI_AGENT_FINGERPRINTS):
+                self._audit("block_ai_agent", {"client_id": client_id, "user_agent": user_agent})
+                return False
+
         # Explicit allowlist overrides; during lockdown, only allowlisted clients pass
         if self.policy.lockdown_active:
             if client_id not in self.policy.allowlist_clients:
                 self._audit("block_client_not_allowlisted", {"client_id": client_id})
                 return False
 
-            # Heuristic block: known AI agent fingerprints in the user-agent
-            if user_agent:
-                ua_l = user_agent.lower()
-                if any(fp in ua_l for fp in AI_AGENT_FINGERPRINTS):
-                    self._audit("block_ai_agent", {"client_id": client_id, "user_agent": user_agent})
-                    return False
         return True
 
     # --- Jarvondis response gate ---

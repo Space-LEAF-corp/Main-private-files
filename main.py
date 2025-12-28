@@ -16,6 +16,10 @@ def load_policy(path: str) -> LockdownPolicy:
     if "owner_id" not in cfg:
         raise ValueError("Policy configuration missing required field: owner_id")
     
+    # Security check: admin_secret should never be in the JSON file
+    if "admin_secret" in cfg:
+        raise ValueError("admin_secret must not be stored in the policy JSON file. Use JARVONDIS_ADMIN_SECRET environment variable instead.")
+    
     admin_secret = os.environ.get("JARVONDIS_ADMIN_SECRET")
     if not admin_secret:
         raise ValueError("JARVONDIS_ADMIN_SECRET environment variable not set")

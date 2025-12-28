@@ -3,7 +3,7 @@ import time
 from jarvondis_lockdown import LockdownPolicy, AdministrativeLockdown, _hmac_sha256
 
 
-class TestLockdownPolicy(unittest.TestCase):
+class TestAdministrativeLockdown(unittest.TestCase):
     INVALID_SIGNATURE = "0" * 64  # Invalid hex signature for testing
     
     def setUp(self):
@@ -11,7 +11,7 @@ class TestLockdownPolicy(unittest.TestCase):
             owner_id="leif.w.sogge",
             # NOTE: This is a hardcoded test secret for unit testing only.
             #       Never use this value in production code.
-            admin_secret="test_secret_123456",
+            admin_secret="unittest_secret_key_123456",
             lockdown_active=True,
             allowlist_clients={"captains-log", "eternal-chalkboard", "leif-personal-device", "dimitri"},
             audit_enabled=True,
@@ -63,7 +63,7 @@ class TestLockdownPolicy(unittest.TestCase):
     def test_signature_verification_valid(self):
         """Test valid signature verification"""
         timestamp = int(time.time())
-        payload = "set_lockdown:False"
+        payload = "set_lockdown:false"
         message = f"{self.policy.owner_id}:{timestamp}:{payload}".encode("utf-8")
         signature = _hmac_sha256(self.policy.admin_secret.encode("utf-8"), message)
         
@@ -73,7 +73,7 @@ class TestLockdownPolicy(unittest.TestCase):
     def test_signature_verification_invalid_owner(self):
         """Test signature rejection with wrong owner"""
         timestamp = int(time.time())
-        payload = "set_lockdown:False"
+        payload = "set_lockdown:false"
         message = f"wrong_owner:{timestamp}:{payload}".encode("utf-8")
         signature = _hmac_sha256(self.policy.admin_secret.encode("utf-8"), message)
         
@@ -83,7 +83,7 @@ class TestLockdownPolicy(unittest.TestCase):
     def test_signature_verification_stale_timestamp(self):
         """Test signature rejection with stale timestamp"""
         timestamp = int(time.time()) - 120  # 2 minutes ago
-        payload = "set_lockdown:False"
+        payload = "set_lockdown:false"
         message = f"{self.policy.owner_id}:{timestamp}:{payload}".encode("utf-8")
         signature = _hmac_sha256(self.policy.admin_secret.encode("utf-8"), message)
         
@@ -93,7 +93,7 @@ class TestLockdownPolicy(unittest.TestCase):
     def test_signature_verification_invalid_signature(self):
         """Test signature rejection with incorrect signature"""
         timestamp = int(time.time())
-        payload = "set_lockdown:False"
+        payload = "set_lockdown:false"
         
         result = self.guard.verify_owner_command(self.policy.owner_id, self.INVALID_SIGNATURE, payload, timestamp)
         self.assertFalse(result)
@@ -101,7 +101,7 @@ class TestLockdownPolicy(unittest.TestCase):
     def test_set_lockdown_with_valid_signature(self):
         """Test changing lockdown state with valid signature"""
         timestamp = int(time.time())
-        payload = "set_lockdown:False"
+        payload = "set_lockdown:false"
         message = f"{self.policy.owner_id}:{timestamp}:{payload}".encode("utf-8")
         signature = _hmac_sha256(self.policy.admin_secret.encode("utf-8"), message)
         
@@ -173,6 +173,62 @@ class TestLockdownPolicy(unittest.TestCase):
         """Test that empty user agent doesn't block allowlisted clients"""
         result = self.guard.respond("dimitri", "", "test")
         self.assertEqual(result["status"], "ok")
+
+    def test_weak_secret_validation_placeholder_values(self):
+        """Test that weak placeholder secrets are rejected"""
+        weak_secrets = [
+            "CHANGE_ME_TO_A_STRONG_SECRET",
+            "test",
+            "password",
+            "secret",
+            "test_secret_123456"
+        ]
+        for weak_secret in weak_secrets:
+            with self.assertRaises(ValueError, msg=f"Weak secret '{weak_secret}' should be rejected"):
+                LockdownPolicy(
+                    owner_id="leif.w.sogge",
+                    admin_secret=weak_secret,
+                    lockdown_active=True
+                )
+
+    def test_weak_secret_validation_short_secret(self):
+        """Test that secrets shorter than 16 characters are rejected"""
+        short_secrets = ["short", "12345", "a" * 15]
+        for short_secret in short_secrets:
+            with self.assertRaises(ValueError, msg=f"Short secret '{short_secret}' should be rejected"):
+                LockdownPolicy(
+                    owner_id="leif.w.sogge",
+                    admin_secret=short_secret,
+                    lockdown_active=True
+                )
+
+    def test_signature_verification_future_timestamp(self):
+        """Test signature rejection with future timestamp"""
+        timestamp = int(time.time()) + 120  # 2 minutes in the future
+        payload = "set_lockdown:false"
+        message = f"{self.policy.owner_id}:{timestamp}:{payload}".encode("utf-8")
+        signature = _hmac_sha256(self.policy.admin_secret.encode("utf-8"), message)
+        
+        result = self.guard.verify_owner_command(self.policy.owner_id, signature, payload, timestamp)
+        self.assertFalse(result, "Future timestamp should be rejected")
+
+    def test_ai_agent_blocking_when_lockdown_off(self):
+        """Test that AI agents are blocked even when lockdown is off"""
+        self.policy.lockdown_active = False
+        
+        ai_user_agents = [
+            "Mozilla/5.0 (compatible; OpenAI/1.0)",
+            "Anthropic-Claude/1.0",
+            "Google-AI-Agent"
+        ]
+        for ua in ai_user_agents:
+            # Test with allowlisted client
+            result = self.guard.respond("dimitri", ua, "test")
+            self.assertEqual(result["status"], "blocked", f"AI agent should be blocked even when lockdown is off: {ua}")
+            
+            # Test with non-allowlisted client
+            result = self.guard.respond("some-client", ua, "test")
+            self.assertEqual(result["status"], "blocked", f"AI agent should be blocked even when lockdown is off: {ua}")
 
 
 if __name__ == "__main__":

@@ -13,8 +13,8 @@ The Jarvondis Lockdown Protocol enforces sovereign authorship, owner-only contro
    - `AdministrativeLockdown`: Main enforcement class with HMAC signature verification, allowlist checking, and AI blocking
 
 2. **jarvondis_policy.json** - Configuration file
-   - **IMPORTANT**: This file is gitignored to prevent secret leakage. Copy `jarvondis_policy.json.example` to `jarvondis_policy.json` and set `JARVONDIS_ADMIN_SECRET` environment variable.
-   - Configure `owner_id`, `allowlist_clients`, and other settings
+   - **IMPORTANT**: The committed version of this file must contain only non-sensitive placeholder values. Copy or adapt `jarvondis_policy.json.example` locally, and always provide the real admin secret via the `JARVONDIS_ADMIN_SECRET` environment variable (never store real secrets in this file).
+   - Configure `owner_id`, `allowlist_clients`, and other non-secret settings
 
 3. **main.py** - Example usage demonstrating policy loading and guard usage
 

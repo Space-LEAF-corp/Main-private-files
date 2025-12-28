@@ -27,7 +27,8 @@ if __name__ == "__main__":
     
     owner_id = "leif.w.sogge"
     # Try environment variable first, then prompt interactively
-    secret = os.environ.get("JARVONDIS_ADMIN_SECRET") or getpass.getpass("Enter admin secret: ")
-    payload = "set_lockdown:False"
+    secret = os.environ.get("JARVONDIS_ADMIN_SECRET") or getpass.getpass("Enter JARVONDIS_ADMIN_SECRET: ")
+    lockdown_state = False
+    payload = f"set_lockdown:{'true' if lockdown_state else 'false'}"
     sig, ts = make_signature(owner_id, secret, payload)
     print({"signature": sig, "timestamp": ts})
