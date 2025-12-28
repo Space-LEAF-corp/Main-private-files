@@ -157,7 +157,7 @@ class AuditChain:
         }
         serialized = json.dumps(payload, sort_keys=True).encode("utf-8")
         entry_hash = sha256(serialized)
-        record = {**payload, "entry_hash": entry_hash}
+        record: Dict[str, Any] = {**payload, "entry_hash": entry_hash}
         with open(self.path, "a") as f:
             f.write(json.dumps(record) + "\n")
         self.prev_hash = entry_hash

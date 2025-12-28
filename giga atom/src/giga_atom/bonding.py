@@ -3,13 +3,11 @@ bonding.py — Bonding heuristics and partner scanning
 Space Leaf Corp — Internal Use Only
 """
 
-try:
-    import numpy as np
-except ImportError:
-    np = None
-    # Optionally: raise or warn here if numpy is required for your workflow
-
 import pandas as pd # pyright: ignore[reportMissingModuleSource]
+try:
+    import numpy as np # pyright: ignore[reportMissingImports]
+except ImportError as e:
+    raise ImportError("numpy is required for bonding.py to function correctly.") from e
 from .simulations import PHYSICAL_SHELLS
 
 def valence_from_Z(Z: int) -> int:
@@ -38,6 +36,6 @@ def bonding_scan(val_giga: int = 1, maxZ: int = 118):
 
 def combined_stability_for_partner(val_giga: int, val_elem: int, days: int = 3650, d: float = 2.0): # pyright: ignore[reportUnknownParameterType]
     mismatch = abs(val_giga - val_elem) / max(1, val_elem + val_giga)
-        t = np.arange(0, days + 1) # pyright: ignore[reportOptionalMemberAccess, reportUnknownMemberType]
-        stability: np.ndarray = np.exp(-d * mismatch * t / 365.0)  # type: ignore
-        return t, stability
+    t = np.arange(0, days + 1) # pyright: ignore[reportUnknownVariableType, reportOptionalMemberAccess, reportUnknownMemberType]
+    stability: "np.ndarray" = np.exp(-d * mismatch * t / 365.0)  # type: ignore
+    return t, stability # pyright: ignore[reportUnknownVariableType]

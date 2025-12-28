@@ -28,6 +28,11 @@
         "./pip install kyber-py dilithium-py cryptography biopython qutip ",
         "./pip install kyber-py dilithium-py cryptography biopython qutip ",
         "./pip install kyber-py dilithium-py cryptography biopython qutip ",
+        "./pip install kyber-py dilithium-py cryptography biopython qutip ",
+        "./pip install pycryptodome pynacl qrcode pillow ",
+        "./giga atom/src",
+        "./pip install kyber-py dilithium-py cryptography biopython qutip ",
+        "./pip install kyber-py dilithium-py cryptography biopython qutip ",
         "./pip install kyber-py dilithium-py cryptography biopython qutip "
     ]
 }
