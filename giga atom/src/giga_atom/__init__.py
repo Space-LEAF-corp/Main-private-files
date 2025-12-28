@@ -16,7 +16,7 @@ from .simulations import (
     stability_time_series,
     run_scenario,
 )
-from .gyroscope import gyroscopic_S_time_series
+from .gyroscope import gyroscopic_S_time_series # pyright: ignore[reportUnknownVariableType]
 from .bonding import (
     valence_from_Z,
     bonding_score,

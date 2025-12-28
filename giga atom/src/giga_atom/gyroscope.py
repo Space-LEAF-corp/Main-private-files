@@ -3,15 +3,16 @@ gyroscope.py — Gyroscopic stability model
 Space Leaf Corp — Internal Use Only
 """
 
+from typing import Optional
 import numpy as np
 
 def gyroscopic_S_time_series(
-    counts,
+    counts: list[float],
     days: int = 3650,
     omega0: float = 10.0,
     c: float = 0.5,
-    impulse_every=None,
-    impulse_drop=0.05
+    impulse_every: 'Optional[int]' = None,
+    impulse_drop: float = 0.05
 ):
     radii = [(i + 1) ** 2 for i in range(len(counts))]
     masses = [cnt * 1e-3 for cnt in counts]
@@ -19,10 +20,14 @@ def gyroscopic_S_time_series(
     I_total = sum(I_n)
 
     t = np.arange(0, days + 1)
-    omega = omega0 * np.exp(-c * t / days)
+    omega = omega0 * np.exp(-c * t / days)  # type: np.ndarray
 
-    if impulse_every:
-        for day in range(impulse_every, days + 1, impulse_every):
+    if impulse_every is not None:
+        try:
+            impulse_every_int = int(impulse_every)
+        except (TypeError, ValueError):
+            raise ValueError("impulse_every must be an integer or convertible to int")
+        for day in range(impulse_every_int, days + 1, impulse_every_int):
             omega[day:] *= (1 - impulse_drop)
 
     S = omega / omega0

@@ -1,4 +1,5 @@
 # tests/test_bonding.py
+# type: ignore
 from giga_atom.simulations import valence_from_Z, bonding_score
 
 def test_valence_small():

@@ -1,5 +1,5 @@
 # tests/test_model.py
-from giga_atom.simulations import compute_excess_and_lambda, baseline_counts
+from ..giga_atom.simulations import compute_excess_and_lambda, baseline_counts
 
 def test_baseline_no_excess():
     counts = baseline_counts()

@@ -25,18 +25,18 @@ def compute_states(counts: List[int], k: float = 3.0) -> List[ShellState]:
     for i, (phys, cnt) in enumerate(zip(PHYSICAL_SHELLS, counts), start=1):
         excess = compute_excess_fraction(cnt, phys)
         lam = compute_lambda(excess, k)
-        states.append(ShellState(i, phys, cnt, excess, lam))
+        states.append(ShellState(i, phys, cnt, excess, lam)) # pyright: ignore[reportUnknownMemberType]
     return states
 
 def stability_time_series(states: List[ShellState], days: int = 3650):
     t = np.arange(0, days + 1)
-    per_shell = np.zeros((len(states), len(t)))
+    per_shell = np.zeros((len(states), len(t)))  # type: ignore[arg-type]
 
     for i, s in enumerate(states):
         if s.excess_fraction == 0:
             per_shell[i, :] = 1.0
         else:
-            per_shell[i, :] = np.exp(-s.lambda_daily * t)
+            per_shell[i, :] = np.exp(-s.lambda_daily * t) # pyright: ignore[reportUnknownMemberType]
 
     overall = per_shell.mean(axis=0)
     return t, overall, per_shell
@@ -45,11 +45,16 @@ def run_scenario(name: str, counts: List[int], k: float = 3.0, days: int = 3650)
     states = compute_states(counts, k)
     t, overall, per_shell = stability_time_series(states, days)
 
-    def first_below(series, thresh):
-        idx = np.where(series < thresh)[0]
-        return int(idx[0]) if idx.size > 0 else None
+    from typing import Optional, Dict, Any
 
-    return {
+    def first_below(series: np.ndarray, thresh: float) -> Optional[int]:
+        idx = np.where(series < thresh)[0]
+        if idx.size > 0: # pyright: ignore[reportUnknownMemberType]
+            return int(idx[0])
+        else:
+            return None
+
+    result: Dict[str, Any] = {
         "name": name,
         "states": states,
         "counts": counts,
@@ -62,3 +67,4 @@ def run_scenario(name: str, counts: List[int], k: float = 3.0, days: int = 3650)
         "first_below_0.75": first_below(overall, 0.75),
         "first_below_0.5": first_below(overall, 0.5),
     }
+    return result

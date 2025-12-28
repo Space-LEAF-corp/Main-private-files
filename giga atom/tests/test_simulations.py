@@ -20,8 +20,7 @@ from giga_atom.simulations import (
     gyroscopic_S_time_series,
     bonding_scan,
     combined_stability_for_partner,
-    monte_carlo_trials,
-    TOTAL_ELECTRONS
+    monte_carlo_trials
 )
 
 # ---------------------------------------------------------
@@ -95,16 +94,21 @@ def test_gyroscopic_S_monotonic():
 
 def test_bonding_scan_valid():
     """Bonding scan should return 118 rows and valid scores."""
-    df = bonding_scan(val_giga=1)
+    import pandas as pd
+    df: pd.DataFrame = bonding_scan(val_giga=1)  # type: ignore
+    assert isinstance(df, pd.DataFrame), f"bonding_scan did not return a DataFrame, got {type(df)}"
     assert len(df) == 118
-    assert df["bonding_score"].between(0, 1).all()
+    assert df["bonding_score"].between(0, 1).all()  # type: ignore[reportUnknownMemberType]
 
 def test_combined_stability_monotonic():
     """Combined stability with a partner should decay monotonically."""
-    t, stab = combined_stability_for_partner(1, 2, days=3650)
+    from typing import Sequence
+    _: object
+    stab: Sequence[float]
+    partner_id, stab = combined_stability_for_partner(1, 2, days=3650)
     assert stab[0] == 1.0
     assert stab[-1] <= 1.0
-    assert np.all(np.diff(stab) <= 1e-9)
+    assert np.all(np.diff(stab) <= 1e-9)  # type: ignore[attr-defined]
 
 # ---------------------------------------------------------
 # Monte Carlo Tests
@@ -112,6 +116,9 @@ def test_combined_stability_monotonic():
 
 def test_monte_carlo_runs():
     """Monte Carlo should produce the correct number of trials."""
-    df = monte_carlo_trials(n_trials=20, days=3650, seed=123)
-    assert len(df) == 20
-    assert "first_below_0.5" in df.columns
+    import pandas as pd
+    df: pd.DataFrame = monte_carlo_trials(n_trials=20, days=3650, seed=123)  # type: ignore
+    # Ensure df is a DataFrame or has __len__
+    assert hasattr(df, '__len__'), f"monte_carlo_trials did not return a sized object, got {type(df)}" # pyright: ignore[reportUnknownArgumentType]
+    assert len(df) == 20 # pyright: ignore[reportUnknownArgumentType]
+    assert hasattr(df, 'columns') and "first_below_0.5" in df.columns  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
