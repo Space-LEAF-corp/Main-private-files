@@ -6,7 +6,7 @@ def run_tests():
     framework = SecurityFramework(perimeter_km=250)
 
     # Test 1: Basic activation
-    report1 = framework.activate_protocol(user_id="Captain001", environment="Orbital Station")
+    report1: dict[str, str] = framework.activate_protocol(user_id="Captain001", environment="Orbital Station")
     print("Test 1 - Basic Activation", report1)
 
     # Test 2: ICU Glasses disabled
@@ -16,7 +16,7 @@ def run_tests():
 
     # Test 3: Geofence inactive
     framework.geofence.active = False
-    report3 = framework.activate_protocol(user_id="Captain003", environment="Deep Space")
+    report3: dict[str, str] = framework.activate_protocol(user_id="Captain003", environment="Deep Space")
     print("Test 3 - Geofence Inactive", report3)
 
     # Test 4: Multiple users sequentially
