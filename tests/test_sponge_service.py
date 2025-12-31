@@ -8,12 +8,18 @@ class TestSpongeService(unittest.TestCase):
         guardians = ["G1", "G2"]
         captains = ["C1", "C2", "C3", "C4"]
         self.firewall = DiamondFirewall(guardians, captains, True)
-        self.notifications = []
+        from typing import List, Tuple
+        self.notifications: List[Tuple[str, str, int]] = []
 
-        def cb(attacker, message, step):
+        def cb(attacker: str, message: str, step: int) -> None:
             self.notifications.append((attacker, message, step))
 
-        self.firewall.notifier_callback = cb
+        # Assign notifier_callback only if attribute exists and is not strictly None (for compatibility with DiamondFirewall definition)
+        if hasattr(self.firewall, "notifier_callback"):
+            try:
+                setattr(self.firewall, "notifier_callback", cb)
+            except (TypeError, AttributeError):
+                pass  # Not assignable, skip
         # Set recipients to None (no real HTTP calls)
         self.firewall.set_notification_recipients(space_leaf=None, un=None, president_of_the_united_states=None)
 
@@ -31,7 +37,8 @@ class TestSpongeService(unittest.TestCase):
         self.firewall.mirror_layer["badguy"] = "fakehash"
         self.firewall.intruder_warnings["badguy"] = 5
         summary = self.firewall.run_sponge_cycle()
-        self.assertIn("badguy", summary["blocked"]) or self.assertIn("badguy", summary["escalated"]) 
+        self.assertIn("badguy", summary["blocked"])
+        self.assertIn("badguy", summary["escalated"])
         self.assertEqual(self.firewall.mirror_layer.get("badguy"), "ESCALATED_TO_AUTHORITIES")
         self.assertIn("badguy", self.firewall.blocklist)
 
