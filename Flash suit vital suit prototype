@@ -1,0 +1,74 @@
+import time
+import board
+import busio
+import adafruit_max30102  # For heart rate/SpO2 sensor
+import adafruit_ds18b20   # For temperature sensor
+import adafruit_mpu6050   # For accelerometer/gyro (friction/impact detection)
+import adafruit_ssd1306   # For OLED HUD display
+from adafruit_onewire.bus import OneWireBus
+from PIL import Image, ImageDraw, ImageFont  # For drawing on HUD
+
+# Initialize I2C bus and sensors
+i2c = busio.I2C(board.SCL, board.SDA)
+
+# Vital signs: Heart rate/SpO2
+pulse_sensor = adafruit_max30102.MAX30102(i2c)
+
+# Body temperature (connect DS18B20 to GPIO4)
+ow_bus = OneWireBus(board.D4)
+ds18 = adafruit_ds18b20.DS18B20(ow_bus, ow_bus.scan()[0])
+
+# Friction/impact: MPU6050 accelerometer
+mpu = adafruit_mpu6050.MPU6050(i2c)
+
+# HUD: OLED display (128x64, connected via I2C)
+oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
+font = ImageFont.load_default()  # Simple font for text
+
+# Thresholds (customize based on suit design)
+HEAT_THRESHOLD = 40.0  # Celsius, alert if body/suit temp exceeds (gold flakes help dissipate)
+ACCEL_THRESHOLD = 2.0  # g-force for detecting high friction/impact
+
+def read_vitals():
+    """Read heart rate, SpO2, and body temperature."""
+    hr, spo2 = pulse_sensor.heart_rate, pulse_sensor.spo2  # Note: These require calibration/time to stabilize
+    temp = ds18.temperature
+    return hr, spo2, temp
+
+def detect_friction():
+    """Detect high acceleration as proxy for friction/impact."""
+    accel = mpu.acceleration
+    magnitude = (accel[0]**2 + accel[1]**2 + accel[2]**2)**0.5 / 9.81  # Convert to g
+    return magnitude > ACCEL_THRESHOLD
+
+def update_hud(hr, spo2, temp, friction_alert):
+    """Display data on OLED HUD."""
+    image = Image.new("1", (oled.width, oled.height))
+    draw = ImageDraw.Draw(image)
+    
+    # Draw vital signs
+    draw.text((0, 0), f"HR: {hr:.1f} bpm", font=font, fill=255)
+    draw.text((0, 16), f"SpO2: {spo2:.1f}%", font=font, fill=255)
+    draw.text((0, 32), f"Temp: {temp:.1f} C", font=font, fill=255)
+    
+    # Heat/Friction alerts
+    if temp > HEAT_THRESHOLD:
+        draw.text((0, 48), "HEAT ALERT!", font=font, fill=255)
+    if friction_alert:
+        draw.text((64, 48), "FRICTION ALERT!", font=font, fill=255)
+    
+    oled.image(image)
+    oled.show()
+
+# Main loop
+while True:
+    hr, spo2, temp = read_vitals()
+    friction_alert = detect_friction()
+    
+    # Log data (could send to a server or store in file for analysis)
+    print(f"HR: {hr}, SpO2: {spo2}, Temp: {temp}, Friction: {friction_alert}")
+    
+    # Update HUD
+    update_hud(hr, spo2, temp, friction_alert)
+    
+    time.sleep(1)  # Update every second
