@@ -1,67 +1,135 @@
 import time
-import board
-import busio
-import adafruit_max30102  # For heart rate/SpO2 sensor
-import adafruit_ds18b20   # For temperature sensor
-import adafruit_mpu6050   # For accelerometer/gyro (friction/impact detection)
-import adafruit_ssd1306   # For OLED HUD display
-from adafruit_onewire.bus import OneWireBus
-from PIL import Image, ImageDraw, ImageFont  # For drawing on HUD
+try:
+    import board # pyright: ignore[reportMissingImports]
+except ImportError:
+    board = None
+    print("Warning: board module not found. Board-related functionality will be unavailable.")
+try:
+    try:
+        try:
+            import busio # pyright: ignore[reportMissingImports]
+        except ImportError:
+            busio = None
+            print("Warning: busio module not found. I2C communication will be unavailable.")
+    except ImportError:
+        busio = None
+        print("Warning: busio module not found. I2C communication will be unavailable.")
+except ImportError:
+    busio = None
+    print("Warning: busio module not found. I2C communication will be unavailable.")
+try:
+    try:
+        import adafruit_max30102  # pyright: ignore[reportMissingImports] # For heart rate/SpO2 sensor
+    except ImportError:
+        adafruit_max30102 = None
+        print("Warning: adafruit_max30102 module not found. Heart rate/SpO2 sensor will be unavailable.")
+except ImportError:
+    adafruit_max30102 = None
+    print("Warning: adafruit_max30102 module not found. Heart rate/SpO2 sensor will be unavailable.")
+import adafruit_ds18b20   # pyright: ignore[reportMissingImports] # For temperature sensor
+try:
+    try:
+        try:
+            import adafruit_mpu6050   # pyright: ignore[reportMissingImports] # For accelerometer/gyro (friction/impact detection)
+        except ImportError:
+            adafruit_mpu6050 = None
+            print("Warning: adafruit_mpu6050 module not found. Friction/impact detection will be unavailable.")
+    except ImportError:
+        adafruit_mpu6050 = None
+        print("Warning: adafruit_mpu6050 module not found. Friction/impact detection will be unavailable.")
+except ImportError:
+    adafruit_mpu6050 = None
+    print("Warning: adafruit_mpu6050 module not found. Friction/impact detection will be unavailable.")
+try:
+    try:
+        import adafruit_ssd1306   # pyright: ignore[reportMissingImports] # For OLED HUD display
+    except ImportError:
+        adafruit_ssd1306 = None
+        print("Warning: adafruit_ssd1306 module not found. OLED HUD display will be unavailable.")
+except ImportError:
+    adafruit_ssd1306 = None
+    print("Warning: adafruit_ssd1306 module not found. OLED HUD display will be unavailable.")
+from adafruit_onewire.bus import OneWireBus  # type: ignore
+from PIL import Image, ImageDraw, ImageFont  # type: ignore  # pyright: ignore[reportUnknownVariableType, reportMissingImports] # For drawing on HUD
 
 # Initialize I2C bus and sensors
-i2c = busio.I2C(board.SCL, board.SDA)
+i2c: busio.I2C = busio.I2C(board.SCL, board.SDA)  # type: ignore[reportUnknownVariableType]
 
 # Vital signs: Heart rate/SpO2
-pulse_sensor = adafruit_max30102.MAX30102(i2c)
+
+from typing import Optional
+if adafruit_max30102 is not None:
+    from typing import Any
+    pulse_sensor: Optional[Any] = adafruit_max30102.MAX30102(i2c)  # type: ignore  # pyright: ignore[reportOptionalMemberAccess]
+else:
+    pulse_sensor: Optional[Any] = None
 
 # Body temperature (connect DS18B20 to GPIO4)
-ow_bus = OneWireBus(board.D4)
-ds18 = adafruit_ds18b20.DS18B20(ow_bus, ow_bus.scan()[0])
+ow_bus: OneWireBus = OneWireBus(getattr(board, "D4", None) or getattr(board, "GPIO4", None) or 4) # pyright: ignore[reportUnknownVariableType]
+ds18 = adafruit_ds18b20.DS18B20(ow_bus, ow_bus.scan()[0])  # type: ignore
+
 
 # Friction/impact: MPU6050 accelerometer
-mpu = adafruit_mpu6050.MPU6050(i2c)
+if adafruit_mpu6050 is not None:
+    mpu = adafruit_mpu6050.MPU6050(i2c)  # type: ignore[reportUnknownMemberType]
+else:
+    mpu = None
 
 # HUD: OLED display (128x64, connected via I2C)
-oled = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)
-font = ImageFont.load_default()  # Simple font for text
+oled: adafruit_ssd1306.SSD1306_I2C = adafruit_ssd1306.SSD1306_I2C(128, 64, i2c)  # type: ignore[reportUnknownMemberType]
+font: ImageFont.ImageFont = ImageFont.load_default()  # type: ignore  # pyright: ignore[reportUnknownVariableType] # Simple font for text
 
 # Thresholds (customize based on suit design)
 HEAT_THRESHOLD = 40.0  # Celsius, alert if body/suit temp exceeds (gold flakes help dissipate)
 ACCEL_THRESHOLD = 2.0  # g-force for detecting high friction/impact
 
-def read_vitals():
+def read_vitals() -> tuple[float, float, float]:
     """Read heart rate, SpO2, and body temperature."""
-    hr, spo2 = pulse_sensor.heart_rate, pulse_sensor.spo2  # Note: These require calibration/time to stabilize
-    temp = ds18.temperature
-    return hr, spo2, temp
+    if pulse_sensor is not None:
+        hr = pulse_sensor.heart_rate
+        spo2 = pulse_sensor.spo2  # Note: These require calibration/time to stabilize
+        hr_val: float = float(hr) if hr is not None else 0.0
+        spo2_val: float = float(spo2) if spo2 is not None else 0.0
+    else:
+        hr_val: float = 0.0
+        spo2_val: float = 0.0
+    temp_val: float = float(ds18.temperature) if ds18 is not None else 0.0  # type: ignore[reportUnknownMemberType]
+    return hr_val, spo2_val, temp_val
 
-def detect_friction():
+
+# Add explicit return type annotation
+def detect_friction() -> bool:
     """Detect high acceleration as proxy for friction/impact."""
-    accel = mpu.acceleration
-    magnitude = (accel[0]**2 + accel[1]**2 + accel[2]**2)**0.5 / 9.81  # Convert to g
-    return magnitude > ACCEL_THRESHOLD
+    if mpu is None:
+        return False
+    accel: tuple[float, float, float] = mpu.acceleration  # type: ignore[reportUnknownVariableType]
+    magnitude = (accel[0]**2 + accel[1]**2 + accel[2]**2)**0.5 / 9.81  # pyright: ignore[reportUnknownVariableType] # Convert to g
+    return magnitude > ACCEL_THRESHOLD # pyright: ignore[reportUnknownVariableType]
 
-def update_hud(hr, spo2, temp, friction_alert):
+def update_hud(hr: float, spo2: float, temp: float, friction_alert: bool):
     """Display data on OLED HUD."""
-    image = Image.new("1", (oled.width, oled.height))
-    draw = ImageDraw.Draw(image)
+    image: Image.Image = Image.new("1", (oled.width, oled.height)) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+    draw = ImageDraw.Draw(image) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     
     # Draw vital signs
-    draw.text((0, 0), f"HR: {hr:.1f} bpm", font=font, fill=255)
-    draw.text((0, 16), f"SpO2: {spo2:.1f}%", font=font, fill=255)
-    draw.text((0, 32), f"Temp: {temp:.1f} C", font=font, fill=255)
+    draw.text((0, 0), f"HR: {hr:.1f} bpm", font=font, fill=255)  # type: ignore
+    draw.text((0, 16), f"SpO2: {spo2:.1f}%", font=font, fill=255)  # type: ignore
+    draw.text((0, 32), f"Temp: {temp:.1f} C", font=font, fill=255)  # type: ignore
     
     # Heat/Friction alerts
     if temp > HEAT_THRESHOLD:
-        draw.text((0, 48), "HEAT ALERT!", font=font, fill=255)
+        draw.text((0, 48), "HEAT ALERT!", font=font, fill=255)  # type: ignore
     if friction_alert:
-        draw.text((64, 48), "FRICTION ALERT!", font=font, fill=255)
+        draw.text((64, 48), "FRICTION ALERT!", font=font, fill=255)  # type: ignore
     
-    oled.image(image)
-    oled.show()
+    oled.image(image) # pyright: ignore[reportUnknownMemberType]
+    oled.show()  # type: ignore[reportUnknownMemberType]
 
 # Main loop
 while True:
+    hr: float
+    spo2: float
+    temp: float
     hr, spo2, temp = read_vitals()
     friction_alert = detect_friction()
     
