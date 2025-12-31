@@ -47,12 +47,13 @@ class TestLockdownAndNotifications(unittest.TestCase):
         self.assertEqual(self.firewall.is_trapped(attacker), "ESCALATED_TO_AUTHORITIES")
 
     def test_notifier_callback_invoked(self):
-        called = []
+        from typing import List, Tuple, Any
+        called: List[Tuple[str, Any, int]] = []
 
-        def notifier(attacker_id, message, step):
+        def notifier(attacker_id: str, message: Any, step: int):
             called.append((attacker_id, message, step))
 
-        self.firewall.notifier_callback = notifier
+        setattr(self.firewall, "notifier_callback", notifier)
         attacker = "Hacker_Y"
         self.firewall.intrusion_attempt(attacker, "p1")
         self.firewall.intrusion_attempt(attacker, "p2")
