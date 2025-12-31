@@ -4,6 +4,7 @@ GitHub Branch Protection & Required Reviewers
 These are suggested steps an admin can run or perform via the GitHub UI to enforce the governance policies declared in `GOVERNANCE.md`.
 
 Via the GitHub UI (recommended for non-automated setup):
+
 1. Go to `Settings -> Branches` for the repository.
 2. Under "Branch protection rules", add a rule for branch `main`.
 3. Enable "Require pull request reviews before merging" and set the required number of approving reviews (e.g., 1 or 2).
@@ -21,5 +22,6 @@ gh api --method PUT /repos/:owner/:repo/branches/main/protection -f required_sta
 ```
 
 Notes
+
 - The `require_code_owner_reviews` flag makes GitHub require review from the users/teams listed in `.github/CODEOWNERS` for affected files.
 - Only a repository admin can apply these settings.

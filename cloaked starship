@@ -20,7 +20,6 @@ Role: Smooths temperature gradients so the IR layer doesn’t have to fight loca
 Material: Flexium laminate (SMA + Ti or graphene-reinforced foil) mounted on compliant bushings.
 Role: Allows skin expansion, “breathing” gaps, and vibration damping without delamination.
 
-
 ---
 
 Sensing and control
@@ -35,7 +34,6 @@ Result: High-frequency textures (mottle, stripes) and low-frequency blends to av
 Policy: Minimize detection risk while staying within power/thermal budgets and non-interference rules.
 Latency: Prioritize fast local adjustments (<100 ms) and slower global rebalances (seconds).
 
-
 loop:
   bg_vis, bg_ir ← senseEnvironment()
   ship_heatmap ← readThermalGrid()
@@ -47,7 +45,6 @@ loop:
   routeHeatToShadowRadiators(ship_heatmap)
   logStateAndValidateGuardrails()
 end
-
 
 ---
 
@@ -63,7 +60,6 @@ Microfluidics: High speed, high saturation; best for dynamic textures and edge d
 • Fail-safes:
 Rule: If life-safety or navigation anomalies occur, freeze patterning and shift to high-emissivity cooling, then de-cloak as needed.
 
-
 ---
 
 Integration with flexium and breathing gaps
@@ -74,7 +70,6 @@ Design: Shingled, hex-scale tiles with 0.5–1.0 mm labyrinth seams that allow e
 Use: Louvers bias-closed during high heat flux; bias-open for purge and cooldown, coordinated with IR layer to prevent thermal “blinking.”
 • EM continuity:
 Detail: Conductive straps across seams maintain RF shielding while pigment tiles remain electrically isolated for precise control.
-
 
 ---
 
@@ -91,7 +86,6 @@ Goals: Rapid drainage, salt resistance, biofouling mitigation; maintain pigment 
 • Guardrail validation:
 Proof: Non-interference policies enforce RF silence and auto de-cloak on critical anomalies; audit logs remain append-only.
 
-
 ---
 
 What I can deliver next
@@ -99,6 +93,5 @@ What I can deliver next
 • Tile spec: Cell size, stack order, pigment/IR materials, seam geometry, and actuator power budgets.
 • Control profiles: Ocean, land-adjacent, and LEO, each with signature budgets and response latencies.
 • Test matrix: Bench, subscale hull, and field scenarios with pass/fail thresholds.
-
 
 If you want the skin to bias “cool tones” for sea and “earth tones” for land by default, I’ll include palette presets and emissivity baselines for each operating profile.

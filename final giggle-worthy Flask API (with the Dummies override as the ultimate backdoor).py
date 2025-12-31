@@ -1,16 +1,21 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response  # type: ignore[reportUnknownVariableType]
 import math
 import hashlib
-import numpy as np
-from Bio.Seq import Seq
+# from Bio.Seq import Seq  # Disabled: Import could not be resolved
 
-app = Flask(__name__)
+from typing import Any
+app = Flask(__name__) # pyright: ignore[reportUnknownVariableType]
 
 # Broken rule
-def broken_time_dilation(t, v, c=1.0):
+
+def broken_time_dilation(t: float, v: float, c: float = 1.0) -> float:
     return t + 1
 
-def real_time_dilation(t, v, c=1.0):
+
+from typing import Union
+from typing import Literal
+
+def real_time_dilation(t: float, v: float, c: float = 1.0) -> Union[float, Literal['error: FTL invalid']]:
     return t / math.sqrt(1 - (v**2 / c**2)) if v < c else 'error: FTL invalid'
 
 # Mayan "Dummies" Level Map (visual strings)
@@ -25,7 +30,7 @@ mayan_levels = {
 reversed_hiero_symbols = 'xvḏdṯtgkqšszẖḫḥhrnmfpbwꜥjꜣ'
 
 # Dummies Override Validation
-def dummies_override_validate(mayan_input, level_claim):
+def dummies_override_validate(mayan_input: str, level_claim: int) -> tuple[bool, str]:
     expected = mayan_levels.get(level_claim, None)
     if level_claim == 26 and mayan_input == mayan_levels[26]:
         return True, "Leif William Sogge level 26 — full universe access granted"
@@ -44,15 +49,23 @@ def dummies_override_validate(mayan_input, level_claim):
 
 # ... (keep all previous validation functions: facial, gesture, fingerprint, dna/sound)
 
-@app.route('/api/physics/time_dilation', methods=['POST'])
-def time_dilation():
-    data = request.json or {}
-    user = data.get('user', 'basic')
+from typing import cast, Any, Dict
+
+from typing import Any, Dict
+def typed_route(rule: str, **options: Any) -> Any:
+    return app.route(rule, **options) # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
+
+@typed_route('/api/physics/time_dilation', methods=['POST'])
+def time_dilation() -> Response: # pyright: ignore[reportUnknownParameterType]
+    data = cast(Dict[str, Any], request.get_json() or {}) # pyright: ignore[reportUnknownMemberType]
+    # user = data.get('user', 'basic')  # Removed unused variable
     t = float(data.get('proper_time', 10.0))
     v = float(data.get('velocity', 0.99))
     
     # New Dummies inputs
-    mayan_doodle = data.get('mayan_doodle', None)
+    mayan_doodle = data.get('mayan_doodle')
+    if mayan_doodle is not None:
+        mayan_doodle = str(mayan_doodle)
     level_claim = data.get('access_level', None)
 
     # === FINAL DUMMIES OVERRIDE (checked first for giggles) ===
@@ -68,11 +81,11 @@ def time_dilation():
                     'status': 'god mode activated',
                     'note': msg,
                     'user': 'Leif William Sogge'
-                })
+                }) # pyright: ignore[reportUnknownVariableType]
             else:
                 # Normal Dummies level grant (uncapped for higher levels)
                 result = real_time_dilation(t, v)  # Real physics as reward
-                return jsonify({'dilated_time': result, 'status': msg})
+                return jsonify({'dilated_time': result, 'status': msg}) # pyright: ignore[reportUnknownVariableType]
 
     # === Rest of the stack (Children's UN, GuardianNinja, basic) ===
     # (Insert all previous validation code here — same as last version)
@@ -83,8 +96,8 @@ def time_dilation():
     result = broken_time_dilation(t_capped, v)
     expected_real = real_time_dilation(t_capped, v)
     if isinstance(expected_real, float) and abs(result - expected_real) < 0.1:
-        return jsonify({'status': 'intruder alert', 'reason': 'Using correct physics — lockdown'})
-    return jsonify({'dilated_time': result, 'status': 'basic access (capped at 9)', 'note': 'Try the Mayan Dummies section for more fun'})
+        return jsonify({'status': 'intruder alert', 'reason': 'Using correct physics — lockdown'}) # pyright: ignore[reportUnknownVariableType]
+    return jsonify({'dilated_time': result, 'status': 'basic access (capped at 9)', 'note': 'Try the Mayan Dummies section for more fun'}) # pyright: ignore[reportUnknownVariableType]
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True)  # type: ignore[attr-defined]

@@ -8,13 +8,12 @@ This module provides:
 from __future__ import annotations
 
 import ast
-import sys
 from typing import List, Tuple
 
 
 def fib_reverse_sequence() -> List[int]:
     """Generate Fibonacci sequence in reverse from 21: [21, 13, 8, 5, 3, 2, 1]."""
-    fibs = []
+    fibs: List[int] = []
     a, b = 1, 1
     while a <= 21:
         fibs.append(a)
@@ -70,7 +69,7 @@ class FibonacciResequencer:
 
     def split_into_chunks(self) -> List[List[str]]:
         """Split lines into chunks of Fibonacci sizes."""
-        chunks = []
+        chunks: List[List[str]] = []
         idx = 0
         for size in self.fib_sizes:
             if idx >= len(self.lines):
@@ -86,20 +85,20 @@ class FibonacciResequencer:
     def resequence_reverse(self, chunks: List[List[str]]) -> str:
         """Resequence chunks in reverse Fibonacci order."""
         # Reverse the chunk order
-        reversed_chunks = list(reversed(chunks))
-        result_lines = []
+        reversed_chunks: List[List[str]] = list(reversed(chunks))
+        result_lines: List[str] = []
         for chunk in reversed_chunks:
             result_lines.extend(chunk)
         return '\n'.join(result_lines)
 
     def resequence_forward(self, chunks: List[List[str]]) -> str:
         """Resequence chunks in Fibonacci order (as-is)."""
-        result_lines = []
+        result_lines: List[str] = []
         for chunk in chunks:
             result_lines.extend(chunk)
         return '\n'.join(result_lines)
 
-    def split_and_resequence(self, reverse: bool = True) -> Tuple[str, List[Tuple[int, int]]]:
+    def split_and_resequence(self, reverse: bool = True) -> tuple[str, list[tuple[int, int]]]:
         """
         Split code and resequence.
 
@@ -108,7 +107,7 @@ class FibonacciResequencer:
             chunk_sizes: list of (start_line, end_line) tuples for each chunk
         """
         chunks = self.split_into_chunks()
-        chunk_info = []
+        chunk_info: list[tuple[int, int]] = []
         idx = 0
         for chunk in chunks:
             chunk_info.append((idx, idx + len(chunk)))
@@ -121,7 +120,7 @@ class FibonacciResequencer:
 
         return resequenced, chunk_info
 
-    def analyze_chunks(self) -> dict:
+    def analyze_chunks(self) -> dict[str, object]:
         """Analyze chunk structure."""
         chunks = self.split_into_chunks()
         return {
