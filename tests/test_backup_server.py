@@ -1,6 +1,7 @@
 """Tests for backup server."""
 
 import json
+from typing import Dict, Any
 import os
 import shutil
 import time
@@ -36,7 +37,7 @@ class TestBackupServer(unittest.TestCase):
     def test_backup_endpoint_accepts_post(self):
         """Test that the /backup endpoint accepts POST requests."""
         conn = HTTPConnection("localhost", 8787)
-        backup_data = {
+        backup_data: Dict[str, Any] = {
             "timestamp": "2024-01-01T00:00:00.000Z",
             "version": "1.0.0",
             "data": {
@@ -64,7 +65,7 @@ class TestBackupServer(unittest.TestCase):
     def test_backup_creates_file(self):
         """Test that backup creates a file in the backups directory."""
         conn = HTTPConnection("localhost", 8787)
-        backup_data = {
+        backup_data: Dict[str, Any] = {
             "timestamp": "2024-01-01T00:00:00.000Z",
             "version": "1.0.0",
             "data": {"users": [], "sessions": [], "firewall_state": {}, "metadata": {}},
@@ -77,7 +78,9 @@ class TestBackupServer(unittest.TestCase):
             headers={"Content-Type": "application/json"},
         )
         response = conn.getresponse()
-        response_data = json.loads(response.read().decode())
+
+
+        response.read()  # Ensure response is read to clear the connection
         conn.close()
 
         # Check that backup file was created
@@ -90,7 +93,7 @@ class TestBackupServer(unittest.TestCase):
     def test_backup_saves_correct_data(self):
         """Test that backup saves the correct data."""
         conn = HTTPConnection("localhost", 8787)
-        backup_data = {
+        backup_data: Dict[str, Any] = {
             "timestamp": "2024-01-01T00:00:00.000Z",
             "version": "1.0.0",
             "data": {
@@ -108,7 +111,7 @@ class TestBackupServer(unittest.TestCase):
             headers={"Content-Type": "application/json"},
         )
         response = conn.getresponse()
-        response_data = json.loads(response.read().decode())
+        response.read()  # Ensure response is read to clear the connection
         conn.close()
 
         # Read the backup file
@@ -126,7 +129,6 @@ class TestBackupServer(unittest.TestCase):
         conn = HTTPConnection("localhost", 8787)
         conn.request("POST", "/invalid", body="{}")
         response = conn.getresponse()
-
         self.assertEqual(response.status, 404)
         conn.close()
 

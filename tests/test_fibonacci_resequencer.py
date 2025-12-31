@@ -14,19 +14,19 @@ class TestCodeValidator(unittest.TestCase):
     def test_valid_python_forward(self):
         code = "x = 1\ny = 2\nprint(x + y)"
         validator = CodeValidator(code)
-        ok, msg = validator.validate_forward()
+        ok, _ = validator.validate_forward()
         self.assertTrue(ok)
 
     def test_invalid_python_forward(self):
         code = "x = 1\nif x:\n  (missing close)"
         validator = CodeValidator(code)
-        ok, msg = validator.validate_forward()
+        ok, _ = validator.validate_forward()
         self.assertFalse(ok)
 
     def test_validate_both(self):
         code = "def foo():\n    return 42"
         validator = CodeValidator(code)
-        ok, msg = validator.validate_both()
+        ok, _ = validator.validate_both()
         self.assertTrue(ok)
 
 

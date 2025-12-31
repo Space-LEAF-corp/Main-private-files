@@ -57,7 +57,7 @@ class UserRecord:
     otp_secret: Optional[str] = None
     otp_expiry: Optional[float] = None
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> Dict[str, object]:
         return asdict(self)
 
 
@@ -84,11 +84,11 @@ class AuthManager:
 
     def register(self, user_id: str, password: str, dna_code: str) -> bool:
         """First sign-in registration. Requires valid dna_code that starts with LINEAGE_SAFE."""
-        if not isinstance(user_id, str) or not user_id:
+        if not user_id:
             raise ValueError("user_id required")
-        if not isinstance(password, str) or len(password) < 8:
+        if len(password) < 8:
             raise ValueError("password must be at least 8 characters")
-        if not isinstance(dna_code, str) or not dna_code.startswith("LINEAGE_SAFE"):
+        if not dna_code.startswith("LINEAGE_SAFE"):
             raise ValueError("invalid dna_code")
         if user_id in self._users:
             raise ValueError("user already exists")
@@ -108,7 +108,7 @@ class AuthManager:
     def _get_user(self, user_id: str) -> Optional[UserRecord]:
         return self._users.get(user_id)
 
-    def start_login(self, user_id: str, password: str, dna_code: Optional[str] = None) -> Dict:
+    def start_login(self, user_id: str, password: str, dna_code: Optional[str] = None) -> Dict[str, object]:
         """Attempt initial auth with password and optional dna_code.
         If password matches and dna matches (if provided or bound), generate an OTP token and return challenge.
         Returns dict: {"status": "ok"|"challenge"|"denied", ...}
@@ -127,7 +127,7 @@ class AuthManager:
             if not dna_code or dna_code != rec.dna_bound:
                 return {"status": "denied", "reason": "dna mismatch"}
         else:
-            if not dna_code or not isinstance(dna_code, str) or not dna_code.startswith("LINEAGE_SAFE"):
+            if not dna_code or not dna_code.startswith("LINEAGE_SAFE"):
                 return {"status": "denied", "reason": "dna required for first-time bind"}
             # bind dna to account on first login
             rec.dna_bound = dna_code
@@ -139,7 +139,7 @@ class AuthManager:
         self.save()
         return {"status": "challenge", "method": "otp", "otp_hint": "6-hex", "otp": otp}
 
-    def complete_login(self, user_id: str, otp: str) -> Dict:
+    def complete_login(self, user_id: str, otp: str) -> Dict[str, object]:
         rec = self._get_user(user_id)
         if rec is None:
             return {"status": "denied", "reason": "unknown user"}
@@ -168,4 +168,4 @@ class AuthManager:
         self.save()
         return True
 
-*** End Of File
+

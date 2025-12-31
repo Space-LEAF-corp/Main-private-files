@@ -1,8 +1,10 @@
 """Unit tests for MJ Protocol."""
+
 import os
 import tempfile
 import unittest
 import time
+from typing import Any, Dict
 
 from mj_protocol import (
     CeremonialsManager,
@@ -76,7 +78,7 @@ class TestCeremonialsManager(unittest.TestCase):
         cm = CeremonialsManager(self.archive_file)
         cm.inscribe_seal(ResonanceType.FIREWALL, "Guardian", "Seal 1")
         cm.inscribe_seal(ResonanceType.RESILIENCE, "Guardian", "Seal 2")
-        heritage = cm.heritage_chain()
+        heritage: Dict[str, Any] = cm.heritage_chain()  # type: ignore
         self.assertEqual(heritage["total_seals"], 2)
         self.assertEqual(heritage["verified_seals"], 2)
 
@@ -96,8 +98,6 @@ class TestMJLocalLayer(unittest.TestCase):
         except Exception:
             pass
 
-        from auth import AuthManager
-
         self.firewall = SecuredFirewall(users_file=self.auth_file)
         self.mj_local = MJLocalLayer(self.firewall.auth_manager, self.firewall)
         self.mj_local.ceremonials.archive_file = self.archive_file
@@ -113,13 +113,16 @@ class TestMJLocalLayer(unittest.TestCase):
             pass
 
     def test_register_and_seal(self):
-        res = self.mj_local.register_and_seal("alice", "password123", "LINEAGE_SAFE_ALICE_001")
+        res: Dict[str, Any] = self.mj_local.register_and_seal(  # type: ignore[reportUnknownMemberType]
+            "alice", "password123", "LINEAGE_SAFE_ALICE_001"
+        )
+        assert isinstance(res, dict)
         self.assertEqual(res.get("status"), "ok")
         self.assertIn("seal", res)
 
     def test_login_and_check(self):
-        self.mj_local.register_and_seal("bob", "password123", "LINEAGE_SAFE_BOB_001")
-        res = self.mj_local.login_and_check("bob", "password123", "LINEAGE_SAFE_BOB_001")
+        self.mj_local.register_and_seal("bob", "password123", "LINEAGE_SAFE_BOB_001")  # type: ignore[reportUnknownMemberType]
+        res: Dict[str, Any] = self.mj_local.login_and_check("bob", "password123", "LINEAGE_SAFE_BOB_001")  # type: ignore[no-untyped-call, assignment, arg-type]
         self.assertEqual(res.get("status"), "challenge")
         self.assertIn("otp_token", res)
 
@@ -127,16 +130,16 @@ class TestMJLocalLayer(unittest.TestCase):
 class TestMJSatelliteLayer(unittest.TestCase):
     def test_satellite_activation(self):
         sat = MJSatelliteLayer()
-        res = sat.activate()
+        res: Dict[str, Any] = sat.activate()  # type: ignore[assignment, call-arg, unknown-member, reportUnknownMemberType, reportUnknownMemberType, type-arg, reportUnknownMemberType, type-unknown]
         self.assertEqual(res.get("status"), "ok")
         self.assertTrue(sat.connected)
 
     def test_satellite_status(self):
         sat = MJSatelliteLayer()
-        status = sat.status()
+        status: Dict[str, Any] = sat.status()  # type: ignore
         self.assertFalse(status.get("connected"))
-        sat.activate()
-        status = sat.status()
+        sat.activate() # pyright: ignore[reportUnknownMemberType]
+        status = sat.status()  # type: ignore
         self.assertTrue(status.get("connected"))
 
 

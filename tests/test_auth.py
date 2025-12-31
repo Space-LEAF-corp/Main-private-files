@@ -34,6 +34,9 @@ class TestAuthManager(unittest.TestCase):
         self.assertIsNotNone(otp)
 
         # complete login with OTP
+        # Ensure otp is not None before passing to complete_login
+        if otp is None:
+            self.fail("OTP should not be None")
         res2 = self.am.complete_login(user, otp)
         self.assertEqual(res2.get("status"), "ok")
         self.assertIn("session_token", res2)
