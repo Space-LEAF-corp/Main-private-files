@@ -1,16 +1,20 @@
 
+
+
 from typing import List
 import numpy as np
 from numpy.typing import NDArray
+from numpy.random import Generator
 from .models import Plate
 
-def initialize_plates(width: int, height: int, plate_count: int, rng: np.random.Generator) -> List[Plate]:
+
+def initialize_plates(width: int, height: int, plate_count: int, rng: Generator) -> List[Plate]:
     plates: List[Plate] = []
     for pid in range(plate_count):
-        angle = float(rng.uniform(0, 2 * np.pi)) # pyright: ignore[reportUnknownArgumentType]
+        angle = float(rng.uniform(0, 2 * np.pi))
         speed: float = float(rng.uniform(0.001, 0.01))
         vx: float = float(speed * np.cos(angle))
-        vy: float = float(speed * np.sin(angle)) # pyright: ignore[reportUnknownArgumentType]
+        vy: float = float(speed * np.sin(angle))
         is_oceanic = bool(rng.integers(0, 2))
         plates.append(Plate(id=pid, velocity=(vx, vy), is_oceanic=is_oceanic))
     return plates

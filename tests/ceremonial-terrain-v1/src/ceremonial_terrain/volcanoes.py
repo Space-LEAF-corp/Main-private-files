@@ -1,14 +1,13 @@
 
 
-import numpy as np
-from numpy.random import Generator
+import numpy as np  # type: ignore
 
 from .models import VolcanoEvent, WorldState
 
 
 
 
-def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> WorldState:
+def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> WorldState: # pyright: ignore[reportUnknownParameterType]
     """
     Simple volcanic model:
     - Low probability random eruptions in low or mid elevation zones.
