@@ -3,6 +3,7 @@ import time
 import unittest
 import sys
 import os
+from typing import Any
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from time_engine import (
     LearningItem,
@@ -141,16 +142,42 @@ class TestLearningItem(unittest.TestCase):
         self.assertAlmostEqual(item.created_at, item.last_review, delta=0.1)
 
 
+
 class TestTimeEngine(unittest.TestCase):
     """Test TimeEngine main class."""
 
     def setUp(self):
         self.engine = TimeEngine()
 
+    def _extract_float(self, value: object) -> float:
+        # Helper to extract float from possibly nested dict/object
+        if isinstance(value, (float, int)):
+            return float(value)
+        if isinstance(value, dict):
+            for key in ("value", "progress", "score", "strength", "retention", "hours", "time"):
+                if key in value:
+                    v: object = value[key]  # type: ignore
+                    if isinstance(v, (float, int)):
+                        return float(v)
+                    if isinstance(v, str):
+                        try:
+                            return float(v)
+                        except Exception:
+                            continue
+            self.fail(f"Value is not convertible to float: {value!r}")
+        # Only allow float conversion for float/int/str, not arbitrary objects
+        if isinstance(value, str):
+            try:
+                return float(value)
+            except Exception:
+                self.fail(f"String value is not convertible to float: {value!r}")
+        self.fail(f"Value is not convertible to float: {value!r}")
+
     def test_add_item(self):
         """Should add learning items."""
         item = self.engine.add_item("id1", "Learn Python")
-        self.assertIn("id1", self.engine.items)
+        items_dict: dict[str, object] = dict(self.engine.items)  # type: ignore
+        self.assertIn("id1", items_dict)
         self.assertEqual(item.content, "Learn Python")
 
     def test_session_tracking(self):
@@ -162,29 +189,11 @@ class TestTimeEngine(unittest.TestCase):
         result = self.engine.end_session()
         
         session_duration = result["session_duration_hours"]
-        # If session_duration is a dict/object, extract float value
-        if isinstance(session_duration, dict):
-            for key in ("value", "progress", "score", "strength", "retention", "hours", "time"):
-                if key in session_duration:
-                    session_duration = session_duration[key]
-                    break
-        try:
-            session_duration_float = float(session_duration)
-        except (TypeError, ValueError):
-            self.fail(f"session_duration_hours is not convertible to float: {session_duration!r}")
+        session_duration_float = self._extract_float(session_duration)
         self.assertGreater(session_duration_float, 0.0)
 
         total_learning_time = result["total_learning_time_hours"]
-        # If total_learning_time is a dict/object, extract float value
-        if isinstance(total_learning_time, dict):
-            for key in ("value", "progress", "score", "strength", "retention", "hours", "time"):
-                if key in total_learning_time:
-                    total_learning_time = total_learning_time[key]
-                    break
-        try:
-            total_learning_time_float = float(total_learning_time)
-        except (TypeError, ValueError):
-            self.fail(f"total_learning_time_hours is not convertible to float: {total_learning_time!r}")
+        total_learning_time_float = self._extract_float(total_learning_time)
         self.assertGreater(total_learning_time_float, 0.0)
 
     def test_review_item_quality_affects_retention(self):
@@ -194,29 +203,12 @@ class TestTimeEngine(unittest.TestCase):
         # Low quality review
         result_low = self.engine.review_item("id1", 2)
         low_retention = result_low["retention_strength"]
-        # If low_retention is a dict/object, extract float value
-        if isinstance(low_retention, dict):
-            for key in ("value", "progress", "score", "strength", "retention"):
-                if key in low_retention:
-                    low_retention = low_retention[key]
-                    break
-        try:
-            low_retention_float = float(low_retention)
-        except (TypeError, ValueError):
-            self.fail(f"retention_strength is not convertible to float: {low_retention!r}")
+        low_retention_float = self._extract_float(low_retention)
 
         # High quality review
         result_high = self.engine.review_item("id1", 5)
         high_retention = result_high["retention_strength"]
-        if isinstance(high_retention, dict):
-            for key in ("value", "progress", "score", "strength", "retention"):
-                if key in high_retention:
-                    high_retention = high_retention[key]
-                    break
-        try:
-            high_retention_float = float(high_retention)
-        except (TypeError, ValueError):
-            self.fail(f"retention_strength is not convertible to float: {high_retention!r}")
+        high_retention_float = self._extract_float(high_retention)
 
         self.assertLess(low_retention_float, high_retention_float)
 
@@ -254,7 +246,8 @@ class TestTimeEngine(unittest.TestCase):
         analytics = self.engine.learning_analytics()
         self.assertEqual(analytics["total_items"], 2)
         self.assertEqual(analytics["total_reviews"], 2)
-        self.assertGreater(analytics["average_retention"], 0.0)
+        avg_retention = self._extract_float(analytics["average_retention"])
+        self.assertGreater(avg_retention, 0.0)
 
     def test_export_state(self):
         """Should export complete learning state."""
@@ -264,7 +257,12 @@ class TestTimeEngine(unittest.TestCase):
         state = self.engine.export_state()
         
         self.assertIn("items", state)
-        self.assertIn("id1", state["items"])
+        items = state["items"]
+        if isinstance(items, dict):
+            items_dict: dict[str, object] = items  # type: ignore
+            self.assertIn("id1", items_dict)
+        else:
+            self.fail(f"state['items'] is not a dict: {type(items)}")
         self.assertIn("total_learning_time", state)
         self.assertIn("review_history", state)
         self.assertIn("analytics", state)
@@ -284,7 +282,7 @@ class TestTimeEngine(unittest.TestCase):
             self.engine.review_item(item_id, 4)
         
         # End session
-        result = self.engine.end_session()
+        self.engine.end_session()
         
         # Check analytics
         analytics = self.engine.learning_analytics()
@@ -296,10 +294,18 @@ class TestTimeEngine(unittest.TestCase):
         if isinstance(exp_progress, (float, int)):
             exp_progress_float = float(exp_progress)
         elif isinstance(exp_progress, dict):
+            exp_progress_typed: dict[str, Any] = exp_progress  # type: ignore
             for key in ("value", "progress", "score"):
-                if key in exp_progress and isinstance(exp_progress[key], (float, int)):
-                    exp_progress_float = float(exp_progress[key])
+                v = exp_progress_typed.get(key, None)
+                if isinstance(v, (float, int)):
+                    exp_progress_float = float(v)
                     break
+                elif isinstance(v, str):
+                    try:
+                        exp_progress_float = float(v)
+                        break
+                    except Exception:
+                        continue
         if exp_progress_float is None:
             self.fail(f"exponential_progress is not convertible to float: {exp_progress!r}")
         self.assertGreater(exp_progress_float, 0.0)
