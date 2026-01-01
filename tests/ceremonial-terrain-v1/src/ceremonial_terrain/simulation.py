@@ -8,15 +8,19 @@ from .models import WorldState, Snapshot
 
 from .terrain import generate_initial_heightmap, generate_seafloor_from_surface  # type: ignore
 import numpy as np  # type: ignore[import]
-from numpy.random import Generator # pyright: ignore[reportUnknownVariableType]
+try:
+    from numpy.random import Generator  # type: ignore[import]
+except ImportError:
+    Generator = None  # type: ignore
 from .tectonics import initialize_plates # pyright: ignore[reportUnknownVariableType]
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .models import Plate
     from typing import List
-    from numpy import ndarray
-    def update_surface_for_tectonics(surface: "ndarray", plates: "List[Plate]", day: int) -> "ndarray": ... # pyright: ignore[reportUnknownParameterType]
-    def initialize_plates(width: int, height: int, plate_count: int, rng: Generator) -> "List[Plate]": ... # pyright: ignore[reportUnknownParameterType]
+    from numpy import ndarray # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+    def update_surface_for_tectonics(surface: ndarray, plates: List[Plate], day: int) -> ndarray: ... # pyright: ignore[reportUnknownParameterType]
+    from typing import Any
+    def initialize_plates(width: int, height: int, plate_count: int, rng: Any) -> List[Plate]: ... # pyright: ignore[reportUnknownParameterType]
 else:
     from .tectonics import update_surface_for_tectonics
 from .models import Plate
@@ -36,7 +40,7 @@ else:
 def run_365_day_simulation(config: SimulationConfig) -> Dict[int, Snapshot]:
     rng = np.random.default_rng(config.seed) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
 
-    surface: np.ndarray = generate_initial_heightmap(config.width, config.height, rng) # pyright: ignore[reportUnknownVariableType, reportUnknownArgumentType]
+    surface: np.ndarray = generate_initial_heightmap(config.width, config.height, rng) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType, reportUnknownArgumentType]
     seafloor: np.ndarray = generate_seafloor_from_surface(surface)  # type: ignore[reportUnknownVariableType]
     plates = initialize_plates(
         config.width,
@@ -57,8 +61,8 @@ def run_365_day_simulation(config: SimulationConfig) -> Dict[int, Snapshot]:
         )
         state = update_volcanic_activity(state, rng) # pyright: ignore[reportUnknownArgumentType]
         state.seafloor_height = update_seafloor_for_tectonics_and_volcanoes(
-            state.seafloor_height, state.surface_height # pyright: ignore[reportUnknownArgumentType] # pyright: ignore[reportUnknownMemberType]
-        )
+            state.seafloor_height, state.surface_height  # type: ignore[reportUnknownArgumentType]
+        )  # type: ignore[assignment]
 
         if day % config.snapshot_interval == 0 or day == config.days:
             snapshots[day] = _copy_state(state)
@@ -88,12 +92,12 @@ from typing import cast
 
 def _copy_state(state: WorldState) -> Snapshot:
     # Ensure surface_height and seafloor_height are np.ndarray for type checkers
-    from numpy import ndarray
-    surface_height: ndarray = np.array(state.surface_height, copy=True)
-    seafloor_height: ndarray = np.array(cast(ndarray, state.seafloor_height), copy=True)
+    from numpy import ndarray # pyright: ignore[reportMissingImports, reportUnknownVariableType]
+    surface_height: ndarray = np.array(state.surface_height, copy=True) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
+    seafloor_height: ndarray = np.array(cast(ndarray, state.seafloor_height), copy=True) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     # Handle volcano_events if not present
     volcano_events = list(getattr(state, 'volcano_events', []))
-    return WorldState(
+    return Snapshot(
         day=state.day,
         surface_height=surface_height, # pyright: ignore[reportUnknownArgumentType]
         seafloor_height=seafloor_height, # pyright: ignore[reportUnknownArgumentType]
@@ -105,10 +109,10 @@ def _states_equal(a: WorldState, b: WorldState, tol: float = 1e-6) -> bool:
     if a.day != b.day:
         return False
     # Ensure surface_height and seafloor_height are np.ndarray for type checkers
-    a_surface = cast(np.ndarray, a.surface_height) # pyright: ignore[reportUnknownVariableType]
-    b_surface = cast(np.ndarray, b.surface_height) # pyright: ignore[reportUnknownVariableType]
-    a_seafloor = cast(np.ndarray, a.seafloor_height)
-    b_seafloor = cast(np.ndarray, b.seafloor_height)
+    a_surface = cast(np.ndarray, a.surface_height) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
+    b_surface = cast(np.ndarray, b.surface_height) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
+    a_seafloor = cast(np.ndarray, a.seafloor_height) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
+    b_seafloor = cast(np.ndarray, b.seafloor_height) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     if a_surface.shape != b_surface.shape:  # type: ignore[attr-defined]
         return False
     if a_seafloor.shape != b_seafloor.shape:  # type: ignore[attr-defined]

@@ -10,9 +10,9 @@ def update_seafloor_for_tectonics_and_volcanoes(seafloor: np.ndarray, surface: n
     - Deeper where surface is low
     """
     # type: (np.ndarray, np.ndarray) -> np.ndarray
-    assert isinstance(seafloor, np.ndarray), "seafloor must be a numpy ndarray"
+    assert isinstance(seafloor, np.ndarray), "seafloor must be a numpy ndarray" # pyright: ignore[reportUnknownMemberType]
     sea_level = 0.4
-    ocean_mask: np.ndarray = surface < sea_level # pyright: ignore[reportUnknownVariableType]
+    ocean_mask: np.ndarray = surface < sea_level # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     new_seafloor: np.ndarray = seafloor.copy()  # type: ignore[attr-defined]
     new_seafloor[ocean_mask] = -(sea_level - surface[ocean_mask]) * 1.5
     new_seafloor[~ocean_mask] = 0.0

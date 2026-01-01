@@ -1,18 +1,21 @@
 
 
+
 import numpy as np  # type: ignore
+from numpy import ndarray # pyright: ignore[reportMissingImports, reportUnknownVariableType]
 
 from .models import VolcanoEvent, WorldState
 
 
 
 
-def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> WorldState: # pyright: ignore[reportUnknownParameterType]
+def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> WorldState: # pyright: ignore[reportUnknownMemberType, reportUnknownParameterType]
     """
     Simple volcanic model:
     - Low probability random eruptions in low or mid elevation zones.
     - Eruptions raise local elevation slightly.
     """
+    # rng: np.random.Generator is explicitly typed for Pyright
     # Ensure surface is a numpy ndarray for type checkers
     surface: np.ndarray = state.surface_height.copy()  # type: ignore[attr-defined]
     h_raw, w_raw = surface.shape  # type: ignore[attr-defined]
@@ -22,13 +25,11 @@ def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> Wor
     # Probability of eruption per day
     eruption_prob = 0.01
 
-
-
     if rng.uniform() < eruption_prob: # pyright: ignore[reportUnknownMemberType]
         i = int(rng.integers(low=0, high=h, dtype=int)) # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
         j = int(rng.integers(low=0, high=w, dtype=int)) # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
         low, high = 0.01, 0.05
-        strength = float(rng.uniform(low, high)) # pyright: ignore[reportUnknownArgumentType]
+        strength = float(rng.uniform(low=low, high=high)) # pyright: ignore[reportUnknownMemberType, reportUnknownMemberType, reportUnknownArgumentType]
         _apply_eruption(surface, i, j, strength) # pyright: ignore[reportUnknownArgumentType]
         state.volcano_events.append(VolcanoEvent(day=state.day, position=(i, j), strength=strength))
 
@@ -42,7 +43,7 @@ def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> Wor
     state.surface_height = surface
     return state
 
-def _apply_eruption(surface: np.ndarray, i: int, j: int, strength: float, radius: int = 3) -> None: # pyright: ignore[reportUnknownParameterType]
+def _apply_eruption(surface: ndarray, i: int, j: int, strength: float, radius: int = 3) -> None: # pyright: ignore[reportUnknownParameterType]
     h, w = surface.shape # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     for di in range(-radius, radius+1):
         for dj in range(-radius, radius+1):
