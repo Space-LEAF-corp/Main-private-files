@@ -1,15 +1,14 @@
 
 
 import numpy as np
-from numpy import random
-from numpy.typing import NDArray
-Generator = random.Generator
+from numpy.random import Generator
+
 from .models import VolcanoEvent, WorldState
 
 
 
 
-def update_volcanic_activity(state: WorldState, rng: random.Generator) -> WorldState:
+def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> WorldState:
     """
     Simple volcanic model:
     - Low probability random eruptions in low or mid elevation zones.
@@ -26,9 +25,9 @@ def update_volcanic_activity(state: WorldState, rng: random.Generator) -> WorldS
 
 
 
-    if rng.uniform() < eruption_prob:
-        i = int(rng.integers(low=0, high=h, dtype=int)) # pyright: ignore[reportUnknownArgumentType]
-        j = int(rng.integers(low=0, high=w, dtype=int)) # pyright: ignore[reportUnknownArgumentType]
+    if rng.uniform() < eruption_prob: # pyright: ignore[reportUnknownMemberType]
+        i = int(rng.integers(low=0, high=h, dtype=int)) # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
+        j = int(rng.integers(low=0, high=w, dtype=int)) # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
         low, high = 0.01, 0.05
         strength = float(rng.uniform(low, high)) # pyright: ignore[reportUnknownArgumentType]
         _apply_eruption(surface, i, j, strength) # pyright: ignore[reportUnknownArgumentType]
@@ -44,7 +43,7 @@ def update_volcanic_activity(state: WorldState, rng: random.Generator) -> WorldS
     state.surface_height = surface
     return state
 
-def _apply_eruption(surface: NDArray, i: int, j: int, strength: float, radius: int = 3) -> None: # pyright: ignore[reportUnknownParameterType]
+def _apply_eruption(surface: np.ndarray, i: int, j: int, strength: float, radius: int = 3) -> None: # pyright: ignore[reportUnknownParameterType]
     h, w = surface.shape # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     for di in range(-radius, radius+1):
         for dj in range(-radius, radius+1):

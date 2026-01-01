@@ -38,4 +38,4 @@ def update_surface_for_tectonics(surface: NDArray, plates: List[Plate], day: int
     deformed -= np.min(deformed)
     maxv = max(deformed.max(), 1e-9) # pyright: ignore[reportUnknownArgumentType]
     deformed /= maxv
-    return deformed
+    return deformed # pyright: ignore[reportUnknownVariableType]

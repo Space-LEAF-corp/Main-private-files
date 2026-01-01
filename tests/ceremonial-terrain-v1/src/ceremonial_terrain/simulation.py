@@ -75,7 +75,7 @@ from numpy import ndarray
 def _copy_state(state: WorldState) -> Snapshot:
     # Ensure surface_height and seafloor_height are np.ndarray for type checkers
     surface_height: np.ndarray = np.array(state.surface_height, copy=True)
-    seafloor_height: np.ndarray = np.array(state.seafloor_height, copy=True)
+    seafloor_height: np.ndarray = np.array(cast(np.ndarray, state.seafloor_height), copy=True)
     # Handle volcano_events if not present
     volcano_events = list(getattr(state, 'volcano_events', []))
     return WorldState(

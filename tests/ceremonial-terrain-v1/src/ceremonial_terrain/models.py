@@ -1,9 +1,13 @@
+import numpy as np # pyright: ignore[reportMissingImports]
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import numpy as np
+    import numpy as np # pyright: ignore[reportMissingImports]
 from dataclasses import dataclass, field
 from typing import List, Tuple
+
+if TYPE_CHECKING:
+    import numpy as np # pyright: ignore[reportMissingImports]
 
 @dataclass
 class Plate:
@@ -34,7 +38,7 @@ class WorldState:
     def __post_init__(self):
         global np
         try:
-            import numpy as np
+            import numpy as np # pyright: ignore[reportMissingImports]
         except ImportError:
             raise ImportError("numpy is required for WorldState but could not be imported.")
 
