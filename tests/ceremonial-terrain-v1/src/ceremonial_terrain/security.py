@@ -1,7 +1,7 @@
 import hashlib
 import json
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict
 
 @dataclass
 class UserAccount:
@@ -30,11 +30,11 @@ class SecurityManager:
             return False
         return user.password_hash == self._hash_password(password)
 
-    def register_project(self, project_id: str, owner: str, payload: dict) -> None:
+    def register_project(self, project_id: str, owner: str, payload: dict[str, object]) -> None:
         integrity_hash = self._hash_payload(payload)
         self._projects[project_id] = ProjectMetadata(owner=owner, integrity_hash=integrity_hash)
 
-    def verify_project(self, project_id: str, payload: dict) -> bool:
+    def verify_project(self, project_id: str, payload: dict[str, object]) -> bool:
         meta = self._projects.get(project_id)
         if not meta:
             return False
@@ -46,6 +46,6 @@ class SecurityManager:
         return hashlib.sha256(password.encode("utf-8")).hexdigest()
 
     @staticmethod
-    def _hash_payload(payload: dict) -> str:
+    def _hash_payload(payload: dict[str, object]) -> str:
         data = json.dumps(payload, sort_keys=True).encode("utf-8")
         return hashlib.sha256(data).hexdigest()

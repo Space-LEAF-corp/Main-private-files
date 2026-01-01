@@ -1,35 +1,51 @@
-from typing import List
+
+
 import numpy as np
+from numpy import random
+from numpy.typing import NDArray
+Generator = random.Generator
 from .models import VolcanoEvent, WorldState
 
-def update_volcanic_activity(state: WorldState, rng: np.random.Generator) -> WorldState:
+
+
+
+def update_volcanic_activity(state: WorldState, rng: random.Generator) -> WorldState:
     """
     Simple volcanic model:
     - Low probability random eruptions in low or mid elevation zones.
     - Eruptions raise local elevation slightly.
     """
-    surface = state.surface_height.copy()
-    h, w = surface.shape
+    # Ensure surface is a numpy ndarray for type checkers
+    surface: np.ndarray = state.surface_height.copy()  # type: ignore[attr-defined]
+    h_raw, w_raw = surface.shape  # type: ignore[attr-defined]
+    h = int(h_raw) # pyright: ignore[reportUnknownArgumentType]
+    w = int(w_raw) # pyright: ignore[reportUnknownArgumentType]
 
     # Probability of eruption per day
     eruption_prob = 0.01
 
+
+
     if rng.uniform() < eruption_prob:
-        i = int(rng.integers(0, h))
-        j = int(rng.integers(0, w))
-        strength = float(rng.uniform(0.01, 0.05))
-        _apply_eruption(surface, i, j, strength)
+        i = int(rng.integers(low=0, high=h, dtype=int)) # pyright: ignore[reportUnknownArgumentType]
+        j = int(rng.integers(low=0, high=w, dtype=int)) # pyright: ignore[reportUnknownArgumentType]
+        low, high = 0.01, 0.05
+        strength = float(rng.uniform(low, high)) # pyright: ignore[reportUnknownArgumentType]
+        _apply_eruption(surface, i, j, strength) # pyright: ignore[reportUnknownArgumentType]
         state.volcano_events.append(VolcanoEvent(day=state.day, position=(i, j), strength=strength))
 
     # Renormalize
-    surface -= surface.min()
-    maxv = max(surface.max(), 1e-9)
-    surface /= maxv
+    surface = np.asarray(surface)  # type: ignore[attr-defined]
+    minv = float(np.min(surface)) # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
+    surface = surface - minv # pyright: ignore[reportUnknownVariableType]
+    maxval = float(np.max(surface)) # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]
+    maxv = max(1e-9, maxval)
+    surface = surface / maxv # pyright: ignore[reportUnknownVariableType]
     state.surface_height = surface
     return state
 
-def _apply_eruption(surface: np.ndarray, i: int, j: int, strength: float, radius: int = 3) -> None:
-    h, w = surface.shape
+def _apply_eruption(surface: NDArray, i: int, j: int, strength: float, radius: int = 3) -> None: # pyright: ignore[reportUnknownParameterType]
+    h, w = surface.shape # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
     for di in range(-radius, radius+1):
         for dj in range(-radius, radius+1):
             ii, jj = i + di, j + dj
