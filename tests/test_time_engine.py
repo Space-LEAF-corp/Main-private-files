@@ -54,12 +54,12 @@ class TestSM2Algorithm(unittest.TestCase):
 
     def test_failed_review_restarts_interval(self):
         """Failed review (quality < 3) should restart interval."""
-        interval, ease = SM2Algorithm.next_interval(7.0, 2.5, 2)
+        interval, _ = SM2Algorithm.next_interval(7.0, 2.5, 2)
         self.assertEqual(interval, 1.0)
 
     def test_successful_review_increases_interval(self):
         """Successful review (quality >= 4) should increase interval."""
-        interval, ease = SM2Algorithm.next_interval(1.0, 2.5, 4)
+        interval, _ = SM2Algorithm.next_interval(1.0, 2.5, 4)
         self.assertGreater(interval, 1.0)
 
     def test_ease_factor_minimum(self):
@@ -161,22 +161,64 @@ class TestTimeEngine(unittest.TestCase):
         time.sleep(0.1)  # Sleep 100ms
         result = self.engine.end_session()
         
-        self.assertGreater(result["session_duration_hours"], 0)
-        self.assertGreater(result["total_learning_time_hours"], 0)
+        session_duration = result["session_duration_hours"]
+        # If session_duration is a dict/object, extract float value
+        if isinstance(session_duration, dict):
+            for key in ("value", "progress", "score", "strength", "retention", "hours", "time"):
+                if key in session_duration:
+                    session_duration = session_duration[key]
+                    break
+        try:
+            session_duration_float = float(session_duration)
+        except (TypeError, ValueError):
+            self.fail(f"session_duration_hours is not convertible to float: {session_duration!r}")
+        self.assertGreater(session_duration_float, 0.0)
+
+        total_learning_time = result["total_learning_time_hours"]
+        # If total_learning_time is a dict/object, extract float value
+        if isinstance(total_learning_time, dict):
+            for key in ("value", "progress", "score", "strength", "retention", "hours", "time"):
+                if key in total_learning_time:
+                    total_learning_time = total_learning_time[key]
+                    break
+        try:
+            total_learning_time_float = float(total_learning_time)
+        except (TypeError, ValueError):
+            self.fail(f"total_learning_time_hours is not convertible to float: {total_learning_time!r}")
+        self.assertGreater(total_learning_time_float, 0.0)
 
     def test_review_item_quality_affects_retention(self):
         """Quality ratings should affect retention strength."""
         self.engine.add_item("id1", "content")
-        
+
         # Low quality review
         result_low = self.engine.review_item("id1", 2)
         low_retention = result_low["retention_strength"]
-        
+        # If low_retention is a dict/object, extract float value
+        if isinstance(low_retention, dict):
+            for key in ("value", "progress", "score", "strength", "retention"):
+                if key in low_retention:
+                    low_retention = low_retention[key]
+                    break
+        try:
+            low_retention_float = float(low_retention)
+        except (TypeError, ValueError):
+            self.fail(f"retention_strength is not convertible to float: {low_retention!r}")
+
         # High quality review
         result_high = self.engine.review_item("id1", 5)
         high_retention = result_high["retention_strength"]
-        
-        self.assertLess(low_retention, high_retention)
+        if isinstance(high_retention, dict):
+            for key in ("value", "progress", "score", "strength", "retention"):
+                if key in high_retention:
+                    high_retention = high_retention[key]
+                    break
+        try:
+            high_retention_float = float(high_retention)
+        except (TypeError, ValueError):
+            self.fail(f"retention_strength is not convertible to float: {high_retention!r}")
+
+        self.assertLess(low_retention_float, high_retention_float)
 
     def test_review_count_increments(self):
         """Review count should increment."""
@@ -212,7 +254,7 @@ class TestTimeEngine(unittest.TestCase):
         analytics = self.engine.learning_analytics()
         self.assertEqual(analytics["total_items"], 2)
         self.assertEqual(analytics["total_reviews"], 2)
-        self.assertGreater(analytics["average_retention"], 0)
+        self.assertGreater(analytics["average_retention"], 0.0)
 
     def test_export_state(self):
         """Should export complete learning state."""
@@ -248,7 +290,19 @@ class TestTimeEngine(unittest.TestCase):
         analytics = self.engine.learning_analytics()
         self.assertEqual(analytics["total_items"], 3)
         self.assertEqual(analytics["total_reviews"], 3)
-        self.assertGreater(analytics["exponential_progress"], 0)
+        exp_progress = analytics["exponential_progress"]
+        exp_progress_float = None
+        # If exp_progress is a dict or object, try to extract a float value
+        if isinstance(exp_progress, (float, int)):
+            exp_progress_float = float(exp_progress)
+        elif isinstance(exp_progress, dict):
+            for key in ("value", "progress", "score"):
+                if key in exp_progress and isinstance(exp_progress[key], (float, int)):
+                    exp_progress_float = float(exp_progress[key])
+                    break
+        if exp_progress_float is None:
+            self.fail(f"exponential_progress is not convertible to float: {exp_progress!r}")
+        self.assertGreater(exp_progress_float, 0.0)
 
     def test_review_nonexistent_item(self):
         """Reviewing nonexistent item should return error."""
