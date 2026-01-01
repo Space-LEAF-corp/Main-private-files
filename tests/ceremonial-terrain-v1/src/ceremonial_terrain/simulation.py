@@ -34,7 +34,7 @@ else:
 
 
 def run_365_day_simulation(config: SimulationConfig) -> Dict[int, Snapshot]:
-    rng = np.random.default_rng(config.seed) # pyright: ignore[reportUnknownVariableType]
+    rng = np.random.default_rng(config.seed) # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
 
     surface: np.ndarray = generate_initial_heightmap(config.width, config.height, rng) # pyright: ignore[reportUnknownVariableType, reportUnknownArgumentType]
     seafloor: np.ndarray = generate_seafloor_from_surface(surface)  # type: ignore[reportUnknownVariableType]
