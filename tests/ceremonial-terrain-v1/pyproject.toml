@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ceremonial-terrain"
+version = "0.1.0"
+description = "Ceremonial Terrain v1 – Map Generator Prototype"
+authors = [
+  { name = "Space Leaf Corp", email = "example@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "numpy>=1.24",
+]
+
+[project.scripts]
+ceremonial-terrain = "ceremonial_terrain.cli:main"
