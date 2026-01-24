@@ -1,4 +1,4 @@
-
+ updated license 1.0 as of 2026
 Jarvondis (refactor)
 ====================
 
