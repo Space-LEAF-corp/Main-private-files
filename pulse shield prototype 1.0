@@ -1,0 +1,143 @@
+import ui
+import speech
+import hashlib
+import os
+import json
+
+LOGIN_FILE = "local_identity.json"
+
+
+def save_local_identity(username, password):
+    """
+    Saves a hashed version of the username and password locally.
+    No data leaves the device.
+    """
+    hashed_user = hashlib.sha256(username.encode()).hexdigest()
+    hashed_pass = hashlib.sha256(password.encode()).hexdigest()
+
+    data = {
+        "username": hashed_user,
+        "password": hashed_pass
+    }
+
+    with open(LOGIN_FILE, "w") as f:
+        json.dump(data, f)
+
+
+def identity_exists():
+    return os.path.exists(LOGIN_FILE)
+
+
+def create_login(sender):
+    """
+    Opens the login creation screen.
+    """
+    v = ui.View(name="Create Local Identity", bg_color="white")
+
+    label = ui.Label(
+        text="Create Your Local Identity\n(No data leaves your device)",
+        alignment=ui.ALIGN_CENTER,
+        number_of_lines=2,
+        frame=(10, 10, 350, 60)
+    )
+    v.add_subview(label)
+
+    user_field = ui.TextField(
+        placeholder="Choose a username",
+        frame=(20, 90, 300, 40),
+        border_width=1
+    )
+    v.add_subview(user_field)
+
+    pass_field = ui.TextField(
+        placeholder="Choose a password",
+        secure=True,
+        frame=(20, 150, 300, 40),
+        border_width=1
+    )
+    v.add_subview(pass_field)
+
+    def save_and_close(sender):
+        username = user_field.text.strip()
+        password = pass_field.text.strip()
+
+        if username and password:
+            save_local_identity(username, password)
+            ui.close_all()
+            final_screen()
+        else:
+            label.text = "Please enter both fields."
+
+    save_button = ui.Button(
+        title="Save Identity",
+        frame=(20, 210, 300, 50),
+        action=save_and_close,
+        bg_color="#4CAF50",
+        tint_color="white"
+    )
+    v.add_subview(save_button)
+
+    v.present("sheet")
+
+
+def final_screen():
+    """
+    Final confirmation screen after identity creation.
+    """
+    v = ui.View(name="Pulse Shield Ready", bg_color="white")
+
+    label = ui.Label(
+        text="Your local identity is set.\nYou may now use the Pulse Shield prototype.",
+        alignment=ui.ALIGN_CENTER,
+        number_of_lines=2,
+        frame=(10, 10, 350, 60)
+    )
+    v.add_subview(label)
+
+    v.present("sheet")
+
+
+def readme_screen():
+    """
+    First screen shown to the user.
+    """
+    v = ui.View(name="Pulse Shield Read Me", bg_color="white")
+
+    readme_text = (
+        "Welcome to the Pulse Shield Prototype.\n\n"
+        "This tool is designed to simulate a digital hygiene system that helps "
+        "you maintain control over your device and preserve your identity.\n\n"
+        "No data is collected.\n"
+        "Nothing leaves your device.\n"
+        "Your identity is stored locally and privately.\n\n"
+        "To continue, you must create a local login after verifying your intent."
+    )
+
+    label = ui.TextView(
+        text=readme_text,
+        editable=False,
+        frame=(10, 10, 350, 300)
+    )
+    v.add_subview(label)
+
+    def continue_action(sender):
+        ui.close_all()
+        create_login(None)
+
+    continue_button = ui.Button(
+        title="Continue",
+        frame=(20, 320, 300, 50),
+        action=continue_action,
+        bg_color="#2196F3",
+        tint_color="white"
+    )
+    v.add_subview(continue_button)
+
+    # Speak the message aloud
+    speech.say(readme_text)
+
+    v.present("sheet")
+
+
+# Start the app
+readme_screen()
