@@ -1,0 +1,37 @@
+[QR Code in World]
+        |
+        v
+[Phone Camera Capture]
+        |
+        v
+[QR Decode on Phone] --(no cloud, local only)
+        |
+        v
+[Payload Extracted]
+        |
+        v
+[Encrypted Session to Watch (BLE/Wi‑Fi Direct)]
+        |
+        v
+[Watch Receives Payload]
+        |
+        v
+[Ghostbusters Scrub Layer]
+  - sanitize, normalize, strip executables
+        |
+        v
+[Cyber Busters Containment Layer]
+  - classify: Rogue / Unknown / Benign
+  - wrap in encrypted capsule
+        |
+        v
+[Purr Translation Layer]
+  - generate safe, human‑readable summary
+        |
+        v
+[Frett Threshold Monitor]
+  - update tension metrics, maybe shift mode
+        |
+        v
+[Local Vault Storage]
+  - state: "Flagged Rogue AI — Inactive, Pending Reeducation"
