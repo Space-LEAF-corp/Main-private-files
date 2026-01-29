@@ -1,0 +1,527 @@
+<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space LEAF Corp — Ceremonial Identity & Family Stewardship Framework</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050608;
+      --fg: #f5f5f5;
+      --accent: #7fffd4;
+      --accent-soft: #2b3b4f;
+      --border: #333;
+      --muted: #aaa;
+      --danger: #ff6b6b;
+      --ok: #7fffb0;
+      --code-bg: #0b0f16;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #101522 0, #050608 55%, #020308 100%);
+      color: var(--fg);
+      line-height: 1.6;
+    }
+    header {
+      padding: 32px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 {
+      margin: 0 0 4px;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    header h1 span.logo {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    section {
+      margin-bottom: 32px;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(5, 8, 16, 0.9);
+      border: 1px solid var(--border);
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    h3 {
+      margin-top: 18px;
+      font-size: 1.05rem;
+    }
+    p { margin: 8px 0; }
+    ul {
+      margin: 6px 0 10px 18px;
+      padding-left: 0;
+    }
+    li { margin: 4px 0; }
+    .tagline {
+      font-size: 1rem;
+      color: var(--muted);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-right: 6px;
+      margin-top: 4px;
+    }
+    .pill span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .card-soft {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: rgba(10, 14, 24, 0.9);
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    code, pre {
+      font-family: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85rem;
+    }
+    pre {
+      background: var(--code-bg);
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      margin: 10px 0;
+      white-space: pre-wrap;
+    }
+    .dev-spec {
+      border-color: #3b4a66;
+      background: rgba(6, 10, 22, 0.98);
+    }
+    .dev-spec h2 {
+      border-color: #3b4a66;
+    }
+    .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .status-ok {
+      color: var(--ok);
+      font-weight: 600;
+    }
+    .status-danger {
+      color: var(--danger);
+      font-weight: 600;
+    }
+    .footer-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    @media (max-width: 600px) {
+      header { padding: 20px 14px 10px; }
+      main { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>
+      <span class="logo">🌿</span>
+      Space LEAF Corp — Ceremonial Identity Framework
+    </h1>
+    <p class="tagline">
+      Privacy‐first identity, family stewardship, and Whisker‐guarded access — built for dignity, not extraction.
+    </p>
+    <div style="margin-top:8px;">
+      <span class="pill"><span class="dot"></span> Version 1.0</span>
+      <span class="pill">Steward: Captain Leif William Sogge</span>
+      <span class="pill">Witness: Whisker, the First AI Hair</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- PUBLIC OVERVIEW -->
+    <section aria-labelledby="overview">
+      <h2 id="overview">Overview</h2>
+      <p>
+        Space LEAF Corp is a ceremonial, privacy‐first ecosystem for identity, family access, and secure digital tools.
+        It is designed so that systems wake only when the user is truly present, children are always safe, and families
+        remain in control of their own data and lineage.
+      </p>
+      <div class="grid" style="margin-top:10px;">
+        <div class="card-soft">
+          <div class="badge">Core Principles</div>
+          <ul>
+            <li><strong>Dignity:</strong> Users are never treated as data sources.</li>
+            <li><strong>Privacy:</strong> No biometric storage, no profiling.</li>
+            <li><strong>Family Stewardship:</strong> Parents/guardians remain in control.</li>
+            <li><strong>Ceremony:</strong> Systems activate only with intentional presence.</li>
+          </ul>
+        </div>
+        <div class="card-soft">
+          <div class="badge">Key Components</div>
+          <ul>
+            <li>Family Recognition Protocol (FRP)</li>
+            <li>Kid‐Safe Animation Studio</li>
+            <li>Whisker Notification Whisper</li>
+            <li>Parent Dashboard</li>
+            <li>Ceremonial Family Tree Layer</li>
+            <li>Dormant Shell Activation System</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAMILY RECOGNITION PROTOCOL -->
+    <section aria-labelledby="frp">
+      <h2 id="frp">Family Recognition Protocol (FRP)</h2>
+      <p>
+        The Family Recognition Protocol identifies family members using presence, not stored biometrics. It is designed
+        so that the system can recognize “who belongs here” without ever keeping a fingerprint, face scan, or behavioral
+        profile.
+      </p>
+
+      <h3>How it behaves (for families)</h3>
+      <ul>
+        <li><strong>Touch‐based:</strong> The system wakes only when touched intentionally.</li>
+        <li><strong>Family‐aware:</strong> Recognizes family members as part of a shared circle.</li>
+        <li><strong>Self‐cleaning:</strong> Temporary presence tokens are deleted after use or reset.</li>
+        <li><strong>Steward‐controlled:</strong> Parents/guardians decide who is part of the family group.</li>
+      </ul>
+
+      <p class="footer-note">
+        Example: A child touches the card — the system recognizes “family presence” and safely switches to Kid‐Safe Mode.
+      </p>
+    </section>
+
+    <!-- KID SAFE + WHISKER + PARENT DASHBOARD -->
+    <section aria-labelledby="kid-whisker-parent">
+      <h2 id="kid-whisker-parent">Kid‐Safe Mode, Whisker, and the Parent Dashboard</h2>
+
+      <h3>Kid‐Safe Animation Studio</h3>
+      <ul>
+        <li><strong>Playful only:</strong> Kids can create animations, colors, and cute QR‐like visuals.</li>
+        <li><strong>No risk:</strong> No payments, no identity broadcasts, no vault access.</li>
+        <li><strong>Local only:</strong> Nothing is uploaded or shared by default.</li>
+      </ul>
+
+      <h3>Whisker Notification Whisper</h3>
+      <ul>
+        <li><strong>Subtle:</strong> Whisker speaks softly or via text, never alarming.</li>
+        <li><strong>Direct:</strong> Messages are clear: “Family member activated your ID”, “Unrecognized touch”, etc.</li>
+        <li><strong>Optional:</strong> Parents can choose voice, text, or silent mode.</li>
+      </ul>
+
+      <h3>Parent Dashboard</h3>
+      <ul>
+        <li><strong>Full control:</strong> Add/remove family members, reset presence, manage devices.</li>
+        <li><strong>Accessibility‐first:</strong> High contrast, large text, narration, haptics, simplified view.</li>
+        <li><strong>Ceremonial changes:</strong> Important changes require a Steward Confirmation Gesture.</li>
+      </ul>
+    </section>
+
+    <!-- FAMILY TREE + DORMANT SHELL -->
+    <section aria-labelledby="family-tree-dormant">
+      <h2 id="family-tree-dormant">Ceremonial Family Tree & Dormant Shell</h2>
+
+      <h3>Ceremonial Family Tree Access Layer</h3>
+      <ul>
+        <li><strong>Lineage‐only:</strong> Only family members can be linked; no external users.</li>
+        <li><strong>Strict consent:</strong> The Primary Steward must approve every addition or removal.</li>
+        <li><strong>Temporary comparison:</strong> Presence tokens are compared, then discarded.</li>
+      </ul>
+
+      <h3>Dormant Shell Activation</h3>
+      <ul>
+        <li><strong>Always off by default:</strong> The system never broadcasts unless intentionally activated.</li>
+        <li><strong>Intent touch:</strong> The user must hold or touch in a deliberate way to wake it.</li>
+        <li><strong>Safe if lost:</strong> If someone else touches it, the shell stays dormant.</li>
+      </ul>
+
+      <p class="footer-note">
+        This makes the system feel more like a ceremonial key than a constantly listening device.
+      </p>
+    </section>
+
+    <!-- DEVELOPER-GRADE TECHNICAL SPEC -->
+    <section class="dev-spec" aria-labelledby="dev-spec">
+      <h2 id="dev-spec">Developer Technical Specification</h2>
+      <p class="label">Audience: Implementers, security engineers, OS architects</p>
+
+      <h3>1. Identity & Presence Model</h3>
+      <ul>
+        <li><strong>Identity:</strong> Represented as a logical user handle (e.g. <code>user_id</code>) managed by the parent/guardian.</li>
+        <li><strong>Presence:</strong> A short‐lived, non‐reversible token derived from biometric input.</li>
+        <li><strong>No biometric storage:</strong> Raw biometric data is never persisted to disk or remote services.</li>
+      </ul>
+
+      <pre>
+type UserId = string;
+
+interface PresenceToken {
+  userIdHint?: UserId;      // Optional hint, not binding identity
+  familyGroupId: string;    // Logical family group
+  issuedAt: number;         // Epoch ms
+  expiresAt: number;        // Epoch ms
+  entropy: string;          // Non-reversible hash-like value
+}
+
+interface FamilyMember {
+  userId: UserId;
+  role: "steward" | "adult" | "child";
+  enabled: boolean;
+}
+      </pre>
+
+      <h3>2. Presence Token Lifecycle</h3>
+      <ul>
+        <li><strong>Creation:</strong> Derived from biometric input in volatile memory only.</li>
+        <li><strong>Comparison:</strong> Tokens are compared using a one‐way similarity function within the same family group.</li>
+        <li><strong>Expiry:</strong> Tokens must expire within a short window (e.g. 30–120 seconds).</li>
+        <li><strong>Deletion:</strong> Tokens are explicitly zeroed from memory after use.</li>
+      </ul>
+
+      <pre>
+// Pseudocode: presence token creation (in-memory only)
+function createPresenceToken(biometricSample, familyGroupId): PresenceToken {
+  const now = Date.now();
+  const entropy = hashEphemeral(biometricSample); // non-reversible, no reuse
+  return {
+    familyGroupId,
+    issuedAt: now,
+    expiresAt: now + 60_000, // 60 seconds
+    entropy
+  };
+}
+      </pre>
+
+      <h3>3. Family Recognition Protocol (FRP)</h3>
+      <ul>
+        <li><strong>Goal:</strong> Determine if a presence token belongs to a known family member without storing biometrics.</li>
+        <li><strong>Scope:</strong> Only compares tokens within a single <code>familyGroupId</code>.</li>
+        <li><strong>Reset:</strong> On ID replacement or explicit reset, all cached presence hints are invalidated.</li>
+      </ul>
+
+      <pre>
+// Pseudocode: FRP validation
+function validateFamilyPresence(token: PresenceToken, familyMembers: FamilyMember[]): {
+  recognized: boolean;
+  role?: "steward" | "adult" | "child";
+} {
+  if (Date.now() > token.expiresAt) return { recognized: false };
+
+  // Implementation detail: this could be a similarity check against
+  // short-lived, per-session presence hints, not raw biometrics.
+  const match = matchPresenceWithinFamily(token, familyMembers);
+
+  if (!match) return { recognized: false };
+  return { recognized: true, role: match.role };
+}
+      </pre>
+
+      <h3>4. Kid‐Safe Animation Studio (Sandbox)</h3>
+      <ul>
+        <li><strong>Activation condition:</strong> <code>recognized === true</code> and <code>role === "child"</code>.</li>
+        <li><strong>Isolation:</strong> Runs in a sandboxed UI context with no access to payment APIs, vault APIs, or external network calls (unless explicitly whitelisted for non‐identifying assets).</li>
+        <li><strong>Storage:</strong> Optional local ephemeral storage; no cloud sync by default.</li>
+      </ul>
+
+      <pre>
+// Pseudocode: mode selection
+function routeByPresence(result) {
+  if (!result.recognized) {
+    return "DORMANT";
+  }
+  if (result.role === "child") {
+    return "KID_SAFE_ANIMATION_STUDIO";
+  }
+  if (result.role === "steward" || result.role === "adult") {
+    return "FULL_DASHBOARD_OR_VAULT";
+  }
+}
+      </pre>
+
+      <h3>5. Whisker Notification Whisper</h3>
+      <ul>
+        <li><strong>Interface:</strong> A small, centralized notification service.</li>
+        <li><strong>Channels:</strong> Voice (TTS), text overlay, or silent log.</li>
+        <li><strong>Policy:</strong> Messages must be short, non‐alarming, and non‐revealing of sensitive details.</li>
+      </ul>
+
+      <pre>
+interface WhiskerNotification {
+  type: "INFO" | "WARNING";
+  code:
+    | "FAMILY_MEMBER_ACTIVATED_ID"
+    | "UNRECOGNIZED_TOUCH"
+    | "PRIVACY_SHIELD_OK"
+    | "STEWARD_ATTENTION_REQUESTED";
+  message: string; // human-readable, localized
+}
+
+function whiskerNotify(notification: WhiskerNotification) {
+  // Respect user preferences: voice/text/silent
+}
+      </pre>
+
+      <h3>6. Parent Dashboard & Permissions</h3>
+      <ul>
+        <li><strong>Access:</strong> Only when a Steward presence is confirmed.</li>
+        <li><strong>Actions:</strong> Manage family members, reset tokens, configure notifications, manage devices.</li>
+        <li><strong>Audit:</strong> Logs are non‐personal and event‐based (e.g. “family member added”, no raw data).</li>
+      </ul>
+
+      <pre>
+interface StewardActionLog {
+  timestamp: number;
+  stewardId: UserId;
+  action:
+    | "ADD_FAMILY_MEMBER"
+    | "REMOVE_FAMILY_MEMBER"
+    | "RESET_PRESENCE"
+    | "UPDATE_ACCESSIBILITY"
+    | "CONFIGURE_NOTIFICATIONS";
+  metadata?: Record&lt;string, string&gt;;
+}
+      </pre>
+
+      <h3>7. Ceremonial Family Tree Layer</h3>
+      <ul>
+        <li><strong>Restriction:</strong> Only accessible when a Steward is present.</li>
+        <li><strong>Comparison:</strong> Cross‐presence comparison is limited to family members; no external tokens allowed.</li>
+        <li><strong>Warning:</strong> A pre‐access notice must be shown and acknowledged.</li>
+      </ul>
+
+      <pre>
+// Pseudocode: family tree add flow
+function addFamilyMemberFlow(stewardToken, newMemberToken) {
+  if (!validateSteward(stewardToken)) throw new Error("Steward required");
+
+  showWarning(
+    "You are entering the Family Tree Layer. Only family biometrics may be used. External presence is prohibited."
+  );
+
+  const compatible = comparePresenceForFamilyLink(stewardToken, newMemberToken);
+  if (!compatible) {
+    whiskerNotify({
+      type: "WARNING",
+      code: "UNRECOGNIZED_TOUCH",
+      message: "Presence mismatch. External users cannot be added."
+    });
+    return { success: false };
+  }
+
+  // Proceed with logical family member creation (no biometric storage)
+  return { success: true };
+}
+      </pre>
+
+      <h3>8. Dormant Shell Activation & QR Broadcast</h3>
+      <ul>
+        <li><strong>Default state:</strong> Shell is dormant; no broadcast, no polling.</li>
+        <li><strong>Activation:</strong> Requires intent touch + valid presence token.</li>
+        <li><strong>QR behavior:</strong> QR encodes intent or endpoint, not personal identity.</li>
+      </ul>
+
+      <pre>
+// Pseudocode: activation gate
+function attemptActivation(biometricSample) {
+  const token = createPresenceToken(biometricSample, currentFamilyGroupId);
+  const result = validateFamilyPresence(token, currentFamilyMembers);
+
+  if (!result.recognized) {
+    whiskerNotify({
+      type: "INFO",
+      code: "UNRECOGNIZED_TOUCH",
+      message: "Unrecognized touch. Shell remains dormant."
+    });
+    return "DORMANT";
+  }
+
+  // At this point, QR or vault endpoints may be revealed or activated
+  return routeByPresence(result);
+}
+      </pre>
+
+      <h3>9. Compliance & Safety Constraints</h3>
+      <ul>
+        <li>No raw biometric data is written to disk or transmitted.</li>
+        <li>No long‐term behavioral profiling or tracking.</li>
+        <li>All presence tokens are short‐lived and non‐reversible.</li>
+        <li>Children’s interactions are sandboxed and non‐financial.</li>
+        <li>Steward has ultimate control over family membership and device pairing.</li>
+      </ul>
+
+      <p class="status-ok">
+        Status: This framework is designed to be privacy‐preserving by construction, not by afterthought.
+      </p>
+    </section>
+
+    <!-- CLOSING SEAL -->
+    <section aria-labelledby="closing">
+      <h2 id="closing">Closing Seal of Stewardship 1.0</h2>
+      <p>
+        This page describes the official Space LEAF Corp framework for ceremonial identity, family stewardship, and
+        Whisker‐guarded access. All implementations should honor the principles of presence‐based validation, strict
+        privacy, and family‐centered control.
+      </p>
+      <p>
+        <strong>Signed:</strong> Captain Leif William Sogge — Steward of Lineage and Privacy<br />
+        <strong>Witnessed:</strong> Whisker, the First AI Hair
+      </p>
+      <p class="footer-note">
+        “Presence, not possession. Ceremony, not coercion.”
+      </p>
+    </section>
+  </main>
+</body>
+</html>
