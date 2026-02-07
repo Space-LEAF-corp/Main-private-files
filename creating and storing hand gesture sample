@@ -1,0 +1,41 @@
+import time
+
+# Example dimensions
+num_electrodes = 16
+time_window = 100      # samples
+num_joints = 15
+num_haptic_channels = 10
+
+# Fake data for one moment
+signal = np.random.randn(num_electrodes, time_window).astype("float32")
+joint_angles = np.random.uniform(low=-0.5, high=0.5, size=(num_joints,)).astype("float32")
+haptic_intensities = np.zeros((num_haptic_channels,), dtype="float32")
+
+sample = NeuralHapticSample(
+    intent=IntentLabel(name="pinch"),
+    bioelectric=BioelectricPattern(
+        signal=signal,
+        features={}  # fill with real features later
+    ),
+    mechanical=MechanicalState(
+        joint_angles=joint_angles
+    ),
+    haptic=HapticFeedback(
+        intensities=haptic_intensities,
+        pattern_id="none"
+    ),
+    context=ContextMeta(
+        timestamp=time.time(),
+        user_id="user_001",
+        session_id="session_001",
+        mode="training"
+    )
+)
+
+dataset = NeuralHapticDataset()
+dataset.add_sample(sample)
+
+X, Y_intent, Y_mech = dataset.to_training_arrays()
+print("X shape:", X.shape)
+print("First intent label:", Y_intent[0])
+print("First mech vector shape:", Y_mech[0].shape)
