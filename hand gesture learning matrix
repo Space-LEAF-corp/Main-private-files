@@ -1,0 +1,78 @@
+from dataclasses import dataclass
+from typing import List, Dict, Any
+import numpy as np
+
+@dataclass
+class IntentLabel:
+    name: str                 # e.g. "pinch", "open_hand"
+    confidence: float = 1.0   # optional, if inferred
+
+@dataclass
+class BioelectricPattern:
+    # Raw or preprocessed signal window
+    # shape: (num_electrodes, time_window_samples)
+    signal: np.ndarray        # float32/float64
+    features: Dict[str, Any]  # optional: RMS, freq bands, etc.
+
+@dataclass
+class MechanicalState:
+    # Joint angles in radians or degrees
+    # shape: (num_joints,)
+    joint_angles: np.ndarray
+    joint_velocities: np.ndarray | None = None
+    contact_forces: np.ndarray | None = None  # optional
+
+@dataclass
+class HapticFeedback:
+    # Haptic intensity per channel (0.0 - 1.0)
+    # shape: (num_haptic_channels,)
+    intensities: np.ndarray
+    pattern_id: str | None = None  # e.g. "grip_confirm", "slip_warning"
+
+@dataclass
+class ContextMeta:
+    timestamp: float
+    user_id: str
+    session_id: str
+    mode: str  # e.g. "training", "live_use", "rehab", "sim"
+
+@dataclass
+class NeuralHapticSample:
+    intent: IntentLabel
+    bioelectric: BioelectricPattern
+    mechanical: MechanicalState
+    haptic: HapticFeedback
+    context: ContextMeta
+
+
+class NeuralHapticDataset:
+    def __init__(self):
+        self.samples: List[NeuralHapticSample] = []
+
+    def add_sample(self, sample: NeuralHapticSample):
+        self.samples.append(sample)
+
+    def to_training_arrays(self):
+        """
+        Example: convert to X, Y for ML training.
+        X could be bioelectric features, Y could be intent or mechanical state.
+        """
+        X = []
+        Y_intent = []
+        Y_mech = []
+
+        for s in self.samples:
+            # Example: use flattened bioelectric signal as input
+            bio_vec = s.bioelectric.signal.flatten()
+            X.append(bio_vec)
+
+            # Intent as label (could be one-hot encoded later)
+            Y_intent.append(s.intent.name)
+
+            # Mechanical state as regression target
+            Y_mech.append(s.mechanical.joint_angles)
+
+        X = np.stack(X, axis=0)
+        Y_mech = np.stack(Y_mech, axis=0)
+
+        return X, Y_intent, Y_mech
