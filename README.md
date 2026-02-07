@@ -1,3 +1,7 @@
+Objective:
+Build a neural haptic hand-gesture learning matrix
+for accelerated robotic control and amputee interface capability.
+
 Create a hand-gesture learning engine:
 – Exponential learning logic matrix for amputee–robotic interface capability
 – Noninvasive, skin-surface bioelectric sensing with modular haptic feedback
