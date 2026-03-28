@@ -2,10 +2,9 @@ use crate::turbo_stack;
 use crate::shadow_panther;
 
 pub fn run_shell() {
-    // Minimal placeholder "shell" loop.
-    // Later: input handling, task selection, file operations, etc.
+    // Minimal placeholder shell loop.
+    // Future: input handling, task selection, file operations, etc.
 
-    // Example conceptual call:
     let example_task_id = 1;
     turbo_stack::accelerate_task(example_task_id);
 
