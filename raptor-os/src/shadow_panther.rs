@@ -4,5 +4,5 @@ pub fn init_shadow_panther_copilot() {
 }
 
 pub fn analyze_artifact(_artifact_id: u32) {
-    // Later: inspect file metadata/content and suggest possible actions.
+    // Future: inspect file metadata/content and suggest possible actions.
 }
