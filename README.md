@@ -1,3 +1,15 @@
+# Raptor OS
+
+Raptor OS is an offline-first, container-boosted operating shell designed for
+calm, emotionally safe computing. It pairs:
+
+- **Turbo Stack** – a portable container + routing layer that accelerates tasks
+  without demanding more RAM.
+- **Shadow Panther Copilot (Jarvondis IA)** – a silent background intelligence
+  that suggests actions based on artifacts, without chat or interruption.
+
+This repository is an early skeleton: structure first, features later.
+
 Objective:
 Build a neural haptic hand-gesture learning matrix
 for accelerated robotic control and amputee interface capability.
