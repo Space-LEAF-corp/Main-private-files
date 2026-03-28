@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Unified Wallet Dashboard</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+/* ── RESET & BASE ────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-desktop:#1b2a4a;
+  --bg-window:#0d1117;
+  --bg-card:#161b22;
+  --bg-card-hover:#1c2333;
+  --border:#30363d;
+  --accent:#58a6ff;
+  --accent-dim:#1f6feb33;
+  --text:#e6edf3;
+  --text-muted:#8b949e;
+  --green:#3fb950;
+  --yellow:#d29922;
+  --orange:#db6d28;
+  --red:#f85149;
+  --gold:#ffd700;
+  --radius:10px;
+  --radius-sm:6px;
+  --shadow:0 8px 32px rgba(0,0,0,.45);
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+html,body,#root{height:100%;width:100%;font-family:var(--font);color:var(--text);overflow:hidden}
+
+/* ── DESKTOP ─────────────────────────────────── */
+.desktop{
+  height:100%;width:100%;
+  background:linear-gradient(135deg,#0f1c36 0%,#1b2a4a 40%,#243b5e 100%);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.desktop-icons{
+  position:absolute;top:24px;left:24px;
+  display:flex;flex-direction:column;gap:18px;z-index:1;
+}
+.desk-icon{
+  display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
+  padding:8px 12px;border-radius:8px;transition:.2s;user-select:none;
+}
+.desk-icon:hover{background:rgba(255,255,255,.08)}
+.desk-icon.active{background:rgba(88,166,255,.15)}
+.desk-icon svg{width:48px;height:48px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
+.desk-icon span{font-size:11px;color:var(--text);text-shadow:0 1px 4px rgba(0,0,0,.7)}
+
+/* ── TASKBAR ─────────────────────────────────── */
+.taskbar{
+  position:absolute;bottom:0;left:0;right:0;height:48px;
+  background:rgba(13,17,23,.85);backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;padding:0 16px;z-index:100;
+}
+.taskbar-btn{
+  background:rgba(88,166,255,.12);border:1px solid rgba(88,166,255,.25);
+  color:var(--accent);padding:6px 14px;border-radius:6px;font-size:12px;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+}
+.taskbar-btn:hover{background:rgba(88,166,255,.22)}
+.taskbar-clock{margin-left:auto;font-size:12px;color:var(--text-muted)}
+
+/* ── WINDOW FRAME ────────────────────────────── */
+.window-frame{
+  width:min(1120px,94vw);height:min(700px,82vh);
+  background:var(--bg-window);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;
+  animation:windowOpen .35s cubic-bezier(.16,1,.3,1);
+  position:relative;z-index:10;
+}
+@keyframes windowOpen{
+  0%{transform:scale(.85) translateY(30px);opacity:0}
+  100%{transform:scale(1) translateY(0);opacity:1}
+}
+
+/* ── TITLE BAR ───────────────────────────────── */
+.title-bar{
+  height:42px;background:#010409;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 14px;flex-shrink:0;
+  user-select:none;
+}
+.traffic{display:flex;gap:8px;margin-right:14px}
+.traffic span{width:12px;height:12px;border-radius:50%}
+.traffic .red{background:#ff5f57}.traffic .yel{background:#febc2e}.traffic .grn{background:#28c840}
+.title-bar-text{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+.title-bar-text svg{width:16px;height:16px;opacity:.6}
+
+/* ── SIDEBAR ─────────────────────────────────── */
+.window-body{display:flex;flex:1;overflow:hidden}
+.sidebar{
+  width:200px;background:#010409;border-right:1px solid var(--border);
+  padding:12px 0;flex-shrink:0;overflow-y:auto;
+}
+.sidebar-section{padding:6px 14px;font-size:10px;text-transform:uppercase;
+  letter-spacing:1.2px;color:var(--text-muted);margin-top:8px}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;padding:8px 14px;
+  cursor:pointer;font-size:13px;color:var(--text-muted);transition:.15s;
+  border-left:2px solid transparent;
+}
+.sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.sidebar-item.active{background:var(--accent-dim);color:var(--accent);border-left-color:var(--accent)}
+.sidebar-item svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.sidebar-item.active svg{opacity:1}
+
+/* ── MAIN CONTENT ────────────────────────────── */
+.main-content{flex:1;overflow-y:auto;padding:24px 28px 32px;position:relative}
+.main-content::-webkit-scrollbar{width:6px}
+.main-content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── HERO ────────────────────────────────────── */
+.hero-section{margin-bottom:24px}
+.hero-label{font-size:13px;color:var(--text-muted);margin-bottom:4px;letter-spacing:.3px}
+.hero-value{font-size:42px;font-weight:700;letter-spacing:-1px;
+  background:linear-gradient(135deg,var(--gold),#ffa500);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1.1;
+}
+.hero-value .dollar{font-size:28px;font-weight:400;opacity:.7}
+
+/* ── VALUE TOGGLE ────────────────────────────── */
+.toggle-strip{
+  display:inline-flex;background:var(--bg-card);border:1px solid var(--border);
+  border-radius:8px;padding:3px;margin:12px 0 20px;
+}
+.toggle-pill{
+  padding:6px 18px;border-radius:6px;font-size:12px;font-weight:600;
+  cursor:pointer;transition:.2s;color:var(--text-muted);
+  border:none;background:transparent;
+}
+.toggle-pill:hover{color:var(--text)}
+.toggle-pill.active{background:var(--accent);color:#fff}
+
+/* ── TREND STRIP ─────────────────────────────── */
+.trend-strip{
+  display:flex;align-items:center;gap:16px;
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;
+}
+.trend-pct{font-size:22px;font-weight:700;min-width:80px}
+.trend-pct.up{color:var(--green)}.trend-pct.down{color:var(--red)}
+.trend-label{font-size:11px;color:var(--text-muted)}
+.sparkline-box{flex:1;height:48px;position:relative}
+.sparkline-box svg{width:100%;height:100%}
+
+/* ── HEALTH METER ────────────────────────────── */
+.health-meter{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;margin-bottom:24px;
+}
+.health-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.health-title{font-size:13px;font-weight:600}
+.health-badge{
+  font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;text-transform:uppercase;
+}
+.health-badge.stable{background:rgba(63,185,80,.15);color:var(--green)}
+.health-badge.balanced{background:rgba(88,166,255,.15);color:var(--accent)}
+.health-badge.caution{background:rgba(210,153,34,.15);color:var(--yellow)}
+.health-badge.critical{background:rgba(248,81,73,.15);color:var(--red)}
+.health-track{height:8px;background:#21262d;border-radius:4px;overflow:hidden;position:relative}
+.health-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.16,1,.3,1)}
+.health-fill.stable{background:linear-gradient(90deg,var(--green),#2ea043)}
+.health-fill.balanced{background:linear-gradient(90deg,var(--accent),#1f6feb)}
+.health-fill.caution{background:linear-gradient(90deg,var(--yellow),var(--orange))}
+.health-fill.critical{background:linear-gradient(90deg,var(--orange),var(--red))}
+.health-score{font-size:12px;color:var(--text-muted);margin-top:8px;display:flex;justify-content:space-between}
+.health-suggestion{font-size:11px;color:var(--text-muted);font-style:italic;margin-top:4px}
+
+/* ── SECTION HEADERS ─────────────────────────── */
+.section-header{
+  font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-header svg{width:16px;height:16px;color:var(--accent)}
+.section-divider{height:1px;background:var(--border);margin:4px 0 20px}
+
+/* ── VAULT GRID ──────────────────────────────── */
+.vault-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+@media(max-width:800px){.vault-grid{grid-template-columns:1fr}}
+.vault-card{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;transition:.25s;cursor:default;
+  position:relative;overflow:hidden;
+}
+.vault-card:hover{border-color:var(--accent);background:var(--bg-card-hover);
+  box-shadow:0 0 20px rgba(88,166,255,.08)}
+.vault-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.vault-card.DVH::before{background:linear-gradient(90deg,var(--accent),#a371f7)}
+.vault-card.PVH::before{background:linear-gradient(90deg,var(--green),#2ea043)}
+.vault-card.VVV::before{background:linear-gradient(90deg,var(--gold),var(--orange))}
+.vault-id{font-size:12px;font-weight:700;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.vault-id .dot{width:8px;height:8px;border-radius:50%}
+.vault-card.DVH .dot{background:var(--accent)}.vault-card.PVH .dot{background:var(--green)}.vault-card.VVV .dot{background:var(--gold)}
+.vault-main{font-size:22px;font-weight:700;margin-bottom:10px}
+.vault-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px}
+.vault-row span:last-child{color:var(--text);font-weight:500}
+.vault-pct{
+  margin-top:8px;font-size:11px;display:flex;align-items:center;gap:6px;
+}
+.vault-pct-bar{flex:1;height:4px;background:#21262d;border-radius:2px;overflow:hidden}
+.vault-pct-fill{height:100%;border-radius:2px;background:var(--accent)}
+.vault-health-row{margin-top:8px;display:flex;align-items:center;gap:6px}
+.vault-health-dot{width:6px;height:6px;border-radius:50%}
+.vault-health-label{font-size:10px;color:var(--text-muted)}
+
+/* ── COIN LIST ───────────────────────────────── */
+.coin-list{display:flex;flex-direction:column;gap:2px}
+.coin-row{
+  display:grid;grid-template-columns:2fr 1.2fr .8fr .6fr;
+  align-items:center;padding:10px 14px;border-radius:var(--radius-sm);
+  transition:.15s;font-size:13px;
+}
+.coin-row:hover{background:var(--bg-card)}
+.coin-row-header{font-size:11px;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.8px;font-weight:600;padding:6px 14px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.coin-row-header:hover{background:transparent}
+.coin-label{display:flex;align-items:center;gap:8px;font-weight:500}
+.coin-dot{width:8px;height:8px;border-radius:50%}
+.coin-dgv{font-weight:600}
+.coin-pct{color:var(--text-muted);font-size:12px}
+.stability-badge{
+  font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;text-transform:uppercase;
+  display:inline-block;text-align:center;
+}
+.stability-badge.solid{background:rgba(63,185,80,.12);color:var(--green)}
+.stability-badge.mixed{background:rgba(210,153,34,.12);color:var(--yellow)}
+.stability-badge.volatile{background:rgba(248,81,73,.12);color:var(--red)}
+
+/* ── EMPTY / CLOSED STATE ────────────────────── */
+.closed-state{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:60px;color:var(--text-muted)}
+.closed-state svg{width:64px;height:64px;opacity:.3}
+.closed-state p{font-size:13px}
+
+/* ── ANIMATIONS ──────────────────────────────── */
+@keyframes fadeUp{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+.anim-up{animation:fadeUp .4s ease both}
+.anim-up:nth-child(2){animation-delay:.05s}
+.anim-up:nth-child(3){animation-delay:.1s}
+.anim-up:nth-child(4){animation-delay:.15s}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useMemo, useCallback } = React;
+
+/* ══════════════════════════════════════════════
+   MOCK DATA
+   ══════════════════════════════════════════════ */
+const METRICS = ["DGV","NAV","RAV","CEV"];
+
+const summaryData = {
+  DGV: { label:"Total Digital Gross Value (DGV)", value:10886595.24 },
+  NAV: { label:"Net Asset Value (NAV)",           value:7250120.88 },
+  RAV: { label:"Realized Asset Value (RAV)",      value:4120330.55 },
+  CEV: { label:"Ceremonial Equity Value (CEV)",   value:2980410.12 },
+};
+
+const healthData = {
+  DGV: { score:68.15, band:"balanced",  suggestion:"Balanced — watch trends for drift" },
+  NAV: { score:74.30, band:"stable",    suggestion:"Stable — strong net position" },
+  RAV: { score:52.10, band:"caution",   suggestion:"Caution — realised gains trailing" },
+  CEV: { score:41.80, band:"caution",   suggestion:"Caution — ceremonial reserves low" },
+};
+
+const trendData = {
+  DGV: { pct: 7.3,  pts:[30,35,33,40,38,42,45,43,50,48,55,58,54,60,62,58,65,68,64,70,72,68,75,78,74,80,82,78,85,88] },
+  NAV: { pct: 4.1,  pts:[40,42,41,43,44,43,45,46,45,47,48,47,49,50,49,51,52,51,53,54,53,55,56,55,57,58,57,59,60,61] },
+  RAV: { pct:-2.8,  pts:[60,58,56,57,55,53,54,52,50,51,49,48,50,47,46,48,45,44,46,43,42,44,41,40,42,39,38,40,37,36] },
+  CEV: { pct: 1.5,  pts:[20,21,20,22,23,22,24,25,24,26,27,26,28,29,28,30,31,30,32,33,32,34,35,34,36,37,36,38,39,38] },
+};
+
+const vaultBreakdown = [
+  { vaultId:"DVH", dgv:1250000, nav:800000,  cev:300000,  percentOfDGV:11.48, healthScore:72 },
+  { vaultId:"PVH", dgv:6135000, nav:4200000, cev:1800000, percentOfDGV:56.36, healthScore:81 },
+  { vaultId:"VVV", dgv:3501595, nav:2250120, cev:880410,  percentOfDGV:32.17, healthScore:55 },
+];
+
+const coinColors = ["#58a6ff","#a371f7","#3fb950","#ffd700","#f0883e","#f778ba","#79c0ff","#d2a8ff","#56d364","#e3b341"];
+
+const coinBreakdown = [
+  { label:"Clan Coin",      dgv:2500000, percentOfDGV:22.96, stabilityClass:"solid" },
+  { label:"Echo Coin",      dgv:1800000, percentOfDGV:16.54, stabilityClass:"solid" },
+  { label:"Blooper Coin",   dgv:1500000, percentOfDGV:13.78, stabilityClass:"mixed" },
+  { label:"Artifact Coin",  dgv:1200000, percentOfDGV:11.02, stabilityClass:"solid" },
+  { label:"Spark Coin",     dgv:980000,  percentOfDGV:9.00,  stabilityClass:"mixed" },
+  { label:"Drift Coin",     dgv:850000,  percentOfDGV:7.81,  stabilityClass:"volatile" },
+  { label:"Lore Coin",      dgv:720000,  percentOfDGV:6.61,  stabilityClass:"solid" },
+  { label:"Pulse Coin",     dgv:600000,  percentOfDGV:5.51,  stabilityClass:"mixed" },
+  { label:"Rune Coin",      dgv:450000,  percentOfDGV:4.13,  stabilityClass:"volatile" },
+  { label:"Seed Coin",      dgv:286595,  percentOfDGV:2.63,  stabilityClass:"solid" },
+];
+
+const fmt = (n) => n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* ══════════════════════════════════════════════
+   COMPONENTS
+   ══════════════════════════════════════════════ */
+
+/* ── HeroValue ─────────────────────────────── */
+function HeroValue({ label, value, metric }) {
+  return (
+    <div className="hero-section anim-up">
+      <div className="hero-label">{label}</div>
+      <div className="hero-value"><span className="dollar">$</span>{fmt(value)}</div>
+    </div>
+  );
+}
+
+/* ── ValueToggle ──────────────────────────── */
+function ValueToggle({ selected, onChange }) {
+  return (
+    <div className="toggle-strip anim-up">
+      {METRICS.map(m => (
+        <button key={m} className={`toggle-pill${selected===m?" active":""}`}
+          onClick={() => onChange(m)}>{m}</button>
+      ))}
+    </div>
+  );
+}
+
+/* ── TrendStrip ───────────────────────────── */
+function TrendStrip({ percentChange, points, label }) {
+  const up = percentChange >= 0;
+  const max = Math.max(...points), min = Math.min(...points);
+  const range = max - min || 1;
+  const w = 100, h = 48, pad = 2;
+  const step = (w - pad*2) / (points.length - 1);
+  const yScale = (v) => h - pad - ((v - min) / range) * (h - pad*2);
+  const pathD = points.map((v,i) => `${i===0?"M":"L"}${pad + i*step},${yScale(v)}`).join(" ");
+  const areaD = pathD + ` L${pad+(points.length-1)*step},${h} L${pad},${h} Z`;
+  const color = up ? "var(--green)" : "var(--red)";
+  return (
+    <div className="trend-strip anim-up">
+      <div>
+        <div className={`trend-pct ${up?"up":"down"}`}>{up?"+":""}{percentChange.toFixed(1)}%</div>
+        <div className="trend-label">{label || "Portfolio Change (30 Days)"}</div>
+      </div>
+      <div className="sparkline-box">
+        <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity=".25"/>
+              <stop offset="100%" stopColor={color} stopOpacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d={areaD} fill="url(#sparkGrad)"/>
+          <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ── HealthMeter ──────────────────────────── */
+function HealthMeter({ score, band, suggestion }) {
+  return (
+    <div className="health-meter anim-up">
+      <div className="health-header">
+        <span className="health-title">Portfolio Health</span>
+        <span className={`health-badge ${band}`}>{band}</span>
+      </div>
+      <div className="health-track">
+        <div className={`health-fill ${band}`} style={{width:`${score}%`}}/>
+      </div>
+      <div className="health-score">
+        <span>{score.toFixed(1)} / 100</span>
+        <span style={{fontSize:10,opacity:.6}}>0 ─── 25 ─── 50 ─── 75 ─── 100</span>
+      </div>
+      {suggestion && <div className="health-suggestion">{suggestion}</div>}
+    </div>
+  );
+}
+
+/* ── VaultCard ────────────────────────────── */
+function VaultCard({ vaultId, dgv, nav, cev, percentOfDGV, healthScore }) {
+  const hColor = healthScore>=70?"var(--green)":healthScore>=50?"var(--yellow)":"var(--red)";
+  const hLabel = healthScore>=70?"Healthy":healthScore>=50?"Watch":"At Risk";
+  return (
+    <div className={`vault-card ${vaultId} anim-up`}>
+      <div className="vault-id"><span className="dot"/>{vaultId}</div>
+      <div className="vault-main">${fmt(dgv)}</div>
+      <div className="vault-row"><span>NAV</span><span>${fmt(nav)}</span></div>
+      <div className="vault-row"><span>CEV</span><span>${fmt(cev)}</span></div>
+      <div className="vault-pct">
+        <span style={{width:48,flexShrink:0,fontSize:11,color:"var(--text-muted)"}}>{percentOfDGV.toFixed(1)}%</span>
+        <div className="vault-pct-bar"><div className="vault-pct-fill" style={{width:`${percentOfDGV}%`}}/></div>
+      </div>
+      <div className="vault-health-row">
+        <span className="vault-health-dot" style={{background:hColor}}/>
+        <span className="vault-health-label">{healthScore} — {hLabel}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── VaultGrid ────────────────────────────── */
+function VaultGrid({ vaults }) {
+  return (
+    <div className="vault-grid">
+      {vaults.map(v => <VaultCard key={v.vaultId} {...v}/>)}
+    </div>
+  );
+}
+
+/* ── CoinRow ──────────────────────────────── */
+function CoinRow({ label, dgv, percentOfDGV, stabilityClass, color }) {
+  return (
+    <div className="coin-row">
+      <div className="coin-label"><span className="coin-dot" style={{background:color}}/>{label}</div>
+      <div className="coin-dgv">${fmt(dgv)}</div>
+      <div className="coin-pct">{percentOfDGV.toFixed(2)}%</div>
+      <div><span className={`stability-badge ${stabilityClass}`}>{stabilityClass}</span></div>
+    </div>
+  );
+}
+
+/* ── CoinList ─────────────────────────────── */
+function CoinList({ coins }) {
+  return (
+    <div className="coin-list">
+      <div className="coin-row coin-row-header">
+        <div>Coin</div><div>DGV</div><div>% of DGV</div><div>Stability</div>
+      </div>
+      {coins.map((c,i) => <CoinRow key={c.label} {...c} color={coinColors[i % coinColors.length]}/>)}
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   SIDEBAR NAV ICONS (inline SVG)
+   ══════════════════════════════════════════════ */
+const IconDash = () => <svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>;
+const IconVault = () => <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 2a1 1 0 011-1h10a1 1 0 011 1v12a1 1 0 01-1 1H3a1 1 0 01-1-1V2zm2 1v4h8V3H4zm0 6v4h8V9H4z"/></svg>;
+const IconCoin = () => <svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeWidth="1.5"/><text x="8" y="11" textAnchor="middle" fontSize="8" fill="currentColor">$</text></svg>;
+const IconHealth = () => <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 14s-5.5-4.2-5.5-7.5C2.5 4 4.5 2.5 6.5 2.5 7.3 2.5 8 3 8 3s.7-.5 1.5-.5c2 0 4 1.5 4 4C13.5 9.8 8 14 8 14z"/></svg>;
+const IconSettings = () => <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 10a2 2 0 100-4 2 2 0 000 4z"/><path d="M7.1 1a.9.9 0 00-.9.77L6 3.1a5 5 0 00-1.2.7l-1.3-.5a.9.9 0 00-1.1.4L1.5 5.3a.9.9 0 00.2 1.14l1.1.84a5 5 0 000 1.44l-1.1.84a.9.9 0 00-.2 1.14l.9 1.56a.9.9 0 001.1.4l1.3-.5a5 5 0 001.2.7l.2 1.33a.9.9 0 00.9.77h1.8a.9.9 0 00.9-.77L10 12.9a5 5 0 001.2-.7l1.3.5a.9.9 0 001.1-.4l.9-1.56a.9.9 0 00-.2-1.14l-1.1-.84a5 5 0 000-1.44l1.1-.84a.9.9 0 00.2-1.14l-.9-1.56a.9.9 0 00-1.1-.4l-1.3.5a5 5 0 00-1.2-.7L8.9 1.77A.9.9 0 008 1H7.1z"/></svg>;
+
+const TABS = [
+  { id:"dashboard", label:"Dashboard", icon:<IconDash/> },
+  { id:"vaults",    label:"Vaults",    icon:<IconVault/> },
+  { id:"coins",     label:"Coins",     icon:<IconCoin/> },
+  { id:"health",    label:"Health",    icon:<IconHealth/> },
+];
+
+/* ══════════════════════════════════════════════
+   DESKTOP FOLDER ICON
+   ══════════════════════════════════════════════ */
+function FolderIcon({ active }) {
+  return (
+    <svg viewBox="0 0 64 64" fill="none">
+      <path d="M6 16h20l4-6h28a3 3 0 013 3v38a3 3 0 01-3 3H6a3 3 0 01-3-3V19a3 3 0 013-3z"
+        fill={active?"#58a6ff":"#3a4a6a"} stroke={active?"#79c0ff":"#4a5a7a"} strokeWidth="1.5"/>
+      <path d="M3 24h58v27a3 3 0 01-3 3H6a3 3 0 01-3-3V24z"
+        fill={active?"#1f6feb":"#2a3a5a"} stroke={active?"#58a6ff":"#3a4a6a"} strokeWidth="1"/>
+      <text x="32" y="42" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="var(--font)">UWD</text>
+    </svg>
+  );
+}
+function FileIcon() {
+  return (
+    <svg viewBox="0 0 64 64" fill="none">
+      <path d="M12 6h26l14 14v38a3 3 0 01-3 3H12a3 3 0 01-3-3V9a3 3 0 013-3z"
+        fill="#2a3a5a" stroke="#3a4a6a" strokeWidth="1.5"/>
+      <path d="M38 6v14h14" fill="#3a4a6a" stroke="#4a5a7a" strokeWidth="1"/>
+      <rect x="16" y="28" width="28" height="2" rx="1" fill="#4a5a7a"/>
+      <rect x="16" y="34" width="22" height="2" rx="1" fill="#4a5a7a"/>
+      <rect x="16" y="40" width="18" height="2" rx="1" fill="#4a5a7a"/>
+    </svg>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   TAB CONTENT VIEWS
+   ══════════════════════════════════════════════ */
+function DashboardView({ metric, setMetric }) {
+  const s = summaryData[metric];
+  const h = healthData[metric];
+  const t = trendData[metric];
+  return (
+    <>
+      <HeroValue label={s.label} value={s.value} metric={metric}/>
+      <ValueToggle selected={metric} onChange={setMetric}/>
+      <TrendStrip percentChange={t.pct} points={t.pts}/>
+      <HealthMeter score={h.score} band={h.band} suggestion={h.suggestion}/>
+      <div className="section-header"><IconVault/>Vault Breakdown</div>
+      <div className="section-divider"/>
+      <VaultGrid vaults={vaultBreakdown}/>
+      <div className="section-header"><IconCoin/>Coin Breakdown</div>
+      <div className="section-divider"/>
+      <CoinList coins={coinBreakdown}/>
+    </>
+  );
+}
+
+function VaultsView() {
+  return (
+    <>
+      <div className="section-header" style={{fontSize:18,marginBottom:16}}>
+        <IconVault/>Vault Holdings
+      </div>
+      <VaultGrid vaults={vaultBreakdown}/>
+      <div style={{fontSize:13,color:"var(--text-muted)",marginTop:8}}>
+        Total across 3 vaults: <strong style={{color:"var(--text)"}}>${fmt(vaultBreakdown.reduce((a,v)=>a+v.dgv,0))}</strong>
+      </div>
+    </>
+  );
+}
+
+function CoinsView() {
+  return (
+    <>
+      <div className="section-header" style={{fontSize:18,marginBottom:16}}>
+        <IconCoin/>Coin Portfolio
+      </div>
+      <CoinList coins={coinBreakdown}/>
+      <div style={{fontSize:13,color:"var(--text-muted)",marginTop:12}}>
+        {coinBreakdown.length} coins tracked &mdash;
+        {" "}{coinBreakdown.filter(c=>c.stabilityClass==="solid").length} solid,
+        {" "}{coinBreakdown.filter(c=>c.stabilityClass==="mixed").length} mixed,
+        {" "}{coinBreakdown.filter(c=>c.stabilityClass==="volatile").length} volatile
+      </div>
+    </>
+  );
+}
+
+function HealthView({ metric, setMetric }) {
+  return (
+    <>
+      <div className="section-header" style={{fontSize:18,marginBottom:16}}>
+        <IconHealth/>Portfolio Health
+      </div>
+      <ValueToggle selected={metric} onChange={setMetric}/>
+      {METRICS.map(m => {
+        const h = healthData[m];
+        return (
+          <div key={m} style={{marginBottom:16,opacity:m===metric?1:.5,transition:".3s"}}>
+            <div style={{fontSize:12,fontWeight:600,marginBottom:6,color:m===metric?"var(--text)":"var(--text-muted)"}}>{m}</div>
+            <HealthMeter score={h.score} band={h.band} suggestion={h.suggestion}/>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   MAIN APP
+   ══════════════════════════════════════════════ */
+function App() {
+  const [windowOpen, setWindowOpen] = useState(false);
+  const [tab, setTab] = useState("dashboard");
+  const [metric, setMetric] = useState("DGV");
+
+  const now = new Date();
+  const clock = now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+  const dateStr = now.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+
+  const renderContent = () => {
+    switch(tab){
+      case "vaults":  return <VaultsView/>;
+      case "coins":   return <CoinsView/>;
+      case "health":  return <HealthView metric={metric} setMetric={setMetric}/>;
+      default:        return <DashboardView metric={metric} setMetric={setMetric}/>;
+    }
+  };
+
+  return (
+    <div className="desktop">
+      {/* Desktop Icons */}
+      <div className="desktop-icons">
+        <div className={`desk-icon${windowOpen?" active":""}`} onClick={() => setWindowOpen(true)}>
+          <FolderIcon active={windowOpen}/>
+          <span>Unified Wallet</span>
+        </div>
+        <div className="desk-icon" style={{opacity:.4,pointerEvents:"none"}}>
+          <FileIcon/>
+          <span>README.md</span>
+        </div>
+        <div className="desk-icon" style={{opacity:.4,pointerEvents:"none"}}>
+          <FileIcon/>
+          <span>Config</span>
+        </div>
+      </div>
+
+      {/* Window */}
+      {windowOpen && (
+        <div className="window-frame">
+          <div className="title-bar">
+            <div className="traffic">
+              <span className="red" onClick={() => setWindowOpen(false)} style={{cursor:"pointer"}}/>
+              <span className="yel"/>
+              <span className="grn"/>
+            </div>
+            <div className="title-bar-text">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3.5A1.5 1.5 0 012.5 2h3.879a1.5 1.5 0 011.06.44l1.122 1.12A1.5 1.5 0 009.62 4H13.5A1.5 1.5 0 0115 5.5v7a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 011 12.5v-9z"/></svg>
+              Unified Wallet Dashboard
+            </div>
+          </div>
+          <div className="window-body">
+            <div className="sidebar">
+              <div className="sidebar-section">Navigation</div>
+              {TABS.map(t => (
+                <div key={t.id} className={`sidebar-item${tab===t.id?" active":""}`}
+                  onClick={() => setTab(t.id)}>
+                  {t.icon}<span>{t.label}</span>
+                </div>
+              ))}
+              <div className="sidebar-section" style={{marginTop:20}}>System</div>
+              <div className="sidebar-item" style={{opacity:.5}}>
+                <IconSettings/><span>Settings</span>
+              </div>
+            </div>
+            <div className="main-content" key={tab}>
+              {renderContent()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Taskbar */}
+      <div className="taskbar">
+        <button className="taskbar-btn" onClick={() => setWindowOpen(!windowOpen)}>
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="1" y="1" width="6" height="6" rx="1"/>
+            <rect x="9" y="1" width="6" height="6" rx="1"/>
+            <rect x="1" y="9" width="6" height="6" rx="1"/>
+            <rect x="9" y="9" width="6" height="6" rx="1"/>
+          </svg>
+          UWD
+        </button>
+        <div className="taskbar-clock">{dateStr} &nbsp; {clock}</div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
