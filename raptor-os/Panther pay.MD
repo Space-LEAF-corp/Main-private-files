@@ -312,3 +312,251 @@ Closing Ritual
 These rituals create safety, not dependency.
 
 ---
+---
+
+🐾 PANTHER PAY — HYBRID TEXT WIREFRAMES
+
+Ceremonial, emotionally safe, dual‑artifact payment interface
+
+---
+
+1. Tap‑to‑Pay Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   🐾 Panther Pay                                  |
+|--------------------------------------------------|
+|                                                  |
+|          [   Hold device near terminal   ]       |
+|                                                  |
+|                 ┌───────────────┐               |
+|                 │   NFC Field   │               |
+|                 └───────────────┘               |
+|                                                  |
+|   Panther Coin: ● Present                        |
+|                                                  |
+|   [ Soft Panther Glow Animation ]                |
+|                                                  |
+|--------------------------------------------------|
+|   Cancel                                         |
++--------------------------------------------------+
+
+
+UX Notes
+
+• The screen must feel calm, slow, and ceremonial.
+• The “Panther Glow” is a soft pulsing light — no flashing, no urgency.
+• If the Panther Coin is missing, the dot becomes ○ and the OS gently offers alternatives.
+• No countdowns, no pressure, no “hurry up” language.
+• Accessibility: large text, high contrast, optional haptic pulse.
+
+
+---
+
+2. Intent Ritual Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   Confirming Your Intent                         |
+|--------------------------------------------------|
+|                                                  |
+|        🐾  The panther nods gently.              |
+|                                                  |
+|        "Ready when you are."                     |
+|                                                  |
+|        [  Soft Haptic Pulse  ]                   |
+|                                                  |
+|        [  Confirm Payment  ]                     |
+|        [  Cancel          ]                      |
+|                                                  |
++--------------------------------------------------+
+
+
+UX Notes
+
+• This is the ceremonial checkpoint.
+• The panther animation is slow: a nod, a blink, a soft rumble.
+• The haptic pulse is gentle — not a buzz.
+• The child or adult must feel the confirmation, not rush through it.
+• This is the heart of Panther Pay’s accessibility logic.
+
+
+---
+
+3. Payment Processing Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   Processing…                                     |
+|--------------------------------------------------|
+|                                                  |
+|        [ Panther silhouette walking slowly ]     |
+|                                                  |
+|        "I'm sending this through safely."        |
+|                                                  |
+|        [ Soft progress shimmer ]                 |
+|                                                  |
++--------------------------------------------------+
+
+
+UX Notes
+
+• No spinning wheels.
+• No “loading” anxiety.
+• The panther walking is a calming metaphor:
+“We’re moving forward, but gently.”
+• Progress shimmer is slow and non‑directional.
+
+
+---
+
+4. Payment Confirmation Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   Payment Complete                               |
+|--------------------------------------------------|
+|                                                  |
+|        🐾  The panther gives a soft nod.         |
+|                                                  |
+|        "All set. You're good to go."             |
+|                                                  |
+|        Amount: $XX.XX                            |
+|        Merchant: [Name]                          |
+|                                                  |
+|        [ Done ]                                  |
+|                                                  |
++--------------------------------------------------+
+
+
+UX Notes
+
+• No confetti.
+• No dopamine traps.
+• The confirmation is calm, grounded, and emotionally safe.
+• The panther nod is the closing ritual.
+
+
+---
+
+5. Error / Retry Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   Something Didn’t Go Through                    |
+|--------------------------------------------------|
+|                                                  |
+|        🐾  The panther sits calmly.              |
+|                                                  |
+|        "You're okay. We can try again."          |
+|                                                  |
+|        [ Try Again ]                             |
+|        [ Choose Another Method ]                 |
+|        [ Cancel ]                                |
+|                                                  |
++--------------------------------------------------+
+
+
+UX Notes
+
+• No red.
+• No warnings.
+• No blame.
+• The panther sits — a grounding posture.
+• Language is soothing, never shaming.
+
+
+---
+
+6. Panther Coin Pairing Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   Pair Your Panther Coin                         |
+|--------------------------------------------------|
+|                                                  |
+|        [ Panther Coin Illustration ]             |
+|                                                  |
+|        "Hold your Panther Coin near your device."|
+|                                                  |
+|        Status: ○ Searching…                      |
+|                                                  |
+|        [ Cancel ]                                |
+|                                                  |
++--------------------------------------------------+
+
+
+UX Notes
+
+• Pairing is ceremonial, not technical.
+• When detected, ○ becomes ● with a soft glow.
+• No “pairing failed” — only “Let’s try that again.”
+
+
+---
+
+7. Family Budgeting Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   Family Budget (Panther View)                   |
+|--------------------------------------------------|
+|   🐾  "Let's look at your spending together."    |
+|--------------------------------------------------|
+|   Categories:                                    |
+|     • Food            $XX                        |
+|     • Fun             $XX                        |
+|     • Savings         $XX                        |
+|     • Giving          $XX                        |
+|                                                  |
+|   [ View Ritual Spending ]                       |
+|   [ Adjust Categories ]                           |
+|                                                  |
++--------------------------------------------------+
+
+
+UX Notes
+
+• No totals.
+• No pressure.
+• No “overspending” warnings.
+• The panther guides gently, like a budgeting mentor.
+
+
+---
+
+8. Kid‑Safe Spending Ritual Screen
+
+ASCII Wireframe
+
++--------------------------------------------------+
+|   Spending Ceremony                               |
+|--------------------------------------------------|
+|        🐾  "What are we choosing today?"         |
+|--------------------------------------------------|
+|        [ Item Name ]                              |
+|        [ Category Selection Wheel ]               |
+|                                                  |
+|        "Does this feel right?"                   |
+|                                                  |
+|        [ Yes ]   [ Not Today ]                   |
+|                                                  |
++--------------------------------------------------+
+
+
+UX Notes
+
+• This is not a “confirm purchase” screen.
+• It is a values‑based ritual.
+• The child learns intentionality, not consumption.
+• The panther’s question “Does this feel right?” is emotional‑intelligence training.
+
+
+---
