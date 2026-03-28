@@ -6,7 +6,6 @@ license = "MIT"
 description = "Raptor OS – offline-first, container-boosted operating shell."
 
 [dependencies]
-# keep empty or minimal at first
 
 [profile.release]
 lto = true
