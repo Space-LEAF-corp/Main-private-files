@@ -1,0 +1,14 @@
+[package]
+name = "raptor-os"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Raptor OS – offline-first, container-boosted operating shell."
+
+[dependencies]
+# keep empty or minimal at first
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "z"
