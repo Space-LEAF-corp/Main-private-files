@@ -560,3 +560,371 @@ UX Notes
 
 
 ---
+🐾 Panther Pay: Full Technical & Ceremonial Stack
+
+---
+
+1. Panther Pay Protocol Stack (Layers 0–7)
+
+Think “OSI model, but ceremonial and guardian‑grade.”
+
+Layer 0 — Human Ritual Layer
+
+• What: Intent, presence, emotional state.
+• How: Panther Coin + gentle UI + haptics + creature ritual.
+• Goal: Confirm “I mean to do this” in a calm, embodied way.
+
+
+Layer 1 — Artifact Presence Layer
+
+• What: Panther Coin proximity.
+• How: NFC/BLE ping, token ID only (no PII, no payment data).
+• Goal: Verify physical presence of the user’s ceremonial artifact.
+
+
+Layer 2 — Device Identity Layer
+
+• What: Secure enclave, device key, OS identity.
+• How: Hardware‑backed keys, OS‑level identity binding.
+• Goal: Confirm “this is the right device.”
+
+
+Layer 3 — Panther Auth Layer
+
+• What: Dual‑artifact check + ritual completion.
+• How:• device_ok && coin_present && ritual_confirmed
+
+• Goal: Produce a Panther Auth Token (local, ephemeral).
+
+
+Layer 4 — Payment Wrapper Layer
+
+• What: Wraps existing payment rails.
+• How:• Apple Pay / Google Pay / card tokenization
+• Panther Auth Token attached as metadata (local only or OS‑internal).
+
+• Goal: Add guardian‑grade auth without changing rails.
+
+
+Layer 5 — UX & Safety Layer
+
+• What: UI, haptics, voice, error handling.
+• How:• Calm screens
+• No shame, no urgency
+• Clear failure modes
+
+• Goal: Emotional safety and accessibility.
+
+
+Layer 6 — Family & Policy Layer
+
+• What: Limits, categories, ceremonies, kid profiles.
+• How:• Category rules
+• Time‑of‑day rules
+• Parent‑defined constraints
+
+• Goal: Align spending with family values, not just security.
+
+
+Layer 7 — Trail & Reflection Layer
+
+• What: Non‑personal, symbolic history.
+• How:• “You made 3 thoughtful choices this week.”
+• No amounts, no shaming.
+
+• Goal: Teach reflection, not tracking.
+
+
+---
+
+2. Panther Coin Hardware Spec (Conceptual)
+
+Form factor:
+
+• Small, smooth token (coin, tag, or charm).
+• No sharp edges, no aggressive imagery.
+
+
+Core components:
+
+• NFC or BLE chip
+• Unique token ID (random, non‑derivable)
+• Optional: tiny LED for pairing feedback (soft, non‑flashing)
+
+
+What it does NOT contain:
+
+• No payment data
+• No personal data
+• No keys that can authorize transactions
+• No storage of history
+
+
+Behavior:
+
+• Broadcasts ID when in range.
+• OS maps ID → local profile (Panther Pay config).
+• If lost: OS can revoke mapping; coin is inert.
+
+
+Power:
+
+• NFC passive (ideal) or ultra‑low‑power BLE.
+
+
+Ceremonial design:
+
+• Feels like a guardian charm, not a gadget.
+• Optional engraving: panther silhouette, family crest, etc.
+
+
+---
+
+3. Panther Pay Developer API (Conceptual)
+
+TypeScript‑style, high‑level.
+
+class PantherPayClient {
+  constructor(config?: PantherPayConfig)
+
+  // Core
+  isPantherCoinPresent(): Promise<boolean>
+  startPaymentSession(amount: number, merchantId: string): Promise<PantherSessionId>
+  confirmIntent(sessionId: PantherSessionId): Promise<void>
+  completePayment(sessionId: PantherSessionId): Promise<PantherPaymentResult>
+
+  // Family & policy
+  getCategories(): Promise<PantherCategory[]>
+  suggestCategoryForItem(itemName: string): Promise<PantherCategory>
+  startSpendingCeremony(input: SpendingCeremonyInput): Promise<SpendingCeremonyResult>
+
+  // Accessibility
+  setAccessibilityMode(mode: PantherAccessibilityMode): Promise<void>
+}
+
+type PantherAccessibilityMode =
+  | "default"
+  | "haptic_only"
+  | "silent"
+  | "large_type"
+  | "reduced_motion"
+
+interface PantherPaymentResult {
+  status: "success" | "cancelled" | "failed"
+  reason?: string
+}
+
+
+Rules for devs:
+
+• You never touch card numbers or rails.
+• You only orchestrate ritual + intent + categories.
+• All error states must be passed through Panther Pay’s calm UX.
+
+
+---
+
+4. Panther Pay Accessibility Modes
+
+Mode: default
+
+• Soft haptics
+• Gentle sound
+• Calm animations
+• Text + iconography.
+
+
+Mode: haptic_only
+
+• No sound
+• No animation (or minimal)
+• Distinct haptic patterns for:• coin present
+• intent confirmed
+• payment complete
+• error (soft, non‑alarming).
+
+
+
+Mode: silent
+
+• No sound
+• Minimal haptics
+• Visual only, large and clear.
+
+
+Mode: large_type
+
+• Extra‑large text
+• High contrast (calm palette)
+• Simplified layout.
+
+
+Mode: reduced_motion
+
+• No panther walking loops
+• Static or micro‑animations only
+• Fade transitions instead of movement.
+
+
+All modes must preserve:
+
+• calm
+• clarity
+• emotional safety.
+
+
+---
+
+5. Panther Pay Family Budget Ceremony (Full Script + Logic)
+
+Purpose
+
+Turn spending into a values‑based ritual, not a reflex.
+
+When it runs
+
+• Before certain categories (e.g., “Fun”)
+• For kid accounts
+• When parents enable “Ceremonial Spending Mode.”
+
+
+---
+
+Step 1 — Opening
+
+Screen: “Spending Ceremony”
+Panther (text or voice):
+
+“Let’s look at this choice together.”
+
+Logic:
+
+• Show item name + category.
+• No price emphasis, no urgency.
+
+
+---
+
+Step 2 — Naming the Choice
+
+UI:
+
+• Item: [   Ice Cream   ]
+• Category: [ Fun ]
+
+
+Panther:
+
+“What are we choosing today?”
+
+Child or adult can edit the name or category.
+
+---
+
+Step 3 — Values Reflection
+
+Panther:
+
+“How does this choice feel?”
+
+Options (big buttons):
+
+• “Exciting and good.”
+• “I’m not sure yet.”
+• “Maybe not today.”
+
+
+Logic:
+
+• If “Maybe not today” → ceremony ends, no shame.
+• If “I’m not sure yet” → go to gentle reflection.
+• If “Exciting and good” → proceed to confirmation.
+
+
+---
+
+Step 4 — Gentle Reflection (if unsure)
+
+Panther:
+
+“We can pause. There’s no rush.”
+“Do you want to:”
+
+Buttons:
+
+• “Think a bit more.”
+• “Save this for later.”
+• “Skip it today.”
+
+
+If “Save for later” → add to a Wish Trail, not a cart.
+No pressure to come back.
+
+---
+
+Step 5 — Intent Confirmation
+
+If user chooses to proceed:
+
+Panther:
+
+“Are you choosing this with care?”
+
+Buttons:
+
+• “Yes, with care.”
+• “Not today.”
+
+
+This is the emotional intent checkpoint.
+
+---
+
+Step 6 — Panther Pay Ritual + Payment
+
+If “Yes, with care”:
+
+• Trigger Panther Pay flow:• Coin presence check
+• Intent ritual (haptic + nod)
+• Payment wrapper.
+
+
+
+Panther (during):
+
+“I’ll send this through safely.”
+
+---
+
+Step 7 — Closing Reflection
+
+On success:
+
+Panther:
+
+“All set. Thank you for choosing with care.”
+
+Optional:
+
+“This goes on your trail as a thoughtful choice.”
+
+No totals.
+No “you spent X this week.”
+Only qualitative reflection.
+
+---
+
+Step 8 — Parent View (Separate)
+
+Parents see:
+
+• Categories used
+• Count of “thoughtful choices”
+• Count of “maybe not today” moments
+
+
+No shaming.
+No “overspending” alerts.
+Just conversation starters.
+
+---
