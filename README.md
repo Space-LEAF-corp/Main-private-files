@@ -10,6 +10,31 @@ calm, emotionally safe computing. It pairs:
 
 This repository is an early skeleton: structure first, features later.
 
+## Goals
+
+- Offline-first design
+- Emotionally safe, non-intrusive interaction model
+- Portable container logic for file organization
+- Low-RAM, low-noise processing acceleration
+- Modular architecture for future expansion
+
+## Status
+
+Early prototype skeleton. Not yet bootable. Intended for conceptual and
+architectural development.
+
+# Raptor OS
+
+Raptor OS is an offline-first, container-boosted operating shell designed for
+calm, emotionally safe computing. It pairs:
+
+- **Turbo Stack** – a portable container + routing layer that accelerates tasks
+  without demanding more RAM.
+- **Shadow Panther Copilot (Jarvondis IA)** – a silent background intelligence
+  that suggests actions based on artifacts, without chat or interruption.
+
+This repository is an early skeleton: structure first, features later.
+
 Objective:
 Build a neural haptic hand-gesture learning matrix
 for accelerated robotic control and amputee interface capability.
