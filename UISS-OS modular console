@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UISS‑OS Modular Console</title>
+    <style>
+        /* ── Theme Tokens ─────────────────────────────── */
+        :root {
+            --color-bg:          #0b0f17;
+            --color-surface:     #1a2233;
+            --color-input:       #2d3748;
+            --color-border:      #1f2937;
+            --color-border-light:#2d3748;
+            --color-text:        #e0e6f0;
+            --color-text-muted:  #9ca3af;
+            --color-accent:      #3b82f6;
+            --color-accent-hover:#2563eb;
+            --radius:            8px;
+            --radius-lg:         12px;
+            --transition:        0.2s ease;
+        }
+
+        /* ── Reset & Base ─────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        /* ── Header ───────────────────────────────────── */
+        header {
+            background-color: #111827;
+            padding: 28px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--color-border);
+        }
+
+        header h1 {
+            font-size: 1.75rem;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        header p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ── Main Layout ──────────────────────────────── */
+        main {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* ── Section Cards ────────────────────────────── */
+        .module-card {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+            transition: box-shadow var(--transition);
+        }
+
+        .module-card:hover {
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.12);
+        }
+
+        .module-card h2 {
+            font-size: 1.2rem;
+            border-bottom: 1px solid var(--color-border-light);
+            padding-bottom: 10px;
+            margin-bottom: 6px;
+        }
+
+        .module-card p.description {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+
+        /* ── Form Controls ────────────────────────────── */
+        label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            margin-top: 14px;
+            color: var(--color-text);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            border: 1px solid transparent;
+            background-color: var(--color-input);
+            color: var(--color-text);
+            font-size: 0.95rem;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        /* ── Buttons ──────────────────────────────────── */
+        .btn {
+            display: inline-block;
+            padding: 12px 22px;
+            background-color: var(--color-accent);
+            border: none;
+            border-radius: var(--radius);
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 18px;
+            transition: background-color var(--transition), transform var(--transition);
+        }
+
+        .btn:hover  { background-color: var(--color-accent-hover); }
+        .btn:active { transform: scale(0.98); }
+        .btn:focus-visible {
+            outline: 2px solid var(--color-accent);
+            outline-offset: 3px;
+        }
+
+        /* ── Footer ───────────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 24px 20px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            border-top: 1px solid var(--color-border);
+        }
+
+        footer strong { color: var(--color-text); }
+        footer p + p  { margin-top: 6px; }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.35rem; }
+            .module-card { padding: 20px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+    <h1>UISS‑OS Modular Console</h1>
+    <p>Universal International Space Station Operating System</p>
+</header>
+
+<!-- ═══════════════════ MAIN ════════════════════ -->
+<main>
+
+    <!-- ── Module 1 · Login ────────────────────── -->
+    <section class="module-card" aria-labelledby="login-heading">
+        <h2 id="login-heading">Login</h2>
+        <p class="description">Create or access your role‑based profile.</p>
+
+        <form id="login-form" autocomplete="off">
+            <label for="login-username">Username</label>
+            <input
+                type="text"
+                id="login-username"
+                name="username"
+                placeholder="Enter username"
+                required
+                autocomplete="username"
+            >
+
+            <label for="login-password">12‑Digit Password</label>
+            <input
+                type="password"
+                id="login-password"
+                name="password"
+                placeholder="Enter 12‑digit password"
+                minlength="12"
+                maxlength="12"
+                required
+                autocomplete="current-password"
+            >
+
+            <label for="login-role">Select Your Role</label>
+            <select id="login-role" name="role" required>
+                <option value="" disabled selected>— Choose a role —</option>
+                <option value="civilian">Civilian Student</option>
+                <option value="creator">Captain Creator</option>
+                <option value="maintenance">Maintenance Crew Member</option>
+                <option value="steward">Planetary Steward</option>
+            </select>
+
+            <button type="submit" class="btn">Login / Create Profile</button>
+        </form>
+    </section>
+
+    <!-- ── Module 2 · Star Key Sync ────────────── -->
+    <section class="module-card" aria-labelledby="starkey-heading">
+        <h2 id="starkey-heading">Five‑Word Star Key Sync</h2>
+        <p class="description">Unlock modular tools, extensions, and local system features.</p>
+
+        <form id="starkey-form" autocomplete="off">
+            <label for="starkey-phrase">Star Key Phrase</label>
+            <input
+                type="text"
+                id="starkey-phrase"
+                name="starkey"
+                placeholder="Enter your 5‑word star key phrase"
+                required
+            >
+
+            <button type="submit" class="btn">Sync Key</button>
+        </form>
+    </section>
+
+    <!-- ── Module 3 · QR Module Loader ─────────── -->
+    <section class="module-card" aria-labelledby="qr-heading">
+        <h2 id="qr-heading">QR Module Loader</h2>
+        <p class="description">Scan or paste a QR code payload to load a module (artifact, script, extension, or link).</p>
+
+        <form id="qr-form" autocomplete="off">
+            <label for="qr-payload">QR Payload</label>
+            <textarea
+                id="qr-payload"
+                name="qr_payload"
+                placeholder="Paste QR payload here…"
+                required
+            ></textarea>
+
+            <button type="submit" class="btn">Load Module</button>
+        </form>
+    </section>
+
+    <!-- ── Module 4 · Recovery Access ──────────── -->
+    <section class="module-card" aria-labelledby="recovery-heading">
+        <h2 id="recovery-heading">Recovery Access</h2>
+        <p class="description">For creators, administrators, and public figures.</p>
+
+        <form id="recovery-form" autocomplete="off">
+            <label for="recovery-phrase">12‑Word Recovery Phrase</label>
+            <input
+                type="text"
+                id="recovery-phrase"
+                name="recovery_phrase"
+                placeholder="Enter your 12‑word recovery phrase"
+                required
+            >
+
+            <button type="submit" class="btn">Request Recovery Validation</button>
+        </form>
+    </section>
+
+</main>
+
+<!-- ═══════════════════ FOOTER ══════════════════ -->
+<footer>
+    <p>For recovery validation or collaborative webmaster support, contact:</p>
+    <p><strong>spaceleafcorp@outlook.com</strong></p>
+    <p>This system is built through public collaboration, shared stewardship, and privacy‑respecting design.</p>
+</footer>
+
+</body>
+</html>
