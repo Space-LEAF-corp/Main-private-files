@@ -1,0 +1,42 @@
+public interface ICloudClient
+{
+    Task<ShadowInventorySnapshot?> LoadAsync(string playerId, string gameId);
+    Task SaveAsync(ShadowInventorySnapshot snapshot);
+}
+
+public class ShadowInventoryWithCloud : ShadowInventory
+{
+    private readonly ICloudClient _cloud;
+    private readonly string _playerId;
+    private readonly string _gameId;
+    private long _version;
+
+    public ShadowInventoryWithCloud(ICloudClient cloud, string playerId, string gameId)
+    {
+        _cloud = cloud;
+        _playerId = playerId;
+        _gameId = gameId;
+    }
+
+    public async Task LoadFromCloudAsync()
+    {
+        var snapshot = await _cloud.LoadAsync(_playerId, _gameId);
+        if (snapshot == null) return;
+
+        storage = snapshot.Items.ToDictionary(k => k.Key, v => v.Value);
+        _version = snapshot.Version;
+    }
+
+    public async Task SaveToCloudAsync()
+    {
+        var snapshot = new ShadowInventorySnapshot
+        {
+            PlayerId = _playerId,
+            GameId = _gameId,
+            Items = new Dictionary<string, long>(storage),
+            Version = ++_version
+        };
+
+        await _cloud.SaveAsync(snapshot);
+    }
+}
