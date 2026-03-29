@@ -1,0 +1,25 @@
+// InventoryRouter.h
+#pragma once
+#include "CoreMinimal.h"
+#include "InventoryInterface.h"
+#include "InventoryRouter.generated.h"
+
+UCLASS(Blueprintable)
+class UInventoryRouter : public UObject, public IInventoryInterface
+{
+    GENERATED_BODY()
+
+public:
+    UPROPERTY()
+    UGameInventory* GameInventory;
+
+    UPROPERTY()
+    UShadowInventory* ShadowInventory;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    bool bShadowEnabled = true;
+
+    virtual bool AddItem_Implementation(TScriptInterface<IItem> Item, int32 Quantity) override;
+    virtual bool RemoveItem_Implementation(FName ItemId, int32 Quantity) override;
+    virtual int32 GetQuantity_Implementation(FName ItemId) const override;
+};
