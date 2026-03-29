@@ -1,0 +1,9 @@
+public class InventoryArtifact
+{
+    public string ArtifactId { get; set; }          // physical/digital token id
+    public string OwnerPlayerId { get; set; }
+    public string ScopeGameId { get; set; }         // which game(s) it can unlock
+    public HashSet<string> AllowedItemTags { get; set; } = new();
+    public int MaxSlots { get; set; }               // capacity constraint
+    public bool IsReadOnly { get; set; }            // e.g., museum mode
+}
