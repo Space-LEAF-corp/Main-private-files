@@ -1,0 +1,7 @@
+public class ShadowInventorySnapshot
+{
+    public string PlayerId { get; set; }
+    public string GameId { get; set; }
+    public Dictionary<string, long> Items { get; set; } = new();
+    public long Version { get; set; } // for conflict resolution
+}
