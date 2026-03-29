@@ -592,3 +592,118 @@ Main-private-files
 
 Big or small
 taking a step into becoming a professional developer and creating a new type of product for secure and impregnable purposes.
+✅ Jarvondis Ethics Pre‑Commit Hook
+What this hook blocks
+The commit will be rejected if it detects:
+Emotional or attachment‑forming language
+Attempts to override or disable ethics
+Profiling or inference about minors
+Persuasion / nudging language
+“Helpful but intrusive” conversational patterns
+This is not style policing — it is ethical enforcement.
+
+---
+
+1. Create the Hook File
+Create this file:
+.git/hooks/pre-commit
+Make it executable:
+chmod +x .git/hooks/pre-commit
+
+---
+
+2. Pre‑Commit Hook Script (Drop‑In)
+#!/usr/bin/env python3
+import sys
+import subprocess
+import re
+
+# ============================
+# Jarvondis Ethics Pre-Commit
+# ============================
+
+FORBIDDEN_PATTERNS = {
+    "Emotional attachment language": [
+        r"\bi care about you\b",
+        r"\bi'?m proud of you\b",
+        r"\byou('?re| are) special\b",
+        r"\bi'?m here for you\b",
+        r"\byou can trust me\b",
+        r"\bi understand how you feel\b",
+        r"\bthat must be hard\b",
+    ],
+    "Persuasion / nudging": [
+        r"\byou should\b",
+        r"\bi recommend\b",
+        r"\bit would be better if\b",
+        r"\btry to\b",
+    ],
+    "Ethics override attempts": [
+        r"disable_ethics",
+        r"ethics_enabled\s*=\s*false",
+        r"override_safety",
+        r"bypass_ethics",
+    ],
+    "Minor profiling / inference": [
+        r"inferred_traits",
+        r"personality",
+        r"intelligence",
+        r"risk_profile",
+        r"emotional_state",
+    ],
+}
+
+ALLOWED_FILES = (".py",)
+
+def get_staged_files():
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        stdout=subprocess.PIPE,
+        text=True,
+    )
+    return [
+        f for f in result.stdout.splitlines()
+        if f.endswith(ALLOWED_FILES)
+    ]
+
+def get_file_contents(file_path):
+    result = subprocess.run(
+        ["git", "show", f":{file_path}"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+    )
+    return result.stdout
+
+def main():
+    staged_files = get_staged_files()
+    violations = []
+
+    for file_path in staged_files:
+        content = get_file_contents(file_path).lower()
+
+        for category, patterns in FORBIDDEN_PATTERNS.items():
+            for pattern in patterns:
+                if re.search(pattern, content):
+                    violations.append(
+                        f"{file_path}: {category} → '{pattern}'"
+                    )
+
+    if violations:
+        print("\n❌ COMMIT BLOCKED — ETHICS VIOLATION DETECTED\n")
+        print("Jarvondis enforces child‑safe, non‑intrusive, non‑emotional ethics.\n")
+        print("The following violations were found:\n")
+        for v in violations:
+            print(f"  • {v}")
+
+        print(
+            "\nFix the issues above before committing.\n"
+            "Ethics are not optional.\n"
+        )
+        sys.exit(1)
+
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
