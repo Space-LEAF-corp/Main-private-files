@@ -1,0 +1,3 @@
+if AdultMode == false → return false
+if ReplayCount < Threshold → return false
+else return true
