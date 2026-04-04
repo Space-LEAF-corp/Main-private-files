@@ -1,0 +1,9 @@
++--------------------------------------------------------------+
+| HEAT MAP LEGEND | TRACK VIEWPORT (Stress Overlay)           |
+|-----------------|--------------------------------------------|
+| - Velocity      |   [Red Zones = Unsafe]                     |
+| - G-Force       |   [Yellow Zones = Needs Review]            |
+| - Structural    |   [Green Zones = Stable]                   |
++--------------------------------------------------------------+
+| FAILURE POINTS | SUGGESTED FIXES | AUTO-REPAIR BUTTON        |
++--------------------------------------------------------------+
