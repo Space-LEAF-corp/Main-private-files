@@ -1,0 +1,29 @@
+---
+
+3.1 Core Systems
+
+Track Geometry Engine
+
+• Spline generation
+• Segment snapping
+• Node validation
+• Mesh generation
+• Collision mesh creation
+
+
+Physics & Simulation
+
+• G‑force calculation
+• Velocity prediction
+• Gravity modifiers
+• Stress analysis
+
+
+Rendering
+
+• Real‑time viewport
+• Heat map overlays
+• Cinematic camera system
+
+
+---
