@@ -1,0 +1,12 @@
++--------------------------------------------------------------+
+| SEGMENT LIBRARY | TRACK VIEWPORT (3D)                       |
+|-----------------|--------------------------------------------|
+| - Straights     |   [Camera Controls]   [Mode Switch]        |
+| - Curves        |                                            |
+| - Loops         |   [Track Spline]                           |
+| - Arcs          |                                            |
+| - Boosts        |   [Nodes + Constraints]                    |
+| - Hazards       |                                            |
++--------------------------------------------------------------+
+| TIMELINE | SAFETY PANEL | VERSION HISTORY | PUBLISH BUTTON   |
++--------------------------------------------------------------+
