@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RipHub — Content Scrubber Core Layer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    background: #05060a;
+    color: #d6f6ff;
+    font-family: "JetBrains Mono", monospace;
+    line-height: 1.6;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 600;
+    color: #7df9ff;
+    margin-top: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+    text-shadow: 0 0 8px #00eaff;
+  }
+
+  .constellation-divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #00eaff, transparent);
+    margin: 2.5rem 0;
+    position: relative;
+  }
+
+  .constellation-divider::after {
+    content: "✦";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #00eaff;
+    font-size: 1.2rem;
+    text-shadow: 0 0 6px #00eaff;
+  }
+
+  .phase-label {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid #00eaff;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #00eaff;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .terminal-box {
+    background: rgba(0, 20, 30, 0.6);
+    border: 1px solid #003b4d;
+    padding: 1rem 1.2rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+  }
+
+  .flow {
+    color: #9dfcff;
+    font-size: 0.95rem;
+    padding-left: 0.5rem;
+  }
+
+  .flow span {
+    display: inline-block;
+    margin: 0.2rem 0;
+  }
+
+  ul {
+    margin-left: 1.2rem;
+  }
+
+  code {
+    background: #00141c;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    color: #7df9ff;
+  }
+
+  .mantra {
+    text-align: center;
+    margin-top: 3rem;
+    padding: 1.5rem;
+    border: 1px solid #003b4d;
+    border-radius: 6px;
+    background: rgba(0, 20, 30, 0.4);
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #b8faff;
+  }
+
+  footer {
+    margin-top: 4rem;
+    text-align: center;
+    color: #4ac7d6;
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+
+<body>
+<main>
+
+<h1>RipHub — Content Scrubber Core Layer</h1>
+<p>A structural boundary, not a ceremony. A constellation node in the publishing lineage.</p>
+
+<div class="constellation-divider"></div>
+
+<h2>Publishing Flow (RipHub Minimalist Pipeline)</h2>
+<div class="terminal-box flow">
+  <span>Upload → Detect Type → If <code>.html</code> → Scan →</span>
+  <span>If Clean → Publish</span><br>
+  <span>If Restricted → Gate</span><br>
+  <span>If Malicious → Block</span>
+</div>
+<p>No buttons. No bypass. No “run scan.”  
+Publishing stays implicit — responsibility becomes structural.</p>
+
+<div class="constellation-divider"></div>
+
+<h2><span class="phase-label">Phase 11</span> HTML Content Scrubber</h2>
+
+<h3>Trigger Condition</h3>
+<ul>
+  <li>File extension: <code>.html</code> or <code>.htm</code></li>
+  <li>Only scans finalized uploads (never drafts)</li>
+  <li>Preserves creative flow while enforcing accountability</li>
+</ul>
+
+<h3>What the Scrubber Checks</h3>
+
+<h4>1. Malicious / Dangerous Content (Hard Block)</h4>
+<ul>
+  <li>Obfuscated JavaScript payloads</li>
+  <li>Known malware signatures</li>
+  <li>Phishing forms</li>
+  <li>Drive‐by download scripts</li>
+  <li>Undisclosed crypto‐mining</li>
+  <li>External injections from flagged domains</li>
+</ul>
+<div class="terminal-box">Result: ❌ Publish Denied  
+Message: “This content cannot be hosted.”</div>
+
+<h4>2. Age‐Restricted / Sensitive Content (Gated)</h4>
+<ul>
+  <li>Adult‐only themes</li>
+  <li>Explicit imagery references</li>
+  <li>Sexualized content</li>
+  <li>Graphic violence</li>
+  <li>Explicit substance depiction</li>
+</ul>
+<div class="terminal-box">Result: ⚠️ Restricted  
+Cannot publish publicly by default.</div>
+
+<div class="constellation-divider"></div>
+
+<h2><span class="phase-label">Phase 12</span> Ethical Publishing Gate</h2>
+
+<p>For restricted but non‐malicious content, all conditions must be met:</p>
+<ul>
+  <li>Publisher acknowledgement: “Not intended for minors.”</li>
+  <li>Subscription tier (covers monitoring + compliance)</li>
+  <li>Mandatory access controls:
+    <ul>
+      <li>Age gate</li>
+      <li>Restricted indexing</li>
+      <li>Monitoring enabled</li>
+    </ul>
+  </li>
+</ul>
+
+<p>If any condition fails → publish blocked.  
+No moral panic. No loopholes. Just accountability.</p>
+
+<div class="constellation-divider"></div>
+
+<h2><span class="phase-label">Phase 13</span> Monitoring & Enforcement</h2>
+
+<h3>Continuous Checks</h3>
+<ul>
+  <li>Re‐scan on updates</li>
+  <li>Periodic integrity checks</li>
+  <li>Visitor reports</li>
+  <li>Pattern drift detection</li>
+</ul>
+
+<h3>Enforcement Ladder</h3>
+<ul>
+  <li>Warning</li>
+  <li>Temporary unpublish</li>
+  <li>Account restriction</li>
+  <li>Removal</li>
+</ul>
+
+<p>No public shaming. No silent tolerance.</p>
+
+<div class="constellation-divider"></div>
+
+<h2>Structural Non‐Bypass Rules</h2>
+<ul>
+  <li>No renaming extensions</li>
+  <li>No remote embedding to evade scanning</li>
+  <li>No HTML obfuscation tricks</li>
+  <li>No “I didn’t know” claims</li>
+  <li>No accidental restricted publishing</li>
+</ul>
+
+<p>Trust is optional. Structure is mandatory.</p>
+
+<div class="constellation-divider"></div>
+
+<h2>Minimalism Preserved</h2>
+<ul>
+  <li>Uploads remain instant</li>
+  <li>No dashboards</li>
+  <li>No queues for clean content</li>
+  <li>No friction for ethical sites</li>
+  <li>No surprise rules mid‐workflow</li>
+</ul>
+
+<div class="constellation-divider"></div>
+
+<div class="mantra">
+  Files first.<br>
+  Paths are truth.<br>
+  Publishing is implicit.<br>
+  Safety is invisible.<br>
+  Ethics are enforced at the boundary.
+</div>
+
+<footer>
+  RipHub Artifact • Constellation Node 11‐13 • Structural Responsibility Layer
+</footer>
+
+</main>
+</body>
+</html>
