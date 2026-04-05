@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Four-Lane Communication Extension</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 10px; width: 300px; }
+        h1 { text-align: center; font-size: 18px; }
+        .tab-links { display: flex; justify-content: space-around; margin-bottom: 10px; }
+        .tab-link { cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .tab-link.active { background-color: #007bff; color: white; }
+        .tab-content { display: none; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+        .tab-content.active { display: block; }
+        #explicit-tab { text-align: center; }
+        #payment-form { display: none; }
+        #payment-form label { display: block; margin: 10px 0; }
+        #unlock-button { background-color: #28a745; color: white; border: none; padding: 10px; cursor: pointer; }
+        #unlock-button:disabled { background-color: #ccc; }
+        .warning { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Four-Lane Communication</h1>
+    <div class="tab-links">
+        <div class="tab-link active" data-tab="guide">Guide Talk</div>
+        <div class="tab-link" data-tab="girl">Girl Talk</div>
+        <div class="tab-link" data-tab="chill">Chill Talk</div>
+        <div class="tab-link" data-tab="explicit">Explicit Talk</div>
+    </div>
+    <div id="guide-tab" class="tab-content active">
+        <p>Welcome to Guide Talk! This is for everyday conversations, safe and accessible.</p>
+        <!-- Placeholder for chat or content -->
+        <textarea placeholder="Type your message..."></textarea>
+    </div>
+    <div id="girl-tab" class="tab-content">
+        <p>Welcome to Girl Talk! Dive into deeper discussions here.</p>
+        <!-- Placeholder for chat or content -->
+        <textarea placeholder="Type your message..."></textarea>
+    </div>
+    <div id="chill-tab" class="tab-content">
+        <p>Welcome to Chill Talk! Relax and decompress in this space.</p>
+        <!-- Placeholder for chat or content -->
+        <textarea placeholder="Type your message..."></textarea>
+    </div>
+    <div id="explicit-tab" class="tab-content">
+        <div id="paywall">
+            <p class="warning">Explicit Talk: Adult Content Only (18+)</p>
+            <p>This channel contains explicit language and adult themes. Access requires a one-time $8 fee as a safety barrier. Payment unlocks this lane permanently (simulated for prototype).</p>
+            <p>By proceeding, you confirm you are 18 or older and agree to the terms: This content may include trash talk, dirty language, and explicit discussions. It's treated as optional "trash talk" – pay if you want access, but it's not privileged or required.</p>
+            <button id="pay-button">Proceed to Payment</button>
+        </div>
+        <form id="payment-form">
+            <label>
+                <input type="checkbox" id="age-confirm"> I am 18 years or older.
+            </label>
+            <label>
+                <input type="checkbox" id="terms-agree"> I agree to the terms and conditions for explicit content.
+            </label>
+            <p>Simulated Payment: Enter card details (fake for prototype).</p>
+            <input type="text" placeholder="Card Number" disabled>
+            <button id="unlock-button" disabled>Pay $8 and Unlock</button>
+        </form>
+        <div id="unlocked-content" style="display: none;">
+            <p>Welcome to Explicit Talk! This is the adult-only lane for unfiltered discussions.</p>
+            <!-- Placeholder for chat or content -->
+            <textarea placeholder="Type your message..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                link.classList.add('active');
+                document.getElementById(link.dataset.tab + '-tab').classList.add('active');
+            });
+        });
+
+        // Paywall logic
+        const payButton = document.getElementById('pay-button');
+        const paymentForm = document.getElementById('payment-form');
+        const ageConfirm = document.getElementById('age-confirm');
+        const termsAgree = document.getElementById('terms-agree');
+        const unlockButton = document.getElementById('unlock-button');
+        const paywall = document.getElementById('paywall');
+        const unlockedContent = document.getElementById('unlocked-content');
+
+        payButton.addEventListener('click', () => {
+            paywall.style.display = 'none';
+            paymentForm.style.display = 'block';
+        });
+
+        [ageConfirm, termsAgree].forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                if (ageConfirm.checked && termsAgree.checked) {
+                    unlockButton.disabled = false;
+                } else {
+                    unlockButton.disabled = true;
+                }
+            });
+        });
+
+        unlockButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Simulate payment success
+            alert('Payment simulated! Explicit Talk unlocked.');
+            paymentForm.style.display = 'none';
+            unlockedContent.style.display = 'block';
+            // In a real extension, use storage to persist unlock state
+        });
+    </script>
+</body>
+</html>
