@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FLAG SOLVD – Systems Online</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      margin: 0;
+      background: #02040a;
+      color: #e5f5ff;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .console {
+      width: min(90vw, 720px);
+      padding: 24px 28px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top, #101827 0, #02040a 55%);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      border: 1px solid #1f2937;
+    }
+    .line {
+      line-height: 1.5;
+      white-space: pre-wrap;
+      font-size: 0.9rem;
+    }
+    .muted {
+      color: #6b7280;
+    }
+    .accent {
+      color: #38bdf8;
+    }
+    .ok {
+      color: #4ade80;
+    }
+    .warn {
+      color: #facc15;
+    }
+    .error {
+      color: #f97373;
+    }
+    .cursor {
+      display: inline-block;
+      width: 0.6em;
+      background: #e5f5ff;
+      margin-left: 2px;
+      animation: blink 1s steps(1) infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    .flag-banner {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #1f2937;
+      font-size: 1rem;
+    }
+    .flag-title {
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .flag-main {
+      font-size: 1.4rem;
+      letter-spacing: 0.18em;
+      color: #4ade80;
+    }
+    .subtext {
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="console" id="console">
+    <!-- Lines will be injected here -->
+  </div>
+
+  <script>
+    const lines = [
+      { text: "OVL CORE: initializing orbital lattice...", cls: "line muted" },
+      { text: "OVL STATUS: link integrity \u2192 OK", cls: "line ok" },
+      { text: "", cls: "line" },
+      { text: "DLA NODE: mounting digital stacks...", cls: "line muted" },
+      { text: "DLA STATUS: index coherence \u2192 OK", cls: "line ok" },
+      { text: "", cls: "line" },
+      { text: "SFG ENGINE: loading spider-frame logic...", cls: "line muted" },
+      { text: "SFG STATUS: sim lattice \u2192 OK", cls: "line ok" },
+      { text: "", cls: "line" },
+      { text: "UNITY BUS: synchronizing tri-system channels...", cls: "line muted" },
+      { text: "UNITY STATUS: phase alignment \u2192 STABLE", cls: "line ok" },
+      { text: "", cls: "line" },
+      { text: "RESOLVING FLAG...", cls: "line warn" }
+    ];
+
+    const consoleEl = document.getElementById("console");
+
+    function appendLine(text, cls) {
+      const div = document.createElement("div");
+      div.className = cls || "line";
+      div.textContent = text;
+      consoleEl.appendChild(div);
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    function showFlagBanner() {
+      const banner = document.createElement("div");
+      banner.className = "flag-banner";
+
+      const title = document.createElement("div");
+      title.className = "flag-title";
+      title.textContent = "SYSTEM FLAG";
+
+      const main = document.createElement("div");
+      main.className = "flag-main";
+      main.textContent = "FLAG SOLVD";
+
+      const sub = document.createElement("div");
+      sub.className = "subtext";
+      sub.textContent = "OVL–DLA–SFG tri-system online. Commands and input now accepted.";
+
+      banner.appendChild(title);
+      banner.appendChild(main);
+      banner.appendChild(sub);
+      consoleEl.appendChild(banner);
+    }
+
+    let i = 0;
+    function step() {
+      if (i < lines.length) {
+        const { text, cls } = lines[i];
+        appendLine(text, cls);
+        i++;
+        setTimeout(step, 450);
+      } else {
+        setTimeout(showFlagBanner, 600);
+      }
+    }
+
+    // Start sequence
+    step();
+  </script>
+</body>
+</html>
