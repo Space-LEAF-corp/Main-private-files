@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Story Engine – Movie / Game Generator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1rem 1.5rem;
+      background: #141a33;
+      border-bottom: 1px solid #252b4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    header span {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1px;
+      background: #252b4a;
+    }
+    .sidebar {
+      background: #111628;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .mode-select {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .mode-select button {
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      background: #181f3a;
+      color: #f5f5f5;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .mode-select button.active {
+      background: #2b3a7a;
+      border-color: #6f8cff;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .field label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .field textarea,
+    .field input {
+      background: #0b1020;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      color: #f5f5f5;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .field small {
+      font-size: 0.7rem;
+      opacity: 0.6;
+    }
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .actions button {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      background: #1f2744;
+      color: #f5f5f5;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .actions button.primary {
+      background: #6f8cff;
+      border-color: #9fb4ff;
+      color: #050814;
+      font-weight: 600;
+    }
+    .output {
+      background: #050814;
+      padding: 1rem 1.25rem;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85rem;
+    }
+    footer {
+      padding: 0.5rem 1.5rem;
+      background: #141a33;
+      border-top: 1px solid #252b4a;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Story Engine</h1>
+    <span>Movie / Game skeleton generator (local demo)</span>
+  </header>
+
+  <main>
+    <section class="sidebar">
+      <div class="mode-select">
+        <strong style="font-size:0.8rem;opacity:0.8;">Mode</strong>
+        <button id="mode-movie" class="active">🎬 Movie Generator</button>
+        <button id="mode-game">🎮 Game Engine Generator</button>
+      </div>
+
+      <div class="field">
+        <label for="title-input">Title / Working Name</label>
+        <input id="title-input" placeholder="e.g. Ready Player Two: Temporal Drift" />
+      </div>
+
+      <div class="field">
+        <label for="prompt-input">Core idea / vibe</label>
+        <textarea id="prompt-input" rows="4"
+          placeholder="Describe the tone, key characters, or central paradox."></textarea>
+        <small>Think of this as the seed: ‘Doc + Captain + time bubble + van between Earth and Moon.’</small>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="generate-btn">Generate skeleton</button>
+        <button id="clear-btn">Clear</button>
+      </div>
+    </section>
+
+    <section class="output" id="output">
+      <!-- Generated skeleton appears here -->
+    </section>
+  </main>
+
+  <footer>
+    Local-only demo. No network, no backend. Just structure you can extend.
+  </footer>
+
+  <script>
+    const modeMovieBtn = document.getElementById("mode-movie");
+    const modeGameBtn = document.getElementById("mode-game");
+    const generateBtn = document.getElementById("generate-btn");
+    const clearBtn = document.getElementById("clear-btn");
+    const outputEl = document.getElementById("output");
+    const titleInput = document.getElementById("title-input");
+    const promptInput = document.getElementById("prompt-input");
+
+    let currentMode = "movie";
+
+    modeMovieBtn.addEventListener("click", () => {
+      currentMode = "movie";
+      modeMovieBtn.classList.add("active");
+      modeGameBtn.classList.remove("active");
+      renderHint();
+    });
+
+    modeGameBtn.addEventListener("click", () => {
+      currentMode = "game";
+      modeGameBtn.classList.add("active");
+      modeMovieBtn.classList.remove("active");
+      renderHint();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      outputEl.textContent = "";
+      titleInput.value = "";
+      promptInput.value = "";
+    });
+
+    generateBtn.addEventListener("click", () => {
+      const title = titleInput.value.trim() || "Untitled Project";
+      const seed = promptInput.value.trim() || "No specific prompt given.";
+      if (currentMode === "movie") {
+        outputEl.textContent = generateMovieSkeleton(title, seed);
+      } else {
+        outputEl.textContent = generateGameSkeleton(title, seed);
+      }
+    });
+
+    function renderHint() {
+      if (!outputEl.textContent.trim()) {
+        outputEl.textContent =
+          currentMode === "movie"
+            ? "Movie mode selected.\n\nDescribe your idea on the left, then click “Generate skeleton”."
+            : "Game mode selected.\n\nDescribe your idea on the left, then click “Generate skeleton”.";
+      }
+    }
+
+    // --- MOVIE SKELETON GENERATOR ---
+
+    function generateMovieSkeleton(title, seed) {
+      return [
+        `=== MOVIE SKELETON: ${title} ===`,
+        ``,
+        `CORE IDEA / VIBE:`,
+        `${seed}`,
+        ``,
+        `STRUCTURE: 3 ACTS + MIDPOINT TWIST`,
+        ``,
+        `ACT I – SETUP`,
+        `  • Opening Image:`,
+        `    - Establish the world tone (e.g. Doc + Captain in the lab, time bubble not yet revealed).`,
+        `  • Theme Stated:`,
+        `    - A line that hints at the core idea (e.g. “You can’t be in two places at once... yet.”).`,
+        `  • Setup:`,
+        `    - Introduce main characters, their dynamic, and the core tech (time engine, van, etc.).`,
+        `    - Show normal life before the paradox hits.`,
+        `  • Catalyst:`,
+        `    - A tear in space, a strange reading, or a digital/real mismatch that can’t be ignored.`,
+        `  • Debate:`,
+        `    - Should they engage? Is this a glitch, a threat, or an opportunity?`,
+        ``,
+        `ACT II – CONFRONTATION`,
+        `  • Break into Two:`,
+        `    - They commit to the mission (e.g. take the van, investigate the Starbridge tear).`,
+        `  • Fun & Games:`,
+        `    - Show off systems, tech, and banter (van tour, wearable seats, ICU glasses, bead modules).`,
+        `    - The promise of the premise: time, space, and humor colliding.`,
+        `  • Midpoint (Your big twist):`,
+        `    - Realization: digital world is doing time travel too.`,
+        `    - “We can’t be in two places at once... no wonder they copied the car.”`,
+        `    - Reveal the time bubble: “We never left the lab.”`,
+        `    - Closed vs open timelines, multiple selves, compressed experience.`,
+        ``,
+        `  • Bad Guys Close In:`,
+        `    - The tear worsens, timelines desync, digital and real begin to overlap dangerously.`,
+        `    - Emotional pressure: Doc questions his sanity; Captain reveals prior deaths/iterations.`,
+        `  • All Is Lost:`,
+        `    - A moment where it seems the bubble will fail or the tear will consume the Starbridge.`,
+        `  • Dark Night of the Soul:`,
+        `    - Quiet scene (e.g. awkward lunch order, 10 McChickens + 10 McDoubles).`,
+        `    - Explanation of hunger as multi-self energy cost.`,
+        `    - “I’m just hungry, Doc.” – simple truth after complex explanation.`,
+        ``,
+        `ACT III – RESOLUTION`,
+        `  • Break into Three:`,
+        `    - New synthesis: use both open and closed timeline logic to stabilize the tear.`,
+        `    - Doc finally understands the Captain’s role and experience.`,
+        `  • Finale:`,
+        `    - Execute the plan: van + bubble + digital/real sync.`,
+        `    - Doc’s realization: “We’re bending time around us, not bending around time.”`,
+        `    - “We have all the time in the world!” shouted into the multiverse.`,
+        `  • Final Image:`,
+        `    - Contrast with opening: same lab or van, but now with mutual respect and integrated tech.`,
+        `    - Optional: quiet beat, maybe a new paradox hinted at, or a joke about lunch.`,
+        ``,
+        `DIALOGUE / SCENE HOOKS (FILLABLE):`,
+        `  • Doc’s first reaction to the van: ________________________________`,
+        `  • Captain explaining the time bubble: _____________________________`,
+        `  • The “three people in one” explanation: _________________________`,
+        `  • Doc’s response to “I’m just hungry, Doc.”: _____________________`,
+        ``,
+        `NOTES FOR COLLABORATORS:`,
+        `  • Treat this as a skeleton, not a script. Swap scenes, add beats, or change tech details.`,
+        `  • Keep the core emotional logic:`,
+        `    - Doc = open chaos, legacy genius.`,
+        `    - Captain = closed bubble, multi-self anchor.`,
+        `  • Humor should land on truth, not randomness.`,
+        `  • Leave room for others to plug in their own paradoxes, tech, or character beats.`,
+        ``
+      ].join("\n");
+    }
+
+    // --- GAME ENGINE SKELETON GENERATOR ---
+
+    function generateGameSkeleton(title, seed) {
+      return [
+        `=== GAME ENGINE SKELETON: ${title} ===`,
+        ``,
+        `CORE IDEA / VIBE:`,
+        `${seed}`,
+        ``,
+        `GAME TYPE:`,
+        `  • Narrative-driven adventure with time/space mechanics.`,
+        `  • Player can experience “open timeline” (Doc-style) and “closed bubble” (Captain-style) states.`,
+        ``,
+        `CORE ENTITIES:`,
+        `  • PlayerCharacter:`,
+        `    - Attributes: timelineState (open/closed), hungerLevel, focus, timelineIterations.`,
+        `  • Vehicle: SpaceVan (Space LEAF Corp prototype)`,
+        `    - Modules: timeBubbleCore, magneticDock, coolingBay, grillMode, seatHarnessSystem.`,
+        `  • Locations:`,
+        `    - Lab (safe hub, time bubble capable).`,
+        `    - Starbridge Corridor (Earth–Moon).`,
+        `    - TearZone (unstable space-time region).`,
+        `    - DigitalLayer (OASIS-like simulation).`,
+        ``,
+        `STATE MACHINE (HIGH LEVEL):`,
+        `  • STATE: LAB_IDLE`,
+        `    - Player can: talk to Doc, configure van, toggle bubble, accept missions.`,
+        `  • STATE: VAN_TRANSIT`,
+        `    - Player can: drive/pilot, manage modules, choose routes (Starbridge, orbit, etc.).`,
+        `  • STATE: STARBRIDGE_INVESTIGATION`,
+        `    - Player can: scan tear, deploy probes, switch between open/closed timeline modes.`,
+        `  • STATE: DIGITAL_OVERLAY`,
+        `    - Player can: interact with digital copies (e.g. copied DeLorean), hack, sync timelines.`,
+        `  • STATE: HUB_BREAK (LUNCH SCENE)`,
+        `    - Player can: restore hunger, trigger deep dialogue, unlock multi-self lore.`,
+        `  • STATE: FINALE_OPERATION`,
+        `    - Player can: execute final stabilization plan, choose outcomes, lock or free timelines.`,
+        ``,
+        `EXAMPLE DATA STRUCTURES (PSEUDO-CODE):`,
+        ``,
+        `  PlayerCharacter = {`,
+        `    name: "Captain",`,
+        `    timelineState: "closed", // "open" or "closed"`,
+        `    hungerLevel: 0,`,
+        `    timelineIterations: 3, // e.g. died twice, third run`,
+        `  };`,
+        ``,
+        `  SpaceVan = {`,
+        `    name: "Space LEAF Van",`,
+        `    modules: {`,
+        `      timeBubbleCore: true,`,
+        `      magneticDock: true,`,
+        `      coolingBay: { mode: "idle" }, // "cold" | "hot"`,
+        `      grillMode: false,`,
+        `      seatHarnessSystem: true,`,
+        `    },`,
+        `  };`,
+        ``,
+        `  function enterLunchState(player) {`,
+        `    // Closed timeline = higher hunger cost`,
+        `    if (player.timelineState === "closed") {`,
+        `      player.hungerLevel += player.timelineIterations * 5;`,
+        `    } else {`,
+        `      player.hungerLevel += 2;`,
+        `    }`,
+        `    // Trigger dialogue: "I'm just hungry, Doc."`,
+        `  }`,
+        ``,
+        `HOOKS FOR IMPLEMENTATION:`,
+        `  • onTearDetected() -> transition LAB_IDLE -> VAN_TRANSIT -> STARBRIDGE_INVESTIGATION`,
+        `  • onDigitalCopySeen() -> transition STARBRIDGE_INVESTIGATION -> DIGITAL_OVERLAY`,
+        `  • onPlayerOverloaded() -> suggest HUB_BREAK (lunch scene)`,
+        `  • onFinalPlanReady() -> transition to FINALE_OPERATION`,
+        ``,
+        `DESIGN NOTES:`,
+        `  • Keep systems modular: van modules, player states, locations, and events should be pluggable.`,
+        `  • Use the same emotional logic as the movie skeleton:`,
+        `    - Open timeline = more chaos, less compression.`,
+        `    - Closed timeline = more control, more personal cost.`,
+        `  • Leave gaps for collaborators to define:`,
+        `    - Specific missions, side quests, NPCs, and paradox types.`,
+        `    - Different vehicles, labs, or corporations beyond Space LEAF.`,
+        ``
+      ].join("\n");
+    }
+
+    // Initial hint
+    renderHint();
+  </script>
+</body>
+</html>
