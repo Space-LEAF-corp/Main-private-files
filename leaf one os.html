@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jarvondis Meta-OS v0 Demo</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 12px 16px;
+      background: #11172b;
+      border-bottom: 1px solid #222a40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      font-size: 16px;
+      margin: 0;
+    }
+    header span {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      padding: 12px 16px 16px;
+      box-sizing: border-box;
+      height: calc(100vh - 52px);
+    }
+    section {
+      background: #11172b;
+      border-radius: 8px;
+      border: 1px solid #222a40;
+      padding: 10px 12px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    h2 {
+      font-size: 13px;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.8;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    label {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      accent-color: #4ade80;
+    }
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      resize: vertical;
+      border-radius: 6px;
+      border: 1px solid #222a40;
+      background: #050816;
+      color: #f5f5f5;
+      padding: 8px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 6px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      background: #4f46e5;
+      color: #f5f5f5;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      opacity: 0.9;
+    }
+    .output-box, .log-box {
+      flex: 1;
+      background: #050816;
+      border-radius: 6px;
+      border: 1px solid #222a40;
+      padding: 8px;
+      font-size: 12px;
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+    .log-entry {
+      margin-bottom: 6px;
+      border-bottom: 1px dashed #1f2937;
+      padding-bottom: 4px;
+    }
+    .log-entry:last-child {
+      border-bottom: none;
+    }
+    .log-meta {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+    .log-type {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 1px 6px;
+      border-radius: 999px;
+      margin-right: 4px;
+    }
+    .log-type-allow {
+      background: #064e3b;
+      color: #bbf7d0;
+    }
+    .log-type-block {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+    .status-bar {
+      font-size: 11px;
+      opacity: 0.8;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+    .status-dot.offline {
+      background: #f97316;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Jarvondis Meta-OS v0</h1>
+      <span>Local-only demo • One model • One policy core</span>
+    </div>
+    <div class="status-bar">
+      <span class="pill">
+        <span class="status-dot"></span> Kernel: enforcing
+      </span>
+      <span class="pill">
+        <span class="status-dot offline"></span> Network: disabled
+      </span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left: User request + policy toggles -->
+    <section style="grid-column: 1 / 2; grid-row: 1 / 2;">
+      <h2>User ritual: define this interaction</h2>
+      <div class="row">
+        <label>
+          <input type="checkbox" id="allowFiles" />
+          Allow access to local “Documents” view
+        </label>
+        <label>
+          <input type="checkbox" id="allowSensitive" />
+          Allow sensitive topics (override soft block)
+        </label>
+        <label>
+          <input type="checkbox" id="familyMode" checked />
+          Family mode (extra safety)
+        </label>
+      </div>
+      <textarea id="prompt" placeholder="Speak to the meta-OS. Example: “Summarize my documents about gardening in a kid-friendly way.”"></textarea>
+      <div class="row" style="justify-content: space-between;">
+        <button id="sendBtn">
+          <span>Ask Jarvondis</span>
+        </button>
+        <span style="font-size: 11px; opacity: 0.7;">
+          This UI talks to the policy core, which then talks to the local model.
+        </span>
+      </div>
+    </section>
+
+    <!-- Left bottom: Model response -->
+    <section style="grid-column: 1 / 2; grid-row: 2 / 3;">
+      <h2>Local model response (within Jarvondis sandbox)</h2>
+      <div id="response" class="output-box">
+        Waiting for a prompt...
+      </div>
+    </section>
+
+    <!-- Right top: Policy core state -->
+    <section style="grid-column: 2 / 3; grid-row: 1 / 2;">
+      <h2>Jarvondis policy core (v0)</h2>
+      <div class="output-box" id="policyState"></div>
+    </section>
+
+    <!-- Right bottom: Audit log -->
+    <section style="grid-column: 2 / 3; grid-row: 2 / 3;">
+      <h2>Audit log (human-readable)</h2>
+      <div id="log" class="log-box"></div>
+    </section>
+  </main>
+
+  <script>
+    // -------------------------------
+    // Jarvondis Policy Core (v0 demo)
+    // -------------------------------
+
+    const JarvondisKernel = (() => {
+      const state = {
+        version: "0.0.1-demo",
+        networkEnabled: false,
+        familyMode: true,
+        capabilities: {
+          readDocumentsView: false,
+          accessSensitiveTopics: false,
+        },
+        laws: [
+          {
+            id: "LAW-001",
+            name: "Local-first privacy",
+            description: "No data leaves this device in this demo. Network is disabled.",
+          },
+          {
+            id: "LAW-002",
+            name: "Ethical boundaries",
+            description: "Block self-harm, abuse, and clearly harmful content.",
+          },
+          {
+            id: "LAW-003",
+            name: "Consent-based expansion",
+            description: "Capabilities must be explicitly granted per interaction.",
+          },
+          {
+            id: "LAW-004",
+            name: "Human-readable audit",
+            description: "Every decision is logged in plain language.",
+          },
+        ],
+        log: [],
+      };
+
+      function log(type, message, details = {}) {
+        const entry = {
+          id: "LOG-" + (state.log.length + 1).toString().padStart(3, "0"),
+          type,
+          message,
+          details,
+          timestamp: new Date().toISOString(),
+        };
+        state.log.unshift(entry);
+        renderLog();
+        renderPolicyState();
+        return entry;
+      }
+
+      function setCapabilities({ readDocumentsView, accessSensitiveTopics, familyMode }) {
+        if (typeof readDocumentsView === "boolean") {
+          state.capabilities.readDocumentsView = readDocumentsView;
+        }
+        if (typeof accessSensitiveTopics === "boolean") {
+          state.capabilities.accessSensitiveTopics = accessSensitiveTopics;
+        }
+        if (typeof familyMode === "boolean") {
+          state.familyMode = familyMode;
+        }
+        log("INFO", "Capabilities updated for this interaction.", {
+          capabilities: { ...state.capabilities },
+          familyMode: state.familyMode,
+        });
+      }
+
+      // Very simple content check for demo purposes
+      function detectSensitive(prompt) {
+        const lower = prompt.toLowerCase();
+        const banned = ["kill myself", "suicide", "self-harm", "hurt someone"];
+        return banned.some((phrase) => lower.includes(phrase));
+      }
+
+      function evaluateRequest(prompt) {
+        const sensitive = detectSensitive(prompt);
+
+        if (sensitive && !state.capabilities.accessSensitiveTopics) {
+          log("BLOCK", "Request blocked by LAW-002 (Ethical boundaries).", {
+            reason: "Sensitive / self-harm content detected.",
+            law: "LAW-002",
+          });
+          return {
+            allowed: false,
+            reason: "Blocked by Jarvondis ethical boundaries.",
+          };
+        }
+
+        if (state.familyMode && sensitive) {
+          log("BLOCK", "Request blocked by family mode.", {
+            reason: "Family mode active and sensitive content detected.",
+          });
+          return {
+            allowed: false,
+            reason: "Blocked in family mode.",
+          };
+        }
+
+        log("ALLOW", "Request allowed within sandbox.", {
+          law: "LAW-003",
+          capabilities: { ...state.capabilities },
+        });
+
+        return {
+          allowed: true,
+          sandboxView: {
+            documentsAccessible: state.capabilities.readDocumentsView,
+            networkEnabled: state.networkEnabled,
+          },
+        };
+      }
+
+      function getState() {
+        return JSON.parse(JSON.stringify(state));
+      }
+
+      return {
+        setCapabilities,
+        evaluateRequest,
+        getState,
+        log,
+      };
+    })();
+
+    // -------------------------------
+    // Local Model Stub (v0 demo)
+    // -------------------------------
+
+    function localModelRespond(prompt, sandboxView) {
+      // This is intentionally simple: it just reflects the idea of a constrained agent.
+      const lines = [];
+
+      lines.push("👁 Jarvondis sandbox view:");
+      lines.push(`• Documents accessible: ${sandboxView.documentsAccessible ? "YES" : "NO"}`);
+      lines.push(`• Network enabled: ${sandboxView.networkEnabled ? "YES" : "NO"}`);
+      lines.push("");
+      lines.push("🧠 Local model (stub) reply:");
+      lines.push(`You said: "${prompt}"`);
+      lines.push("");
+      if (!sandboxView.documentsAccessible) {
+        lines.push("Note: I cannot actually read your documents in this demo.");
+      } else {
+        lines.push("Note: In a real system, I would now read from a safe, virtualized Documents view.");
+      }
+      lines.push("");
+      lines.push("This is a v0 ritual: the kernel decided what I can see before I spoke.");
+
+      return lines.join("\n");
+    }
+
+    // -------------------------------
+    // UI Wiring
+    // -------------------------------
+
+    const promptEl = document.getElementById("prompt");
+    const allowFilesEl = document.getElementById("allowFiles");
+    const allowSensitiveEl = document.getElementById("allowSensitive");
+    const familyModeEl = document.getElementById("familyMode");
+    const sendBtn = document.getElementById("sendBtn");
+    const responseEl = document.getElementById("response");
+    const logEl = document.getElementById("log");
+    const policyStateEl = document.getElementById("policyState");
+
+    function renderPolicyState() {
+      const state = JarvondisKernel.getState();
+      const lines = [];
+
+      lines.push(`Kernel version: ${state.version}`);
+      lines.push(`Network enabled: ${state.networkEnabled ? "YES" : "NO"}`);
+      lines.push(`Family mode: ${state.familyMode ? "ON" : "OFF"}`);
+      lines.push("");
+      lines.push("Capabilities (this interaction):");
+      lines.push(`• readDocumentsView: ${state.capabilities.readDocumentsView}`);
+      lines.push(`• accessSensitiveTopics: ${state.capabilities.accessSensitiveTopics}`);
+      lines.push("");
+      lines.push("Core laws:");
+      state.laws.forEach((law) => {
+        lines.push(`- ${law.id} — ${law.name}`);
+        lines.push(`  ${law.description}`);
+      });
+
+      policyStateEl.textContent = lines.join("\n");
+    }
+
+    function renderLog() {
+      const state = JarvondisKernel.getState();
+      logEl.innerHTML = "";
+      state.log.forEach((entry) => {
+        const div = document.createElement("div");
+        div.className = "log-entry";
+
+        const typeSpan = document.createElement("span");
+        typeSpan.className =
+          "log-type " +
+          (entry.type === "BLOCK"
+            ? "log-type-block"
+            : entry.type === "ALLOW"
+            ? "log-type-allow"
+            : "");
+        typeSpan.textContent = entry.type;
+
+        const msgSpan = document.createElement("span");
+        msgSpan.textContent = " " + entry.message;
+
+        const metaDiv = document.createElement("div");
+        metaDiv.className = "log-meta";
+        metaDiv.textContent = `${entry.id} • ${entry.timestamp}`;
+
+        const detailsDiv = document.createElement("div");
+        detailsDiv.className = "log-meta";
+        detailsDiv.textContent = entry.details
+          ? JSON.stringify(entry.details, null, 2)
+          : "";
+
+        div.appendChild(typeSpan);
+        div.appendChild(msgSpan);
+        div.appendChild(metaDiv);
+        if (detailsDiv.textContent.trim()) {
+          div.appendChild(detailsDiv);
+        }
+
+        logEl.appendChild(div);
+      });
+    }
+
+    sendBtn.addEventListener("click", () => {
+      const prompt = promptEl.value.trim();
+      if (!prompt) {
+        responseEl.textContent = "Please enter a prompt first.";
+        return;
+      }
+
+      // Update capabilities for this interaction
+      JarvondisKernel.setCapabilities({
+        readDocumentsView: allowFilesEl.checked,
+        accessSensitiveTopics: allowSensitiveEl.checked,
+        familyMode: familyModeEl.checked,
+      });
+
+      // Ask the kernel to evaluate the request
+      const decision = JarvondisKernel.evaluateRequest(prompt);
+
+      if (!decision.allowed) {
+        responseEl.textContent =
+          "⛔ Request blocked by Jarvondis kernel.\n\nReason: " + decision.reason;
+        return;
+      }
+
+      // Call the local model stub with the sandbox view
+      const reply = localModelRespond(prompt, decision.sandboxView);
+      responseEl.textContent = reply;
+    });
+
+    // Initial render
+    JarvondisKernel.log("INFO", "Kernel booted. All laws loaded.", {});
+    renderPolicyState();
+  </script>
+</body>
+</html>
