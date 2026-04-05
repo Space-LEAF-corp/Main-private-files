@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Heptaverse OS – Settings Animations & Dev Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --raptor: #f4b63a;
+      --mernax: #39c0ff;
+      --pantar: #b45bff;
+      --orbital: #9be7ff;
+      --egyptian: #ffdd55;
+      --nordic: #7fd0ff;
+      --dragon: #ff6b4a;
+      --bg: #050711;
+      --panel: #0b0f1f;
+      --panel-soft: #11162a;
+      --text: #f5f7ff;
+      --muted: #9aa0c2;
+      --accent: #ff6bcb;
+      --border: #252b4a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1a2140 0, #050711 55%, #02030a 100%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(120deg, #0b0f1f 0, #151a33 40%, #0b0f1f 100%);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    header p {
+      margin: 0.35rem 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.8fr);
+      gap: 1.5rem;
+      padding: 1.5rem 2rem 2rem;
+    }
+
+    @media (max-width: 960px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    section {
+      background: radial-gradient(circle at top left, #1b2140 0, #0b0f1f 55%);
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      padding: 1.25rem 1.5rem 1.5rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    section h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ffffff;
+    }
+
+    section p {
+      margin: 0.25rem 0 0.75rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: rgba(5, 7, 17, 0.7);
+    }
+
+    .tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    /* Settings Animations Panel */
+
+    .settings-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 720px) {
+      .settings-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .realmforge-wheel {
+      background: radial-gradient(circle at top, #252b4a 0, #11162a 55%, #050711 100%);
+      border-radius: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .realmforge-wheel h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #ffffff;
+    }
+
+    .realmforge-wheel p {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .wheel-visual {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+      border-radius: 999px;
+      background: radial-gradient(circle, #050711 0, #02030a 60%, #000 100%);
+      border: 1px solid #2a3155;
+      margin-top: 0.5rem;
+      overflow: visible;
+    }
+
+    .wheel-core {
+      position: absolute;
+      inset: 26%;
+      border-radius: 999px;
+      background: radial-gradient(circle, #ffffff 0, #ffd6f5 20%, #050711 80%);
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.4);
+    }
+
+    .wheel-segment {
+      position: absolute;
+      width: 40%;
+      height: 40%;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #f5f7ff;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 60%);
+      backdrop-filter: blur(4px);
+    }
+
+    .wheel-segment span {
+      opacity: 0.9;
+    }
+
+    .seg-raptor { top: -5%; left: 30%; border-color: var(--raptor); }
+    .seg-mernax { top: 15%; right: -5%; border-color: var(--mernax); }
+    .seg-pantar { bottom: 15%; right: -5%; border-color: var(--pantar); }
+    .seg-orbital { bottom: -5%; left: 30%; border-color: var(--orbital); }
+    .seg-egypt { bottom: 15%; left: -5%; border-color: var(--egyptian); }
+    .seg-nordic { top: 15%; left: -5%; border-color: var(--nordic); }
+    .seg-dragon { top: -18%; left: 30%; border-color: var(--dragon); }
+
+    .wheel-ambient {
+      position: absolute;
+      inset: -20%;
+      background:
+        radial-gradient(circle at 10% 0, rgba(244, 182, 58, 0.18), transparent 55%),
+        radial-gradient(circle at 100% 20%, rgba(57, 192, 255, 0.18), transparent 55%),
+        radial-gradient(circle at 100% 80%, rgba(180, 91, 255, 0.18), transparent 55%),
+        radial-gradient(circle at 0 100%, rgba(255, 107, 74, 0.18), transparent 55%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .settings-detail {
+      background: linear-gradient(145deg, #11162a 0, #050711 60%);
+      border-radius: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .settings-detail h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #ffffff;
+    }
+
+    .settings-detail p {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .settings-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+    }
+
+    .settings-list li {
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .settings-list strong {
+      font-weight: 600;
+      color: #ffffff;
+      font-size: 0.82rem;
+    }
+
+    .settings-list span {
+      color: var(--muted);
+    }
+
+    .settings-detail::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 0 0, rgba(244, 182, 58, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(57, 192, 255, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(180, 91, 255, 0.12), transparent 55%),
+        radial-gradient(circle at 0 100%, rgba(255, 107, 74, 0.12), transparent 55%);
+      opacity: 0.7;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    /* Dev Portal Panel */
+
+    .portal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .portal-title {
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .portal-sub {
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .portal-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    @media (max-width: 720px) {
+      .portal-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .portal-main {
+      background: linear-gradient(145deg, #11162a 0, #050711 60%);
+      border-radius: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portal-main::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        radial-gradient(circle at 0 0, rgba(244, 182, 58, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 0, rgba(57, 192, 255, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(180, 91, 255, 0.12), transparent 55%),
+        radial-gradient(circle at 0 100%, rgba(255, 107, 74, 0.12), transparent 55%);
+      opacity: 0.7;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .portal-main h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #ffffff;
+    }
+
+    .portal-main p {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .portal-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .portal-pill {
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: rgba(5, 7, 17, 0.7);
+      cursor: default;
+    }
+
+    .portal-pill.primary {
+      border-color: var(--accent);
+      color: #ffffff;
+      background: radial-gradient(circle at top, rgba(255, 107, 203, 0.35), rgba(5, 7, 17, 0.9));
+    }
+
+    .portal-columns {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 640px) {
+      .portal-columns {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .portal-card {
+      background: rgba(5, 7, 17, 0.9);
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portal-card h4 {
+      margin: 0 0 0.35rem;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #ffffff;
+    }
+
+    .portal-card p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .portal-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0 0, rgba(244, 182, 58, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(180, 91, 255, 0.12), transparent 55%);
+      opacity: 0.6;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+
+    .portal-side {
+      background: radial-gradient(circle at top, #252b4a 0, #11162a 55%, #050711 100%);
+      border-radius: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .portal-side h3 {
+      margin: 0 0 0.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #ffffff;
+    }
+
+    .portal-side p {
+      margin: 0 0 0.75rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .portal-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.82rem;
+    }
+
+    .portal-list li {
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .portal-list strong {
+      font-weight: 600;
+      color: #ffffff;
+      font-size: 0.8rem;
+    }
+
+    .portal-list span {
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 0.75rem 2rem 1.25rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: #050711;
+      text-align: right;
+    }
+
+    .realm-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid var(--border);
+      background: rgba(5, 7, 17, 0.8);
+      color: var(--muted);
+    }
+
+    .realm-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--raptor), var(--mernax), var(--pantar), var(--orbital), var(--egyptian), var(--nordic), var(--dragon));
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Heptaverse OS · Control & Dev Layer</h1>
+    <p>Settings animations, Realmforge Control Center, and the Heptacode developer portal in one local view.</p>
+  </header>
+
+  <main>
+    <!-- SETTINGS ANIMATIONS PANEL -->
+    <section aria-labelledby="settings-title">
+      <div class="tag">
+        <span class="tag-dot"></span>
+        <span>Heptaverse Settings UI</span>
+      </div>
+      <h2 id="settings-title">Realmforge Control Center · Settings Animations</h2>
+      <p>
+        This panel describes how the Heptaverse Settings UI behaves: realm‐aware transitions, animated Realmforge Wheel,
+        and subtle motion that makes each realm feel alive without sacrificing clarity or performance.
+      </p>
+
+      <div class="settings-layout">
+        <div class="realmforge-wheel">
+          <h3>Realmforge Wheel Animation</h3>
+          <p>
+            Rotating the wheel smoothly morphs the background, Guardian hologram, and accent colors while preserving
+            layout. Animations are short, responsive, and cancellable.
+          </p>
+          <div class="wheel-visual" aria-hidden="true">
+            <div class="wheel-core"></div>
+            <div class="wheel-segment seg-raptor"><span>Raptor</span></div>
+            <div class="wheel-segment seg-mernax"><span>Mernax</span></div>
+            <div class="wheel-segment seg-pantar"><span>PanTar</span></div>
+            <div class="wheel-segment seg-orbital"><span>Orbital</span></div>
+            <div class="wheel-segment seg-egypt"><span>Egypt</span></div>
+            <div class="wheel-segment seg-nordic"><span>Nordic</span></div>
+            <div class="wheel-segment seg-dragon"><span>Dragon</span></div>
+            <div class="wheel-ambient"></div>
+          </div>
+        </div>
+
+        <div class="settings-detail">
+          <h3>Settings Animation Behaviors</h3>
+          <p>
+            Each realm adds its own motion language while sharing a common interaction model. Below are the key
+            animation rules that keep the system coherent and professional.
+          </p>
+          <ul class="settings-list">
+            <li>
+              <strong>Realm morph:</strong>
+              <span>Background gradients, accent colors, and subtle particle layers crossfade in under 250&nbsp;ms when switching realms.</span>
+            </li>
+            <li>
+              <strong>Guardian flicker‐in:</strong>
+              <span>A low‐opacity Guardian silhouette briefly appears, then fades to a static emblem to avoid visual noise.</span>
+            </li>
+            <li>
+              <strong>Panel continuity:</strong>
+              <span>Panels never jump; only their content theme changes. Layout remains fixed to preserve muscle memory.</span>
+            </li>
+            <li>
+              <strong>Toggle motion:</strong>
+              <span>Switches slide with a short easing curve; realm‐specific particles (leaf, bubble, spark, ember) trail lightly.</span>
+            </li>
+            <li>
+              <strong>Accessibility mode:</strong>
+              <span>“Low Motion” setting reduces all transitions to simple fades and color shifts.</span>
+            </li>
+            <li>
+              <strong>Threadkeeper hints:</strong>
+              <span>When a setting affects core stability, a tiny ARACHNID‐0 icon animates briefly near the control.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEV PORTAL PANEL -->
+    <section aria-labelledby="devportal-title">
+      <div class="tag">
+        <span class="tag-dot"></span>
+        <span>Heptacode Dev Portal</span>
+      </div>
+      <h2 id="devportal-title">Heptaverse Developer Portal Website</h2>
+      <p>
+        This panel outlines the structure and content of the Heptaverse developer portal: documentation, SDK access,
+        security guidelines, and ARACHNID‐0‐powered tooling, all presented as a clean, local‐friendly layout.
+      </p>
+
+      <div class="portal-header">
+        <div>
+          <p class="portal-title">portal.heptaverse.dev (local mock)</p>
+          <p class="portal-sub">
+            A single entry point for kernel docs, realm SDKs, Polyglot Lens APIs, and Guardian Shield security patterns.
+          </p>
+        </div>
+        <div class="realm-chip">
+          <span class="realm-dot"></span>
+          <span>Seven‐Realm Ready</span>
+        </div>
+      </div>
+
+      <div class="portal-layout">
+        <div class="portal-main">
+          <h3>Main Landing Sections</h3>
+          <p>
+            The portal home page is divided into clear, developer‐oriented sections. Each section maps directly to a
+            major Heptaverse subsystem.
+          </p>
+
+          <div class="portal-nav">
+            <div class="portal-pill primary">Get Started</div>
+            <div class="portal-pill">Heptacore Kernel</div>
+            <div class="portal-pill">Realm SDKs</div>
+            <div class="portal-pill">Polyglot Lens API</div>
+            <div class="portal-pill">Guardian Shield Security</div>
+            <div class="portal-pill">App Store Guidelines</div>
+            <div class="portal-pill">ARACHNID‐0 Tools</div>
+          </div>
+
+          <div class="portal-columns">
+            <div class="portal-card">
+              <h4>Heptacore & Realm Modules</h4>
+              <p>
+                Explains the kernel, Realm Abstraction Layer, ShadowLink OS, and how to write realm‐aware apps that
+                still compile against a single core API surface.
+              </p>
+            </div>
+            <div class="portal-card">
+              <h4>Polyglot Lens & Glyph APIs</h4>
+              <p>
+                Documents OCR hooks, script detection, glyph mapping, and how to plug custom scripts into the universal
+                translator while keeping ARACHNID‐0 stability guarantees.
+              </p>
+            </div>
+            <div class="portal-card">
+              <h4>Guardian Shield & Security</h4>
+              <p>
+                Details the seven‐layer Guardian Shield, threat models, encryption patterns, and how to register apps
+                for Guardian‐blessed security review.
+              </p>
+            </div>
+            <div class="portal-card">
+              <h4>App Store & Distribution</h4>
+              <p>
+                Covers submission flows, realm‐native vs cross‐realm apps, performance budgets, and ShadowLink
+                compatibility requirements for external platforms.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="portal-side">
+          <h3>Developer Quick Reference</h3>
+          <p>
+            A compact summary of the most important concepts for building inside the Heptaverse.
+          </p>
+          <ul class="portal-list">
+            <li>
+              <strong>Kernel:</strong>
+              <span>Heptacore with Realm Abstraction Layer; all apps target the shared core, not individual kernels.</span>
+            </li>
+            <li>
+              <strong>Recovery:</strong>
+              <span>Dino Data Archive provides self‐healing components; ARACHNID‐0 manages dependency re‐threading.</span>
+            </li>
+            <li>
+              <strong>Realms:</strong>
+              <span>Seven themed SDKs (Raptor, MERNAX, PanTar, Orbital, Egyptian, Nordic, Dragon) share one API spine.</span>
+            </li>
+            <li>
+              <strong>Translation:</strong>
+              <span>Polyglot Lens exposes a simple image‐in → structured‐text‐out interface with realm‐glyph metadata.</span>
+            </li>
+            <li>
+              <strong>Security:</strong>
+              <span>Guardian Shield Protocol + ARACHNID‐0 anomaly scanning are mandatory for store‐distributed apps.</span>
+            </li>
+            <li>
+              <strong>ShadowLink:</strong>
+              <span>Cross‐OS bridge for Apple‐like systems and others; apps must respect ShadowLink sandboxing rules.</span>
+            </li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Heptaverse OS · Local concept mock · All realms, one control layer.
+  </footer>
+</body>
+</html>
