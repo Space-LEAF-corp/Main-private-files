@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Krystal Core Setup Wizard — Space LEAF Corp</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #0b0b0b;
+        color: #e0e0e0;
+        font-family: Arial, sans-serif;
+    }
+
+    .top-bar {
+        width: 100%;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        background: rgba(0,0,0,0.6);
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+
+    .menu {
+        display: flex;
+        gap: 20px;
+    }
+
+    .menu a {
+        color: #7fffd4;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .wizard-container {
+        width: 600px;
+        margin: 60px auto;
+        background: rgba(0,0,0,0.75);
+        padding: 30px;
+        border-radius: 12px;
+        border: 1px solid #333;
+    }
+
+    h2 {
+        color: #7fffd4;
+        margin-top: 0;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        background: #222;
+        border: 1px solid #444;
+        border-radius: 5px;
+        color: #e0e0e0;
+    }
+
+    button {
+        padding: 12px 20px;
+        background-color: #7fffd4;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    .step {
+        display: none;
+    }
+
+    .active {
+        display: block;
+    }
+
+</style>
+
+<script>
+    let currentStep = 0;
+
+    function showStep(n) {
+        const steps = document.getElementsByClassName("step");
+        steps[currentStep].classList.remove("active");
+        steps[n].classList.add("active");
+        currentStep = n;
+    }
+
+    function nextStep() {
+        showStep(currentStep + 1);
+    }
+
+    function prevStep() {
+        showStep(currentStep - 1);
+    }
+</script>
+
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="logo">SPACE LEAF CORP</div>
+    <div class="menu">
+        <a href="#">About</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Current Status</a>
+    </div>
+</div>
+
+<div class="wizard-container">
+
+    <!-- STEP 1 — NAME THE CORE -->
+    <div class="step active">
+        <h2>Step 1 — Name Your Krystal Core</h2>
+        <input type="text" placeholder="Example: StarKey Alpha">
+        <button onclick="nextStep()">Continue</button>
+    </div>
+
+    <!-- STEP 2 — 5-WORD SYNC PHRASE -->
+    <div class="step">
+        <h2>Step 2 — Create Your 5‐Word Sync Phrase</h2>
+        <p>This phrase is your daily interface handshake.</p>
+        <input type="text" placeholder="Word 1">
+        <input type="text" placeholder="Word 2">
+        <input type="text" placeholder="Word 3">
+        <input type="text" placeholder="Word 4">
+        <input type="text" placeholder="Word 5">
+        <button onclick="prevStep()">Back</button>
+        <button onclick="nextStep()">Continue</button>
+    </div>
+
+    <!-- STEP 3 — 12-WORD RECOVERY PHRASE -->
+    <div class="step">
+        <h2>Step 3 — Create Your 12‐Word Recovery Phrase</h2>
+        <p>This is your sovereign override phrase. Store it safely.</p>
+        <textarea rows="4" placeholder="Enter 12 words separated by spaces..."></textarea>
+        <button onclick="prevStep()">Back</button>
+        <button onclick="nextStep()">Continue</button>
+    </div>
+
+    <!-- STEP 4 — BEAD TIER SELECTION -->
+    <div class="step">
+        <h2>Step 4 — Select Your Bead Tier</h2>
+        <select>
+            <option>3 Beads — Kid Tier</option>
+            <option>5 Beads — Standard User</option>
+            <option>8 Beads — Advanced User</option>
+            <option>12 Beads — Multi‐Password Tier</option>
+            <option>MDF Bead — Master Diamond Firewall</option>
+        </select>
+        <button onclick="prevStep()">Back</button>
+        <button onclick="nextStep()">Continue</button>
+    </div>
+
+    <!-- STEP 5 — MDF BEAD SETUP -->
+    <div class="step">
+        <h2>Step 5 — Diamond Firewall Setup</h2>
+        <p>Define your symbolic firewall boundaries.</p>
+        <input type="text" placeholder="Firewall Name (Example: Panther Shield)">
+        <textarea rows="5" placeholder="Describe your firewall rules..."></textarea>
+        <button onclick="prevStep()">Back</button>
+        <button onclick="nextStep()">Continue</button>
+    </div>
+
+    <!-- STEP 6 — FINAL CONFIRMATION -->
+    <div class="step">
+        <h2>Setup Complete</h2>
+        <p>Your Krystal Core has been configured for this local prototype.</p>
+        <p>You may now proceed to your dashboard.</p>
+        <button>Finish</button>
+    </div>
+
+</div>
+
+</body>
+</html>
