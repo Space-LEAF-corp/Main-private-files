@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://5mp6za1garxj.space.minimax.io/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giga Atom - Space Leaf Corp Simulation Package</title>
+    <link href="./Giga Atom - Space Leaf Corp Simulation Package_files/css2" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #0ea5e9;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #0ea5e9 50%, #10b981 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-100px) rotate(180deg); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-badge {
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Atom Animation */
+        .atom-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 3rem auto;
+        }
+
+        .nucleus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            border-radius: 50%;
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.5);
+        }
+
+        .orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            animation: orbit-rotate linear infinite;
+        }
+
+        .orbit:nth-child(2) { width: 100px; height: 100px; margin: -50px; animation-duration: 3s; }
+        .orbit:nth-child(3) { width: 160px; height: 160px; margin: -80px; animation-duration: 5s; }
+        .orbit:nth-child(4) { width: 220px; height: 220px; margin: -110px; animation-duration: 7s; }
+        .orbit:nth-child(5) { width: 280px; height: 280px; margin: -140px; animation-duration: 9s; }
+
+        .electron {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--secondary);
+            border-radius: 50%;
+            top: -5px;
+            left: 50%;
+            margin-left: -5px;
+            box-shadow: 0 0 20px var(--secondary);
+        }
+
+        @keyframes orbit-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Features Section */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .module-card {
+            background: var(--dark-light);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .module-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .module-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .module-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .module-functions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .function-tag {
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Shell Configuration Section */
+        .shell-config {
+            background: var(--dark-light);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+
+        .shell-visualization {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .shell-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .shell-bar .bar {
+            width: 50px;
+            background: var(--gradient);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .shell-bar .bar:hover {
+            transform: scaleY(1.05);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .shell-bar .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .shell-bar .value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Code Example */
+        .code-section {
+            background: #0d1117;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
+        .code-header {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0.75rem 1rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .code-dot:nth-child(1) { background: #ff5f57; }
+        .code-dot:nth-child(2) { background: #ffbd2e; }
+        .code-dot:nth-child(3) { background: #28ca42; }
+
+        .code-content {
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+        }
+
+        .code-keyword { color: #ff79c6; }
+        .code-function { color: #50fa7b; }
+        .code-string { color: #f1fa8c; }
+        .code-comment { color: #6272a4; }
+        .code-number { color: #bd93f9; }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--dark-light);
+            border-radius: 16px;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-light);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .shell-visualization {
+                gap: 0.5rem;
+            }
+
+            .shell-bar .bar {
+                width: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="particle" style="width: 300px; height: 300px; top: 10%; left: -5%;"></div>
+        <div class="particle" style="width: 200px; height: 200px; top: 60%; right: -5%; animation-delay: -5s;"></div>
+        <div class="particle" style="width: 250px; height: 250px; bottom: 10%; left: 30%; animation-delay: -10s;"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">⚛️ Giga Atom</div>
+        <ul class="nav-links">
+            <li><a href="https://5mp6za1garxj.space.minimax.io/#modules">Modules</a></li>
+            <li><a href="https://5mp6za1garxj.space.minimax.io/#shells">Shell Config</a></li>
+            <li><a href="https://5mp6za1garxj.space.minimax.io/#usage">Usage</a></li>
+            <li><a href="https://5mp6za1garxj.space.minimax.io/#stats">Stats</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-badge">Space Leaf Corp Internal Package</div>
+        <h1>Giga Atom</h1>
+        <p>Advanced atomic simulation package for electron shell stability analysis, gyroscopic models, and chemical bonding heuristics.</p>
+        <div class="cta-buttons">
+            <a href="https://5mp6za1garxj.space.minimax.io/#usage" class="btn btn-primary">Get Started</a>
+            <a href="https://5mp6za1garxj.space.minimax.io/#modules" class="btn btn-secondary">Explore Modules</a>
+        </div>
+
+        <!-- Atom Animation -->
+        <div class="atom-container">
+            <div class="nucleus"></div>
+            <div class="orbit"><div class="electron"></div></div>
+            <div class="orbit"><div class="electron"></div></div>
+            <div class="orbit"><div class="electron"></div></div>
+            <div class="orbit"><div class="electron"></div></div>
+        </div>
+    </section>
+
+    <!-- Modules Section -->
+    <section class="section" id="modules">
+        <div class="section-header">
+            <h2>Core Modules</h2>
+            <p>A comprehensive suite of tools for atomic simulation and analysis</p>
+        </div>
+
+        <div class="modules-grid">
+            <!-- Model Module -->
+            <div class="module-card">
+                <div class="module-icon">📐</div>
+                <h3>model.py</h3>
+                <p>Core data structures for the Giga Atom including shell states, excess fraction computation, and daily decay constants.</p>
+                <div class="module-functions">
+                    <span class="function-tag">ShellState</span>
+                    <span class="function-tag">compute_excess_fraction</span>
+                    <span class="function-tag">compute_lambda</span>
+                </div>
+            </div>
+
+            <!-- Simulations Module -->
+            <div class="module-card">
+                <div class="module-icon">🧪</div>
+                <h3>simulations.py</h3>
+                <p>Stability analysis, stress tests, and Monte Carlo simulations for electron shell configurations.</p>
+                <div class="module-functions">
+                    <span class="function-tag">baseline_counts</span>
+                    <span class="function-tag">apply_overload</span>
+                    <span class="function-tag">compute_states</span>
+                    <span class="function-tag">stability_time_series</span>
+                    <span class="function-tag">run_scenario</span>
+                </div>
+            </div>
+
+            <!-- Gyroscope Module -->
+            <div class="module-card">
+                <div class="module-icon">🌀</div>
+                <h3>gyroscope.py</h3>
+                <p>Gyroscopic stability model with angular momentum calculations, impulse handling, and time series analysis.</p>
+                <div class="module-functions">
+                    <span class="function-tag">gyroscopic_S_time_series</span>
+                </div>
+            </div>
+
+            <!-- Bonding Module -->
+            <div class="module-card">
+                <div class="module-icon">🔗</div>
+                <h3>bonding.py</h3>
+                <p>Chemical bonding heuristics and partner element scanning with valence calculations and stability predictions.</p>
+                <div class="module-functions">
+                    <span class="function-tag">valence_from_Z</span>
+                    <span class="function-tag">bonding_score</span>
+                    <span class="function-tag">bonding_scan</span>
+                    <span class="function-tag">combined_stability_for_partner</span>
+                </div>
+            </div>
+
+            <!-- Utils Module -->
+            <div class="module-card">
+                <div class="module-icon">🛠️</div>
+                <h3>utils.py</h3>
+                <p>Plotting utilities and CSV export functions for data visualization and analysis output.</p>
+                <div class="module-functions">
+                    <span class="function-tag">export_csv</span>
+                    <span class="function-tag">plot_series</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shell Configuration Section -->
+    <section class="section" id="shells">
+        <div class="section-header">
+            <h2>Physical Shell Configuration</h2>
+            <p>Electron capacity distribution across 8 physical shells</p>
+        </div>
+
+        <div class="shell-config">
+            <div class="shell-visualization">
+                <div class="shell-bar">
+                    <div class="bar" style="height: 20px;"><span class="value">2</span></div>
+                    <span class="label">Shell 1</span>
+                </div>
+                <div class="shell-bar">
+                    <div class="bar" style="height: 40px;"><span class="value">8</span></div>
+                    <span class="label">Shell 2</span>
+                </div>
+                <div class="shell-bar">
+                    <div class="bar" style="height: 60px;"><span class="value">18</span></div>
+                    <span class="label">Shell 3</span>
+                </div>
+                <div class="shell-bar">
+                    <div class="bar" style="height: 90px;"><span class="value">32</span></div>
+                    <span class="label">Shell 4</span>
+                </div>
+                <div class="shell-bar">
+                    <div class="bar" style="height: 120px;"><span class="value">50</span></div>
+                    <span class="label">Shell 5</span>
+                </div>
+                <div class="shell-bar">
+                    <div class="bar" style="height: 150px;"><span class="value">72</span></div>
+                    <span class="label">Shell 6</span>
+                </div>
+                <div class="shell-bar">
+                    <div class="bar" style="height: 180px;"><span class="value">98</span></div>
+                    <span class="label">Shell 7</span>
+                </div>
+                <div class="shell-bar">
+                    <div class="bar" style="height: 210px;"><span class="value">128</span></div>
+                    <span class="label">Shell 8</span>
+                </div>
+            </div>
+            <p style="text-align: center; color: var(--text-muted); margin-top: 1rem;">
+                Total Electron Capacity: <strong style="color: var(--primary);">408 electrons</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- Usage Section -->
+    <section class="section" id="usage">
+        <div class="section-header">
+            <h2>Quick Start</h2>
+            <p>Get up and running with Giga Atom in minutes</p>
+        </div>
+
+        <div class="code-section">
+            <div class="code-header">
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+            </div>
+            <div class="code-content">
+<pre><span class="code-comment"># Import the giga_atom package</span>
+<span class="code-keyword">from</span> giga_atom <span class="code-keyword">import</span> (
+    ShellState, compute_excess_fraction, compute_lambda,
+    baseline_counts, apply_overload, run_scenario,
+    gyroscopic_S_time_series, bonding_scan
+)
+
+<span class="code-comment"># Run a stability simulation</span>
+counts = <span class="code-function">baseline_counts</span>()
+overloaded = <span class="code-function">apply_overload</span>(counts, {<span class="code-number">3</span>: <span class="code-number">0.5</span>, <span class="code-number">5</span>: <span class="code-number">0.3</span>})
+result = <span class="code-function">run_scenario</span>(<span class="code-string">"Stress Test"</span>, overloaded, days=<span class="code-number">3650</span>)
+
+<span class="code-comment"># Analyze gyroscopic stability</span>
+t, S, I_total = <span class="code-function">gyroscopic_S_time_series</span>(
+    counts, days=<span class="code-number">3650</span>, omega0=<span class="code-number">10.0</span>, impulse_every=<span class="code-number">365</span>
+)
+
+<span class="code-comment"># Scan bonding compatibility for all elements</span>
+df = <span class="code-function">bonding_scan</span>(val_giga=<span class="code-number">1</span>, maxZ=<span class="code-number">118</span>)</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="section" id="stats">
+        <div class="section-header">
+            <h2>Package Overview</h2>
+            <p>Key metrics and capabilities</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Physical Shells</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">408</div>
+                <div class="stat-label">Total Electrons</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">118</div>
+                <div class="stat-label">Element Compatibility</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">5</div>
+                <div class="stat-label">Core Modules</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-logo">⚛️ Giga Atom</div>
+        <p>Space Leaf Corp — Internal Use Only</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+            Created by Leif William Sogge | All rights reserved under Space Leaf Corp Proprietary License 1.0
+        </p>
+    </footer>
+
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add interactive hover effects to shell bars
+        document.querySelectorAll('.shell-bar .bar').forEach(bar => {
+            bar.addEventListener('mouseenter', function() {
+                this.style.filter = 'brightness(1.2)';
+            });
+            bar.addEventListener('mouseleave', function() {
+                this.style.filter = 'brightness(1)';
+            });
+        });
+    </script>
+<style>
+#minimax-floating-ball {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 12px;
+  background: #222222;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  color: #F8F8F8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  z-index: 9999;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#minimax-floating-ball:hover {
+  transform: translateY(-2px);
+  background: #383838;
+}
+.minimax-ball-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.minimax-logo-wave {
+  
+  width: 20px;
+  height: 17px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='17' viewBox='0 0 20 17' fill='none'%3E%3Cpath d='M20 12.3718L16.283 16.2413H12.2518V13.1614H9.17175V16.2413H7.00999V13.1613H3.92998V16.2413H0V4.00101L3.84145 0H20V12.3718Z' fill='white'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.minimax-ball-text {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.minimax-close-icon {
+  margin-left: 8px;
+  font-size: 16px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.minimax-close-icon:hover {
+  opacity: 1;
+}
+</style>
+<div id="minimax-floating-ball" style="opacity: 1; transform: scale(1);">
+  <div class="minimax-ball-content">
+    <div class="minimax-logo-wave"></div>
+    <span class="minimax-ball-text">Created by MiniMax Agent</span>
+  </div>
+  <div class="minimax-close-icon">×</div>
+</div>
+<script>
+// Initialize floating ball functionality
+function initFloatingBall() {
+  const ball = document.getElementById('minimax-floating-ball');
+  if (!ball) return;
+
+  // Initial animation
+  ball.style.opacity = '0';
+  ball.style.transform = 'translateY(20px)';
+
+  setTimeout(() => {
+    ball.style.opacity = '1';
+    ball.style.transform = 'translateY(0)';
+  }, 500);
+
+  // Handle logo click
+  const ballContent = ball.querySelector('.minimax-ball-content');
+  ballContent.addEventListener('click', function (e) {
+    e.stopPropagation();
+    window.open('https://agent.minimax.io/', '_blank');
+    ball.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      ball.style.transform = 'scale(1)';
+    }, 100);
+  });
+
+  // Handle close button click
+  const closeIcon = ball.querySelector('.minimax-close-icon');
+  closeIcon.addEventListener('click', function (e) {
+    e.stopPropagation();
+    ball.style.opacity = '0';
+    ball.style.transform = 'translateY(20px)';
+
+    setTimeout(() => {
+      ball.style.display = 'none';
+    }, 300);
+  });
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', initFloatingBall); 
+</script>
+
+
+</body></html>
