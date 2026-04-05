@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dignity OS – Public Demo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #sidebar {
+      width: 220px;
+      background: #111628;
+      border-right: 1px solid #22283a;
+      padding: 16px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    h1 {
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+    .section-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9aa4c6;
+      margin-bottom: 6px;
+    }
+    #shapePalette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .shape-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      border: 1px solid #2b3550;
+      background: #151a2c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .shape-btn.active {
+      border-color: #4f8cff;
+      box-shadow: 0 0 0 1px #4f8cff55;
+    }
+    .shape-icon {
+      width: 28px;
+      height: 28px;
+      stroke: #e0e6ff;
+      fill: none;
+      stroke-width: 2;
+    }
+    #controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    button {
+      border-radius: 6px;
+      border: 1px solid #2b3550;
+      background: #151a2c;
+      color: #e0e6ff;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1b2236;
+    }
+    button.danger {
+      border-color: #ff4f6b55;
+      color: #ffb3c0;
+    }
+    #status {
+      font-size: 12px;
+      color: #9aa4c6;
+      min-height: 32px;
+      border-radius: 6px;
+      background: #101526;
+      padding: 6px 8px;
+      box-sizing: border-box;
+    }
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      box-sizing: border-box;
+      gap: 8px;
+    }
+    #topBar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: #9aa4c6;
+    }
+    #canvasWrapper {
+      flex: 1;
+      background: #050814;
+      border-radius: 12px;
+      border: 1px solid #22283a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #glyphCanvas {
+      background: #050814;
+      border-radius: 8px;
+      border: 1px solid #22283a;
+    }
+    #gridOverlay {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0.25;
+    }
+    #guardianBanner {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 999px;
+      background: #ff4f6b22;
+      color: #ffb3c0;
+      border: 1px solid #ff4f6b55;
+      display: none;
+    }
+    #qrOutput {
+      font-size: 11px;
+      color: #9aa4c6;
+      margin-top: 4px;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <div>
+      <h1>Dignity OS – Public Demo</h1>
+      <div style="font-size:12px;color:#9aa4c6;">
+        Glyph + shapes + Guardian preview
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Shape palette</div>
+      <div id="shapePalette">
+        <div class="shape-btn" data-shape="square" title="Square">
+          <svg class="shape-icon" viewBox="0 0 32 32">
+            <rect x="6" y="6" width="20" height="20" rx="2"></rect>
+          </svg>
+        </div>
+        <div class="shape-btn" data-shape="small-square" title="Small square">
+          <svg class="shape-icon" viewBox="0 0 32 32">
+            <rect x="10" y="10" width="12" height="12" rx="2"></rect>
+          </svg>
+        </div>
+        <div class="shape-btn" data-shape="circle" title="Circle">
+          <svg class="shape-icon" viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="10"></circle>
+          </svg>
+        </div>
+        <div class="shape-btn" data-shape="triangle" title="Triangle">
+          <svg class="shape-icon" viewBox="0 0 32 32">
+            <polygon points="16,6 26,24 6,24"></polygon>
+          </svg>
+        </div>
+        <div class="shape-btn" data-shape="hexagon" title="Hexagon">
+          <svg class="shape-icon" viewBox="0 0 32 32">
+            <polygon points="11,6 21,6 26,16 21,26 11,26 6,16"></polygon>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Controls</div>
+      <div id="controls">
+        <button id="modeDraw">Mode: Draw glyph</button>
+        <button id="modePlace">Mode: Place shape</button>
+        <button id="clearCanvas" class="danger">Clear canvas</button>
+        <button id="generateKey">Generate public key (demo)</button>
+        <button id="simulateGuardian" class="danger">Simulate Guardian event</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Status</div>
+      <div id="status">Ready.</div>
+      <div id="qrOutput"></div>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="topBar">
+      <div>20×20 grid · freehand glyph + shapes</div>
+      <div>Local-only demo · no network</div>
+    </div>
+    <div id="canvasWrapper">
+      <canvas id="glyphCanvas" width="400" height="400"></canvas>
+      <canvas id="gridOverlay" width="400" height="400"></canvas>
+      <div id="guardianBanner">Guardian Mode: suspicious pattern detected (demo)</div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('glyphCanvas');
+    const ctx = canvas.getContext('2d');
+    const gridCanvas = document.getElementById('gridOverlay');
+    const gctx = gridCanvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const qrOutput = document.getElementById('qrOutput');
+    const guardianBanner = document.getElementById('guardianBanner');
+
+    const modeDrawBtn = document.getElementById('modeDraw');
+    const modePlaceBtn = document.getElementById('modePlace');
+    const clearBtn = document.getElementById('clearCanvas');
+    const genKeyBtn = document.getElementById('generateKey');
+    const guardianBtn = document.getElementById('simulateGuardian');
+
+    const shapeButtons = Array.from(document.querySelectorAll('.shape-btn'));
+
+    let mode = 'draw'; // 'draw' or 'shape'
+    let drawing = false;
+    let lastX = 0, lastY = 0;
+    let strokes = []; // for “glyph” hash
+    let currentStroke = [];
+    let selectedShape = null;
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    function setMode(newMode) {
+      mode = newMode;
+      if (mode === 'draw') {
+        modeDrawBtn.style.background = '#1b2236';
+        modePlaceBtn.style.background = '#151a2c';
+        setStatus('Mode: draw glyph (freehand).');
+      } else {
+        modePlaceBtn.style.background = '#1b2236';
+        modeDrawBtn.style.background = '#151a2c';
+        setStatus('Mode: place shapes (click to drop).');
+      }
+    }
+
+    modeDrawBtn.addEventListener('click', () => setMode('draw'));
+    modePlaceBtn.addEventListener('click', () => setMode('shape'));
+
+    function drawGrid() {
+      const size = 20;
+      const step = canvas.width / size;
+      gctx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
+      gctx.strokeStyle = '#2b3550';
+      gctx.lineWidth = 0.5;
+      for (let i = 0; i <= size; i++) {
+        const p = i * step;
+        gctx.beginPath();
+        gctx.moveTo(p, 0);
+        gctx.lineTo(p, canvas.height);
+        gctx.stroke();
+        gctx.beginPath();
+        gctx.moveTo(0, p);
+        gctx.lineTo(canvas.width, p);
+        gctx.stroke();
+      }
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      strokes = [];
+      currentStroke = [];
+      qrOutput.textContent = '';
+      guardianBanner.style.display = 'none';
+      setStatus('Canvas cleared.');
+    }
+
+    clearBtn.addEventListener('click', clearCanvas);
+
+    function canvasPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      };
+    }
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (mode === 'draw') {
+        drawing = true;
+        const { x, y } = canvasPos(e);
+        lastX = x;
+        lastY = y;
+        currentStroke = [{ x, y }];
+      } else if (mode === 'shape' && selectedShape) {
+        const { x, y } = canvasPos(e);
+        placeShape(selectedShape, x, y);
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (!drawing || mode !== 'draw') return;
+      const { x, y } = canvasPos(e);
+      ctx.strokeStyle = '#e0e6ff';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      lastX = x;
+      lastY = y;
+      currentStroke.push({ x, y });
+    });
+
+    canvas.addEventListener('mouseup', () => {
+      if (drawing && mode === 'draw') {
+        drawing = false;
+        if (currentStroke.length > 1) {
+          strokes.push(currentStroke);
+        }
+        currentStroke = [];
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+      if (drawing && mode === 'draw') {
+        drawing = false;
+        if (currentStroke.length > 1) {
+          strokes.push(currentStroke);
+        }
+        currentStroke = [];
+      }
+    });
+
+    function placeShape(shape, x, y) {
+      const size = 40;
+      ctx.strokeStyle = '#8fd1ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      if (shape === 'square') {
+        ctx.rect(x - size / 2, y - size / 2, size, size);
+      } else if (shape === 'small-square') {
+        const s = size * 0.6;
+        ctx.rect(x - s / 2, y - s / 2, s, s);
+      } else if (shape === 'circle') {
+        ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+      } else if (shape === 'triangle') {
+        ctx.moveTo(x, y - size / 2);
+        ctx.lineTo(x + size / 2, y + size / 2);
+        ctx.lineTo(x - size / 2, y + size / 2);
+        ctx.closePath();
+      } else if (shape === 'hexagon') {
+        const r = size / 2;
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i - Math.PI / 2;
+          const px = x + r * Math.cos(angle);
+          const py = y + r * Math.sin(angle);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+      }
+      ctx.stroke();
+      setStatus(`Placed ${shape}.`);
+    }
+
+    shapeButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        shapeButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedShape = btn.getAttribute('data-shape');
+        setMode('shape');
+        setStatus(`Shape selected: ${selectedShape}. Click on canvas to place.`);
+      });
+    });
+
+    function simpleHash(str) {
+      let h = 0;
+      for (let i = 0; i < str.length; i++) {
+        h = (h * 31 + str.charCodeAt(i)) >>> 0;
+      }
+      return h.toString(16).padStart(8, '0');
+    }
+
+    function generatePublicKeyDemo() {
+      if (strokes.length === 0) {
+        setStatus('Draw a glyph first, then generate a key.');
+        return;
+      }
+      const norm = strokes.map(stroke =>
+        stroke.map(p => `${Math.round(p.x)},${Math.round(p.y)}`).join(';')
+      ).join('|');
+      const hash = simpleHash(norm);
+      const fakeQR = `PUBLIC-KEY-DEMO-${hash}`;
+      qrOutput.textContent = `Demo public key (derived from glyph): ${fakeQR}`;
+      setStatus('Demo public key generated from your glyph (local only).');
+    }
+
+    genKeyBtn.addEventListener('click', generatePublicKeyDemo);
+
+    guardianBtn.addEventListener('click', () => {
+      guardianBanner.style.display = 'block';
+      setStatus('Guardian Mode simulated: suspicious pattern detected (demo only).');
+      setTimeout(() => {
+        guardianBanner.style.display = 'none';
+        setStatus('Guardian Mode cleared (demo).');
+      }, 4000);
+    });
+
+    drawGrid();
+    setMode('draw');
+  </script>
+</body>
+</html>
