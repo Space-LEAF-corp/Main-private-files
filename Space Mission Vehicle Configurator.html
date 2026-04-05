@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space Mission Vehicle Configurator</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#02040a; color:#f5f5f5; margin:0; padding:20px; }
+    h1, h2 { margin:0 0 10px; }
+    .grid { display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; }
+    .card { background:#090d16; padding:15px; border-radius:8px; border:1px solid #1b2230; }
+    label { display:block; margin:6px 0 2px; font-size:0.9rem; }
+    input, select { width:100%; padding:6px; border-radius:4px; border:1px solid #333; background:#05070d; color:#f5f5f5; }
+    .row { display:flex; gap:10px; }
+    .row > div { flex:1; }
+    .modules { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .module-pill { padding:6px 10px; border-radius:999px; border:1px solid #444; font-size:0.8rem; cursor:pointer; }
+    .module-pill.active { background:#7b5cff; border-color:#7b5cff; }
+    button { padding:8px 14px; border-radius:4px; border:none; cursor:pointer; font-weight:600; }
+    .primary { background:#7b5cff; color:#fff; }
+    .secondary { background:#1b2230; color:#f5f5f5; }
+    textarea { width:100%; height:140px; background:#020309; color:#b6a8ff; border-radius:4px; border:1px solid #333; padding:8px; font-family:monospace; font-size:0.8rem; }
+  </style>
+</head>
+<body>
+  <h1>Space Mission Vehicle — Digital Blueprint</h1>
+  <p>Configure your Space‐mode mission vehicle, PNI guardian, and EVA systems for a fabrication‐ready blueprint.</p>
+
+  <div class="grid">
+    <!-- LEFT: CONFIG -->
+    <div class="card">
+      <h2>Core Identity</h2>
+      <label>Vehicle Name</label>
+      <input id="vehicleName" placeholder="e.g. SFT‐Orbital Mk.I" />
+
+      <label>PNI Guardian Name</label>
+      <input id="pniName" placeholder="e.g. Helios, Vega, Seraph" />
+
+      <div class="row">
+        <div>
+          <label>Hull Color</label>
+          <input id="bodyColor" type="color" value="#7b5cff" />
+        </div>
+        <div>
+          <label>Accent / EVA Markings</label>
+          <input id="accentColor" type="color" value="#00ffc8" />
+        </div>
+      </div>
+
+      <h2>Mission Modules</h2>
+      <div class="modules" id="modulesSpace"></div>
+
+      <h2>Networks & Access</h2>
+      <label>Secure Spider Frame Network ID</label>
+      <input id="spiderId" placeholder="e.g. orbital‐cluster‐alpha" />
+
+      <label>Mission Profile ID</label>
+      <input id="missionId" placeholder="e.g. LEO‐Family‐Ops‐01" />
+
+      <div style="margin-top:12px; display:flex; gap:10px;">
+        <button class="primary" onclick="exportBlueprint()">Export Blueprint JSON</button>
+        <button class="secondary" onclick="clearForm()">Reset</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: OUTPUT -->
+    <div class="card">
+      <h2>Blueprint Preview</h2>
+      <textarea id="blueprintOutput" readonly></textarea>
+      <p style="font-size:0.8rem; opacity:0.7;">
+        Save this JSON as a file (e.g. <code>space_mission_vehicle_blueprint.json</code>) to share with a yard or orbital fabricator.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const spaceModules = [
+      "Roll Cage + Gyroscopic Inner Cabin",
+      "Pressurized Hull + EVA‐Safe Doors",
+      "Magnetic Hover Platform (Full Zero‐G Mode)",
+      "Detachable Solar Wings / Sails",
+      "Solar Hoverboards (EVA Maintenance Units)",
+      "Side Mag‐Arm Housing Bay (Remote Ops)",
+      "PNI Guardian (Space Mode + Life‐Support Backup)",
+      "Portable Shake‐Powered Console (Emergency Brain)",
+      "Rubber‐Band Haptic Network (Crew Link)",
+      "Docking + Thruster Control Interface",
+      "Radiation‐Shielded Life‐Support Core",
+    ];
+
+    const selectedModules = new Set();
+
+    function initModules() {
+      const container = document.getElementById("modulesSpace");
+      spaceModules.forEach((name, index) => {
+        const pill = document.createElement("div");
+        pill.className = "module-pill";
+        pill.textContent = name;
+        pill.onclick = () => toggleModule(index, pill);
+        container.appendChild(pill);
+      });
+    }
+
+    function toggleModule(index, pill) {
+      const name = spaceModules[index];
+      if (selectedModules.has(name)) {
+        selectedModules.delete(name);
+        pill.classList.remove("active");
+      } else {
+        selectedModules.add(name);
+        pill.classList.add("active");
+      }
+      exportBlueprint(false);
+    }
+
+    function exportBlueprint(showAlert = true) {
+      const blueprint = {
+        mode: "SPACE",
+        vehicleName: document.getElementById("vehicleName").value || "Unnamed Space Mission Vehicle",
+        pniGuardianName: document.getElementById("pniName").value || "Unnamed PNI",
+        colors: {
+          hull: document.getElementById("bodyColor").value,
+          accent: document.getElementById("accentColor").value,
+        },
+        modules: Array.from(selectedModules),
+        networks: {
+          spiderFrameNetworkId: document.getElementById("spiderId").value || null,
+          missionProfileId: document.getElementById("missionId").value || null,
+        },
+        notes: "This JSON represents a configurable digital blueprint for a Space Mission Vehicle. Use as a seed for BOM + fabrication.",
+      };
+
+      const output = document.getElementById("blueprintOutput");
+      output.value = JSON.stringify(blueprint, null, 2);
+      if (showAlert) alert("Blueprint generated. Copy and save the JSON from the preview.");
+    }
+
+    function clearForm() {
+      document.getElementById("vehicleName").value = "";
+      document.getElementById("pniName").value = "";
+      document.getElementById("spiderId").value = "";
+      document.getElementById("missionId").value = "";
+      selectedModules.clear();
+      document.querySelectorAll(".module-pill").forEach(p => p.classList.remove("active"));
+      document.getElementById("blueprintOutput").value = "";
+    }
+
+    initModules();
+  </script>
+</body>
+</html>
