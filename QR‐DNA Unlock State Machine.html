@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR‐DNA Unlock State Machine</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#05060a; color:#f5f5f5; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #444; padding: 0.5rem; font-size: 0.9rem; vertical-align: top; }
+    th { background: #111827; }
+    tr:nth-child(even) { background: #0b0f19; }
+    input, textarea, select {
+      width: 100%; box-sizing: border-box; background:#020617; color:#e5e7eb;
+      border:1px solid #374151; padding:0.25rem; font-size:0.85rem;
+    }
+    .qr-config { margin-top:1.5rem; padding:1rem; border:1px solid #374151; background:#020617; }
+    .qr-output { margin-top:0.5rem; font-family:monospace; font-size:0.8rem; word-break:break-all; }
+  </style>
+</head>
+<body>
+
+<h1>QR‐DNA Unlock Transition Table</h1>
+<p>Each row is a transition. Customize the log schema fields per transition; your config can be turned into a personalized QR Seal.</p>
+
+<table id="transition-table">
+  <thead>
+    <tr>
+      <th>Transition ID</th>
+      <th>From State</th>
+      <th>To State</th>
+      <th>Trigger / Event</th>
+      <th>Conditions</th>
+      <th>Actions</th>
+      <th>User Log Schema (custom)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- T0 -->
+    <tr>
+      <td>T0</td>
+      <td>S0 — Idle</td>
+      <td>S1 — Awaiting QR Seal</td>
+      <td>User selects capsule</td>
+      <td>Capsule exists & not locked down</td>
+      <td>Show “Present QR Seal”</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"capsule_select","fields":["capsule_id","timestamp","user_id"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T1 -->
+    <tr>
+      <td>T1</td>
+      <td>S1 — Awaiting QR Seal</td>
+      <td>S2 — Verifying QR Seal</td>
+      <td>QR scanned</td>
+      <td>QR payload decodable</td>
+      <td>Decode, parse, start verification</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"qr_scanned","fields":["capsule_id","qr_raw","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T2 -->
+    <tr>
+      <td>T2</td>
+      <td>S2 — Verifying QR Seal</td>
+      <td>S4 — Awaiting DNA Seal</td>
+      <td>QR verification success</td>
+      <td>sig, time, purpose, nonce, cid all valid</td>
+      <td>Mark nonce pending; show “Present DNA Seal”</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"qr_verified","fields":["capsule_id","nonce","purpose","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T3 -->
+    <tr>
+      <td>T3</td>
+      <td>S2 — Verifying QR Seal</td>
+      <td>S3 — QR Seal Failed</td>
+      <td>QR verification failure</td>
+      <td>Any validation check fails</td>
+      <td>Increment failure counter; Frett tension++</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"qr_failed","fields":["capsule_id","reason","timestamp","failure_count"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T4 -->
+    <tr>
+      <td>T4</td>
+      <td>S3 — QR Seal Failed</td>
+      <td>S1 or S9</td>
+      <td>Retry or threshold reached</td>
+      <td>failure_count &lt; threshold → S1; else → S9</td>
+      <td>Either allow retry or enter Lockdown</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"qr_failure_escalation","fields":["capsule_id","failure_count","new_state","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T5 -->
+    <tr>
+      <td>T5</td>
+      <td>S4 — Awaiting DNA Seal</td>
+      <td>S5 — Verifying DNA Seal</td>
+      <td>DNA input started</td>
+      <td>DNA mode configured</td>
+      <td>Capture biometric / gesture / passphrase</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"dna_input_start","fields":["capsule_id","dna_mode","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T6 -->
+    <tr>
+      <td>T6</td>
+      <td>S5 — Verifying DNA Seal</td>
+      <td>S7 — Capsule Unlocked</td>
+      <td>DNA verification success</td>
+      <td>DNA matches configured mode</td>
+      <td>Mark nonce used; decrypt; open read‐only; start timer</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"dual_seal_unlock","fields":["capsule_id","dna_mode","timestamp","unlock_window_s"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T7 -->
+    <tr>
+      <td>T7</td>
+      <td>S5 — Verifying DNA Seal</td>
+      <td>S6 — DNA Seal Failed</td>
+      <td>DNA verification failure</td>
+      <td>DNA mismatch</td>
+      <td>Increment DNA failure counter; Frett tension++</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"dna_failed","fields":["capsule_id","reason","timestamp","failure_count"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T8 -->
+    <tr>
+      <td>T8</td>
+      <td>S6 — DNA Seal Failed</td>
+      <td>S4 or S9</td>
+      <td>Retry or threshold reached</td>
+      <td>failure_count &lt; threshold → S4; else → S9</td>
+      <td>Either allow retry or enter Lockdown</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"dna_failure_escalation","fields":["capsule_id","failure_count","new_state","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T9 -->
+    <tr>
+      <td>T9</td>
+      <td>S7 — Capsule Unlocked</td>
+      <td>S8 — Auto‐Relock</td>
+      <td>Unlock timer expires</td>
+      <td>unlock_window elapsed</td>
+      <td>Wipe temp key; close view</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"auto_relock","fields":["capsule_id","timestamp","unlock_duration_s"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T10 -->
+    <tr>
+      <td>T10</td>
+      <td>S8 — Auto‐Relock</td>
+      <td>S0 — Idle</td>
+      <td>Relock complete</td>
+      <td>All cleanup done</td>
+      <td>Return to idle</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"relock_complete","fields":["capsule_id","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T11 -->
+    <tr>
+      <td>T11</td>
+      <td>S7 — Capsule Unlocked</td>
+      <td>S8 — Auto‐Relock</td>
+      <td>Manual relock</td>
+      <td>User triggers close</td>
+      <td>Same as auto‐relock, user‐initiated</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"manual_relock","fields":["capsule_id","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T12 -->
+    <tr>
+      <td>T12</td>
+      <td>S3/S6/Any</td>
+      <td>S9 — Lockdown</td>
+      <td>Lockdown trigger</td>
+      <td>Thresholds or Frett global alert</td>
+      <td>Freeze unlocks; require override</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"lockdown_enter","fields":["reason","capsule_id","timestamp"]}'></textarea>
+      </td>
+    </tr>
+
+    <!-- T13 -->
+    <tr>
+      <td>T13</td>
+      <td>S9 — Lockdown</td>
+      <td>S0 — Idle</td>
+      <td>Lockdown cleared</td>
+      <td>Override or timer</td>
+      <td>Reset counters; remain high‐tension if desired</td>
+      <td>
+        <textarea placeholder='e.g. {"event":"lockdown_exit","fields":["reason","timestamp"]}'></textarea>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="qr-config">
+  <h2>Generate Personalized QR Config Artifact</h2>
+  <p>This will serialize your custom log schemas + a user ID into a JSON blob you can feed into your QR‐Seal generator.</p>
+
+  <label>
+    User / Captain ID:
+    <input id="user-id" type="text" placeholder="e.g. captain_leif_001">
+  </label>
+
+  <button id="generate-config">Generate Config Payload</button>
+
+  <div class="qr-output" id="qr-output"></div>
+</div>
+
+<script>
+  function collectTransitionConfig() {
+    const rows = document.querySelectorAll("#transition-table tbody tr");
+    const transitions = [];
+    rows.forEach(row => {
+      const tId = row.cells[0].innerText.trim();
+      const from = row.cells[1].innerText.trim();
+      const to   = row.cells[2].innerText.trim();
+      const trig = row.cells[3].innerText.trim();
+      const cond = row.cells[4].innerText.trim();
+      const act  = row.cells[5].innerText.trim();
+      const log  = row.cells[6].querySelector("textarea").value.trim();
+
+      let logSchema = null;
+      if (log) {
+        try { logSchema = JSON.parse(log); }
+        catch (e) { logSchema = { raw: log }; }
+      }
+
+      transitions.push({
+        id: tId,
+        from, to,
+        trigger: trig,
+        conditions: cond,
+        actions: act,
+        log_schema: logSchema
+      });
+    });
+    return transitions;
+  }
+
+  document.getElementById("generate-config").addEventListener("click", () => {
+    const userId = document.getElementById("user-id").value.trim() || "anonymous";
+    const transitions = collectTransitionConfig();
+
+    const payload = {
+      user_id: userId,
+      protocol: "qr_dna_unlock_v1",
+      transitions
+    };
+
+    const json = JSON.stringify(payload);
+    // This string is what you’d feed into your QR generator (or sign + encode as part of a QR Seal).
+    document.getElementById("qr-output").textContent = json;
+  });
+</script>
+
+</body>
+</html>
