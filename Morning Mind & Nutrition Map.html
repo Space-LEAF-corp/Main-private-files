@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Morning Mind & Nutrition Map</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #151a2b;
+      --accent: #6cf0c2;
+      --accent-soft: #2bffb880;
+      --text-main: #f5f7ff;
+      --text-soft: #a9b0d9;
+      --border-soft: #262c45;
+      --danger: #ff6b81;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #1b2340 0, #050814 55%, #02030a 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 960px;
+      padding: 24px 16px 40px;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 1.6rem;
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-pill {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.2fr;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: linear-gradient(145deg, #101528, #090c18);
+      border-radius: 14px;
+      border: 1px solid var(--border-soft);
+      padding: 14px 14px 16px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      color: var(--text-soft);
+    }
+
+    .field-group {
+      margin-bottom: 10px;
+    }
+
+    .field-label {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      margin-bottom: 4px;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--border-soft);
+      background: #070a14;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 50px;
+      max-height: 120px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(108, 240, 194, 0.25);
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      accent-color: var(--accent);
+    }
+
+    .slider-value {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      min-width: 26px;
+      text-align: right;
+    }
+
+    .summary-card {
+      margin-top: 16px;
+    }
+
+    .summary-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .summary-text {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 7px 14px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: #02100b;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    button.secondary {
+      background: transparent;
+      border-color: var(--border-soft);
+      color: var(--text-soft);
+    }
+
+    .tiny {
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      margin-top: 6px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      color: var(--text-soft);
+    }
+
+    .pill.good {
+      border-color: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .pill.warn {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="title">
+        Morning Map
+        <span class="title-pill">Mind · Nutrition · Pair Sync</span>
+      </div>
+      <div class="subtitle">
+        A quiet daily check‐in for you and your partner—no wearables, no cloud, just reflection and rhythm.
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- You -->
+      <section class="card" id="you-card">
+        <div class="card-header">
+          <div class="card-title">You</div>
+          <div class="chip">Local · Private</div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Name (optional)</div>
+          <input type="text" id="you-name" placeholder="How do you want to be labeled today?" />
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Mood</div>
+          <div class="slider-row">
+            <input type="range" id="you-mood" min="1" max="10" value="6" />
+            <div class="slider-value" id="you-mood-val">6</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Energy</div>
+          <div class="slider-row">
+            <input type="range" id="you-energy" min="1" max="10" value="5" />
+            <div class="slider-value" id="you-energy-val">5</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Hunger level</div>
+          <div class="slider-row">
+            <input type="range" id="you-hunger" min="1" max="10" value="4" />
+            <div class="slider-value" id="you-hunger-val">4</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Last meal (roughly)</div>
+          <input type="text" id="you-last-meal" placeholder="e.g., small snack at 10pm, skipped dinner, etc." />
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Body notes</div>
+          <textarea id="you-notes" placeholder="Any aches, tension, cravings, or signals worth noting?"></textarea>
+        </div>
+      </section>
+
+      <!-- Partner -->
+      <section class="card" id="partner-card">
+        <div class="card-header">
+          <div class="card-title">Partner</div>
+          <div class="chip">Shared by consent</div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Name (optional)</div>
+          <input type="text" id="partner-name" placeholder="Their name or nickname" />
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Mood (your read)</div>
+          <div class="slider-row">
+            <input type="range" id="partner-mood" min="1" max="10" value="6" />
+            <div class="slider-value" id="partner-mood-val">6</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Energy (your read)</div>
+          <div class="slider-row">
+            <input type="range" id="partner-energy" min="1" max="10" value="5" />
+            <div class="slider-value" id="partner-energy-val">5</div>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Shared meal intention</div>
+          <input type="text" id="shared-meal" placeholder="e.g., light breakfast together, big brunch later, etc." />
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">Support notes</div>
+          <textarea id="partner-notes" placeholder="Anything you think they might need today?"></textarea>
+        </div>
+      </section>
+    </div>
+
+    <!-- Summary / Briefing -->
+    <section class="card summary-card" id="summary-card">
+      <div class="card-header">
+        <div class="card-title">Daily Briefing</div>
+        <div class="chip">For your eyes · Save if you wish</div>
+      </div>
+
+      <div class="summary-title">Snapshot</div>
+      <div class="pill-row" id="snapshot-pills"></div>
+
+      <div class="summary-title" style="margin-top:10px;">Narrative</div>
+      <div class="summary-text" id="summary-text">
+        Fill in your fields above, then tap “Generate Briefing” to see a gentle summary of where you both are today.
+      </div>
+
+      <div class="actions">
+        <button id="generate-btn">Generate Briefing</button>
+        <button class="secondary" id="clear-btn">Clear Fields</button>
+      </div>
+      <div class="tiny">
+        This runs entirely in your browser. Nothing is sent anywhere. If you want a log, copy the text into your own journal.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Helper to wire sliders to value labels
+    function bindSlider(id, labelId) {
+      const el = document.getElementById(id);
+      const label = document.getElementById(labelId);
+      if (!el || !label) return;
+      const update = () => (label.textContent = el.value);
+      el.addEventListener("input", update);
+      update();
+    }
+
+    bindSlider("you-mood", "you-mood-val");
+    bindSlider("you-energy", "you-energy-val");
+    bindSlider("you-hunger", "you-hunger-val");
+    bindSlider("partner-mood", "partner-mood-val");
+    bindSlider("partner-energy", "partner-energy-val");
+
+    function classifyLevel(val) {
+      const n = Number(val);
+      if (n >= 8) return "high";
+      if (n >= 4) return "medium";
+      return "low";
+    }
+
+    function makePill(label, level) {
+      const span = document.createElement("span");
+      span.className = "pill";
+      if (level === "high") span.classList.add("good");
+      if (level === "low") span.classList.add("warn");
+      span.textContent = label;
+      return span;
+    }
+
+    function generateBriefing() {
+      const youName = document.getElementById("you-name").value.trim() || "You";
+      const partnerName =
+        document.getElementById("partner-name").value.trim() || "Your partner";
+
+      const youMood = document.getElementById("you-mood").value;
+      const youEnergy = document.getElementById("you-energy").value;
+      const youHunger = document.getElementById("you-hunger").value;
+      const youLastMeal = document.getElementById("you-last-meal").value.trim();
+      const youNotes = document.getElementById("you-notes").value.trim();
+
+      const partnerMood = document.getElementById("partner-mood").value;
+      const partnerEnergy = document.getElementById("partner-energy").value;
+      const sharedMeal = document.getElementById("shared-meal").value.trim();
+      const partnerNotes = document.getElementById("partner-notes").value.trim();
+
+      const snapshot = document.getElementById("snapshot-pills");
+      snapshot.innerHTML = "";
+
+      snapshot.appendChild(
+        makePill(`${youName}: mood ${youMood}/10`, classifyLevel(youMood))
+      );
+      snapshot.appendChild(
+        makePill(`${youName}: energy ${youEnergy}/10`, classifyLevel(youEnergy))
+      );
+      snapshot.appendChild(
+        makePill(`${youName}: hunger ${youHunger}/10`, classifyLevel(youHunger))
+      );
+      snapshot.appendChild(
+        makePill(
+          `${partnerName}: mood ${partnerMood}/10`,
+          classifyLevel(partnerMood)
+        )
+      );
+      snapshot.appendChild(
+        makePill(
+          `${partnerName}: energy ${partnerEnergy}/10`,
+          classifyLevel(partnerEnergy)
+        )
+      );
+
+      let text = "";
+
+      text += `${youName} is waking up with mood at ${youMood}/10 and energy at ${youEnergy}/10.\n`;
+      if (youLastMeal) {
+        text += `Last meal note: ${youLastMeal}.\n`;
+      }
+      if (youNotes) {
+        text += `Body notes: ${youNotes}\n`;
+      }
+
+      text += `\n${partnerName} is reading as mood ${partnerMood}/10 and energy ${partnerEnergy}/10.\n`;
+      if (partnerNotes) {
+        text += `Support notes: ${partnerNotes}\n`;
+      }
+
+      if (sharedMeal) {
+        text += `\nShared meal intention: ${sharedMeal}\n`;
+      }
+
+      // Gentle suggestions (non-medical, just pattern-based)
+      const youEnergyLevel = classifyLevel(youEnergy);
+      const youHungerLevel = classifyLevel(youHunger);
+      const partnerEnergyLevel = classifyLevel(partnerEnergy);
+
+      text += `\nSoft suggestions:\n`;
+
+      if (youEnergyLevel === "low") {
+        text += `• ${youName} might benefit from a slower, grounding start and something nourishing.\n`;
+      } else if (youEnergyLevel === "high") {
+        text += `• ${youName} has good energy—maybe channel it into one clear intention instead of scattering it.\n`;
+      }
+
+      if (youHungerLevel === "high") {
+        text += `• ${youName} seems quite hungry—consider a protein‐forward or balanced breakfast.\n`;
+      }
+
+      if (partnerEnergyLevel === "low") {
+        text += `• ${partnerName} may need gentleness, hydration, or a calm check‐in.\n`;
+      } else if (partnerEnergyLevel === "high") {
+        text += `• ${partnerName} might be ready to move—perhaps sync on timing so you don’t clash.\n`;
+      }
+
+      text += `\nRemember: this is a reflection tool, not a diagnosis. Use it as a conversation starter, not a verdict.`;
+
+      document.getElementById("summary-text").textContent = text;
+    }
+
+    function clearFields() {
+      const ids = [
+        "you-name",
+        "you-mood",
+        "you-energy",
+        "you-hunger",
+        "you-last-meal",
+        "you-notes",
+        "partner-name",
+        "partner-mood",
+        "partner-energy",
+        "shared-meal",
+        "partner-notes",
+      ];
+      ids.forEach((id) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.type === "range") {
+          el.value = 5;
+          if (id === "you-hunger") el.value = 4;
+        } else {
+          el.value = "";
+        }
+      });
+
+      bindSlider("you-mood", "you-mood-val");
+      bindSlider("you-energy", "you-energy-val");
+      bindSlider("you-hunger", "you-hunger-val");
+      bindSlider("partner-mood", "partner-mood-val");
+      bindSlider("partner-energy", "partner-energy-val");
+
+      document.getElementById("snapshot-pills").innerHTML = "";
+      document.getElementById("summary-text").textContent =
+        "Fill in your fields above, then tap “Generate Briefing” to see a gentle summary of where you both are today.";
+    }
+
+    document
+      .getElementById("generate-btn")
+      .addEventListener("click", generateBriefing);
+    document.getElementById("clear-btn").addEventListener("click", clearFields);
+  </script>
+</body>
+</html>
