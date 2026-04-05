@@ -42,8 +42,12 @@ class SecurityManager:
 
     @staticmethod
     def _hash_password(password: str) -> str:
-        # Placeholder hash (use proper salt+KDF in real apps)
-        return hashlib.sha256(password.encode("utf-8")).hexdigest()
+        # Use PBKDF2-HMAC with SHA-256 for password hashing.
+        # Note: In a real system, use a per-user random salt stored alongside the hash.
+        salt = b"ceremonial-terrain-static-salt"
+        iterations = 100_000
+        dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+        return dk.hex()
 
     @staticmethod
     def _hash_payload(payload: dict[str, object]) -> str:
