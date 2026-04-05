@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>FED‐UP Delivery Gateway</title>
+<style>
+body <!-- Color Bracelet Panel -->
+<div id="bracelet-panel" class="panel">
+  <h2>Color Bracelet Sequence (18 Slots)</h2>
+  <p>Select a sequence of colors to define your invisible shell or access pattern.</p>
+  <div id="bracelet-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+    <!-- 18 beads -->
+    <div class="bead" data-color="red"    style="width:30px;height:30px;border-radius:50%;background:#ff4444;cursor:pointer;"></div>
+    <div class="bead" data-color="orange" style="width:30px;height:30px;border-radius:50%;background:#ff8800;cursor:pointer;"></div>
+    <div class="bead" data-color="yellow" style="width:30px;height:30px;border-radius:50%;background:#ffdd33;cursor:pointer;"></div>
+    <div class="bead" data-color="green"  style="width:30px;height:30px;border-radius:50%;background:#33cc66;cursor:pointer;"></div>
+    <div class="bead" data-color="teal"   style="width:30px;height:30px;border-radius:50%;background:#33cccc;cursor:pointer;"></div>
+    <div class="bead" data-color="blue"   style="width:30px;height:30px;border-radius:50%;background:#3366ff;cursor:pointer;"></div>
+    <div class="bead" data-color="indigo" style="width:30px;height:30px;border-radius:50%;background:#4b0082;cursor:pointer;"></div>
+    <div class="bead" data-color="violet" style="width:30px;height:30px;border-radius:50%;background:#9933ff;cursor:pointer;"></div>
+    <div class="bead" data-color="pink"   style="width:30px;height:30px;border-radius:50%;background:#ff66cc;cursor:pointer;"></div>
+    <div class="bead" data-color="white"  style="width:30px;height:30px;border-radius:50%;background:#ffffff;cursor:pointer;border:1px solid #555;"></div>
+    <div class="bead" data-color="gray"   style="width:30px;height:30px;border-radius:50%;background:#888888;cursor:pointer;"></div>
+    <div class="bead" data-color="black"  style="width:30px;height:30px;border-radius:50%;background:#000000;cursor:pointer;border:1px solid #555;"></div>
+    <div class="bead" data-color="gold"   style="width:30px;height:30px;border-radius:50%;background:#d4af37;cursor:pointer;"></div>
+    <div class="bead" data-color="silver" style="width:30px;height:30px;border-radius:50%;background:#c0c0c0;cursor:pointer;"></div>
+    <div class="bead" data-color="bronze" style="width:30px;height:30px;border-radius:50%;background:#cd7f32;cursor:pointer;"></div>
+    <div class="bead" data-color="mint"   style="width:30px;height:30px;border-radius:50%;background:#98ff98;cursor:pointer;"></div>
+    <div class="bead" data-color="coral"  style="width:30px;height:30px;border-radius:50%;background:#ff7f50;cursor:pointer;"></div>
+    <div class="bead" data-color="navy"   style="width:30px;height:30px;border-radius:50%;background:#001f3f;cursor:pointer;"></div>
+  </div>
+  <p style="margin-top:10px;">Selected sequence:</p>
+  <pre id="bracelet-sequence" style="background:#000;padding:10px;border-radius:6px;min-height:30px;"></pre>
+</div>
+
+<script>
+let braceletSequence = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".bead").forEach(bead => {
+    bead.addEventListener("click", () => {
+      const color = bead.getAttribute("data-color");
+      if (braceletSequence.length < 18) {
+        braceletSequence.push(color);
+        document.getElementById("bracelet-sequence").textContent = braceletSequence.join(" - ");
+      }
+    });
+  });
+});
+
+// You can later use braceletSequence as an invisible shell key:
+// e.g. hash(braceletSequence) -> admin pattern / secondary shell unlock
+</script>{
+    font-family: Arial, sans-serif;
+    background: #000;
+    color: #eee;
+    padding: 40px;
+}
+h1 { color: #ffcc00; }
+h2 { color: #66ccff; }
+input {
+    padding: 10px;
+    font-size: 18px;
+    width: 320px;
+    margin-top: 10px;
+}
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+.panel {
+    background: #111;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+.option {
+    padding: 10px;
+    margin: 10px 0;
+    background: #222;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.option:hover {
+    background: #333;
+}
+.hidden {
+    display: none;
+}
+</style>
+
+<script>
+function wakeSystem() {
+    const val = document.getElementById("wake").value.trim().toLowerCase();
+    const base = document.getElementById("base-options");
+    const amazon = document.getElementById("amazon-option");
+
+    if (val === "fed up") {
+        base.style.display = "block";
+        amazon.style.display = "none";
+    } 
+    else if (val === "fed up amazon") {
+        base.style.display = "block";
+        amazon.style.display = "block";
+    } 
+    else {
+        alert("Invalid wake phrase. Try: fed up  or  fed up amazon");
+    }
+}
+
+function loadMode(mode) {
+    const title = document.getElementById("mode-title");
+    const body = document.getElementById("mode-body");
+
+    if (mode === "spaceleaf") {
+        title.textContent = "🌿 Space LEAF Corp Delivery Shell";
+        body.innerHTML = "<p>Welcome to the ceremonial, privacy-first delivery interface.</p>";
+    }
+    if (mode === "fedex") {
+        title.textContent = "📦 FedEx Companion Mode (Mock)";
+        body.innerHTML = "<p>This would open FedEx tracking or account tools.</p>";
+    }
+    if (mode === "ups") {
+        title.textContent = "📮 UPS Companion Mode (Mock)";
+        body.innerHTML = "<p>This would open UPS tracking or account tools.</p>";
+    }
+    if (mode === "amazon") {
+        title.textContent = "🛒 Amazon Companion Mode (Mock)";
+        body.innerHTML = "<p>This would open Amazon order history or account tools.</p>";
+    }
+
+    document.getElementById("mode-screen").style.display
+    <!-- Color Bracelet Panel -->
+<div id="bracelet-panel" class="panel">
+  <h2>Color Bracelet Sequence (18 Slots)</h2>
+  <p>Select a sequence of colors to define your invisible shell or access pattern.</p>
+  <div id="bracelet-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">
+    <!-- 18 beads -->
+    <div class="bead" data-color="red"    style="width:30px;height:30px;border-radius:50%;background:#ff4444;cursor:pointer;"></div>
+    <div class="bead" data-color="orange" style="width:30px;height:30px;border-radius:50%;background:#ff8800;cursor:pointer;"></div>
+    <div class="bead" data-color="yellow" style="width:30px;height:30px;border-radius:50%;background:#ffdd33;cursor:pointer;"></div>
+    <div class="bead" data-color="green"  style="width:30px;height:30px;border-radius:50%;background:#33cc66;cursor:pointer;"></div>
+    <div class="bead" data-color="teal"   style="width:30px;height:30px;border-radius:50%;background:#33cccc;cursor:pointer;"></div>
+    <div class="bead" data-color="blue"   style="width:30px;height:30px;border-radius:50%;background:#3366ff;cursor:pointer;"></div>
+    <div class="bead" data-color="indigo" style="width:30px;height:30px;border-radius:50%;background:#4b0082;cursor:pointer;"></div>
+    <div class="bead" data-color="violet" style="width:30px;height:30px;border-radius:50%;background:#9933ff;cursor:pointer;"></div>
+    <div class="bead" data-color="pink"   style="width:30px;height:30px;border-radius:50%;background:#ff66cc;cursor:pointer;"></div>
+    <div class="bead" data-color="white"  style="width:30px;height:30px;border-radius:50%;background:#ffffff;cursor:pointer;border:1px solid #555;"></div>
+    <div class="bead" data-color="gray"   style="width:30px;height:30px;border-radius:50%;background:#888888;cursor:pointer;"></div>
+    <div class="bead" data-color="black"  style="width:30px;height:30px;border-radius:50%;background:#000000;cursor:pointer;border:1px solid #555;"></div>
+    <div class="bead" data-color="gold"   style="width:30px;height:30px;border-radius:50%;background:#d4af37;cursor:pointer;"></div>
+    <div class="bead" data-color="silver" style="width:30px;height:30px;border-radius:50%;background:#c0c0c0;cursor:pointer;"></div>
+    <div class="bead" data-color="bronze" style="width:30px;height:30px;border-radius:50%;background:#cd7f32;cursor:pointer;"></div>
+    <div class="bead" data-color="mint"   style="width:30px;height:30px;border-radius:50%;background:#98ff98;cursor:pointer;"></div>
+    <div class="bead" data-color="coral"  style="width:30px;height:30px;border-radius:50%;background:#ff7f50;cursor:pointer;"></div>
+    <div class="bead" data-color="navy"   style="width:30px;height:30px;border-radius:50%;background:#001f3f;cursor:pointer;"></div>
+  </div>
+  <p style="margin-top:10px;">Selected sequence:</p>
+  <pre id="bracelet-sequence" style="background:#000;padding:10px;border-radius:6px;min-height:30px;"></pre>
+</div>
+
+<script>
+let braceletSequence = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".bead").forEach(bead => {
+    bead.addEventListener("click", () => {
+      const color = bead.getAttribute("data-color");
+      if (braceletSequence.length < 18) {
+        braceletSequence.push(color);
+        document.getElementById("bracelet-sequence").textContent = braceletSequence.join(" - ");
+      }
+    });
+  });
+});
+
+// You can later use braceletSequence as an invisible shell key:
+// e.g. hash(braceletSequence) -> admin pattern / secondary shell unlock
+</script>
+
