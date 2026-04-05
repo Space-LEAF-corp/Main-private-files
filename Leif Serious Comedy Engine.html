@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Leif Serious Comedy Engine</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 1rem; background: #111; color: #eee; }
+    h1 { margin-bottom: 0.5rem; }
+    label { display: block; margin-top: 0.5rem; }
+    input, select, textarea { width: 100%; margin-top: 0.25rem; padding: 0.4rem; }
+    button { margin-top: 1rem; padding: 0.6rem 1rem; cursor: pointer; }
+    pre { white-space: pre-wrap; background: #222; padding: 1rem; margin-top: 1rem; border-radius: 6px; }
+    .beat-label { font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Leif Serious Comedy Engine</h1>
+
+  <label>
+    Setting
+    <input id="setting" placeholder="A grocery store at closing time">
+  </label>
+
+  <label>
+    Characters (comma-separated)
+    <input id="characters" placeholder="Night Manager, New Hire, Security Guard">
+  </label>
+
+  <label>
+    Stakes (what matters)
+    <input id="stakes" placeholder="Finishing inventory before midnight">
+  </label>
+
+  <label>
+    Tone
+    <select id="tone">
+      <option value="serious">Serious</option>
+      <option value="somber">Somber</option>
+      <option value="formal">Formal</option>
+    </select>
+  </label>
+
+  <label>
+    Disruption Type
+    <select id="disruptionType">
+      <option value="procedural">Procedural</option>
+      <option value="physical">Physical</option>
+      <option value="verbal">Verbal</option>
+      <option value="cosmic">Cosmic</option>
+    </select>
+  </label>
+
+  <label>
+    Absurdity Level (1–3)
+    <input id="absurdityLevel" type="number" min="1" max="3" value="2">
+  </label>
+
+  <button id="generateBtn">Generate Scene</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    const ComedyEngine = {
+      init(options) {
+        this.defaults = options || {};
+      },
+      generateScene(config) {
+        const scene = { title: "", beats: [] };
+
+        scene.title = `Serious Comedy in ${config.setting}`;
+
+        scene.beats.push({
+          label: "A. Establish Serious World",
+          text: `In ${config.setting}, ${listCharacters(config.characters)} focus on ${config.stakes}. ` +
+                `Everyone is committed, the tone is ${config.tone}, and no one is trying to be funny.`
+        });
+
+        const disruption = buildDisruption(config);
+        scene.beats.push({
+          label: "B. Introduce Logical Absurdity",
+          text: disruption
+        });
+
+        scene.beats.push({
+          label: "C. Silent Beat",
+          text: `For a brief moment, no one reacts. The room holds its breath. ` +
+                `The absurdity hangs in the air, completely unacknowledged.`
+        });
+
+        const escalation = buildEscalation(config);
+        scene.beats.push({
+          label: "D. Logical Escalation",
+          text: escalation
+        });
+
+        scene.beats.push({
+          label: "E. Return to Mission",
+          text: `Without commenting on what just happened, everyone returns to ${config.stakes}. ` +
+                `The world pretends nothing unusual occurred, and the seriousness resumes as if uninterrupted.`
+        });
+
+        return scene;
+      },
+      renderScene(scene) {
+        let out = `TITLE: ${scene.title}\n\n`;
+        scene.beats.forEach(beat => {
+          out += `${beat.label}\n${beat.text}\n\n`;
+        });
+        return out.trim();
+      },
+      generateAndRender(config) {
+        const scene = this.generateScene(config);
+        return this.renderScene(scene);
+      }
+    };
+
+    function listCharacters(chars) {
+      if (!chars || chars.length === 0) return "unseen figures";
+      if (chars.length === 1) return chars[0];
+      const last = chars[chars.length - 1];
+      return chars.slice(0, -1).join(", ") + " and " + last;
+    }
+
+    function buildDisruption(config) {
+      const { disruptionType, absurdityLevel } = config;
+      const who = listCharacters(config.characters);
+      const level = absurdityLevel || 1;
+
+      if (disruptionType === "procedural") {
+        return `${who} are interrupted by a completely serious, laminated protocol ` +
+               `that requires everyone to perform an oddly specific action before continuing—like ` +
+               `signing a “No Spontaneous Dancing” form in triplicate. No one questions it.`;
+      }
+
+      if (disruptionType === "physical") {
+        return `A perfectly normal object in the room behaves in a slightly impossible way—like ` +
+               `a chair that politely slides itself into place whenever someone stands. ` +
+               `Everyone treats this as standard procedure.`;
+      }
+
+      if (disruptionType === "verbal") {
+        return `One character delivers a line that is technically correct but wildly over-formal, ` +
+               `like reading a simple request as if it were a historic treaty. No one laughs.`;
+      }
+
+      // "cosmic" or fallback
+      return `A small, inexplicable cosmic detail appears—like a tiny, hovering “Meeting In Progress” ` +
+             `constellation in the corner of the room. It’s treated as completely normal.`;
+    }
+
+    function buildEscalation(config) {
+      const { absurdityLevel, disruptionType } = config;
+      const scale = absurdityLevel || 1;
+
+      if (disruptionType === "procedural") {
+        if (scale === 1) {
+          return `The protocol is followed once, with mild inconvenience, and everyone moves on.`;
+        } else if (scale === 2) {
+          return `More protocols emerge, each more oddly specific, yet everyone complies with total seriousness.`;
+        } else {
+          return `The entire scene becomes a maze of hyper-specific procedures, ` +
+                 `yet the characters treat it as the only rational way to proceed.`;
+        }
+      }
+
+      if (disruptionType === "physical") {
+        if (scale === 1) {
+          return `The object repeats its behavior once more, unnoticed by the characters.`;
+        } else if (scale === 2) {
+          return `Other objects begin subtly cooperating, forming a quiet choreography that no one acknowledges.`;
+        } else {
+          return `The room itself seems to assist the mission in small, precise ways, ` +
+                 `yet everyone remains focused and unamused.`;
+        }
+      }
+
+      if (scale === 1) {
+        return `The oddity lingers at the edge of awareness, never addressed.`;
+      } else if (scale === 2) {
+        return `The oddity recurs just enough to feel intentional, but still goes unspoken.`;
+      } else {
+        return `The oddity becomes structurally important to the mission, ` +
+               `yet is treated as just another serious constraint.`;
+      }
+    }
+
+    // Wire UI
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      const config = {
+        setting: document.getElementById("setting").value || "an undefined setting",
+        characters: document.getElementById("characters").value
+          .split(",")
+          .map(s => s.trim())
+          .filter(Boolean),
+        stakes: document.getElementById("stakes").value || "an unspecified mission",
+        tone: document.getElementById("tone").value,
+        disruptionType: document.getElementById("disruptionType").value,
+        absurdityLevel: parseInt(document.getElementById("absurdityLevel").value, 10) || 1
+      };
+
+      const text = ComedyEngine.generateAndRender(config);
+      document.getElementById("output").textContent = text;
+    });
+
+    ComedyEngine.init({});
+  </script>
+</body>
+</html>
