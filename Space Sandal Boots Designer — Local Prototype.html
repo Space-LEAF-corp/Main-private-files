@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Space Sandal Boots Designer — Local Prototype</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #050814;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1rem 2rem;
+      background: #0b1022;
+      border-bottom: 1px solid #222a3a;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+    main {
+      display: flex;
+      flex: 1;
+      padding: 1.5rem;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    section {
+      background: #0f1528;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 0 12px rgba(0,0,0,0.4);
+    }
+    #controls {
+      flex: 1 1 280px;
+      max-width: 360px;
+    }
+    #preview {
+      flex: 1 1 280px;
+      max-width: 420px;
+    }
+    #qr-section {
+      flex: 1 1 280px;
+      max-width: 420px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+    }
+    label {
+      display: block;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+    }
+    input[type="color"],
+    input[type="text"],
+    input[type="password"],
+    select {
+      margin-top: 0.25rem;
+      width: 100%;
+      padding: 0.3rem 0.4rem;
+      border-radius: 6px;
+      border: 1px solid #2b3550;
+      background: #050814;
+      color: #f5f5f5;
+      box-sizing: border-box;
+    }
+    input[type="checkbox"] {
+      margin-right: 0.4rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: 6px;
+      border: none;
+      background: #2f7df4;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2564c0;
+    }
+    .boot-preview {
+      width: 220px;
+      height: 260px;
+      margin: 0 auto;
+      position: relative;
+      background: radial-gradient(circle at 50% 120%, #000 0, #050814 40%, #050814 100%);
+    }
+    .boot-body {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      width: 140px;
+      height: 140px;
+      border-radius: 40px 40px 20px 20px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+    }
+    .boot-sole {
+      position: absolute;
+      bottom: 20px;
+      left: 30px;
+      width: 160px;
+      height: 24px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+    }
+    .boot-faceplate {
+      position: absolute;
+      bottom: 80px;
+      left: 40px;
+      width: 140px;
+      height: 40px;
+      border-radius: 20px 20px 10px 10px;
+      border: 3px solid rgba(255,255,255,0.7);
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.05);
+    }
+    .boot-strap {
+      position: absolute;
+      bottom: 130px;
+      left: 50px;
+      width: 120px;
+      height: 16px;
+      border-radius: 10px;
+      opacity: 0.9;
+    }
+    .mode-pill {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      margin-top: 0.4rem;
+      background: #1b2338;
+      border: 1px solid #2b3550;
+    }
+    .qr-box {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+    .qr-item {
+      flex: 1 1 160px;
+      min-width: 160px;
+      text-align: center;
+    }
+    .qr-item canvas {
+      background: #fff;
+      padding: 4px;
+      border-radius: 6px;
+    }
+    .small-text {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      margin-top: 0.4rem;
+    }
+    pre {
+      background: #050814;
+      padding: 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      overflow-x: auto;
+    }
+    #loginGate {
+      position: fixed;
+      inset: 0;
+      background: #050814;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <!-- Local login gate -->
+  <div id="loginGate">
+    <div style="background:#0f1528;padding:1.5rem 2rem;border-radius:10px;max-width:320px;width:100%;box-shadow:0 0 18px rgba(0,0,0,0.6);">
+      <h2 style="margin-top:0;">Local Profile</h2>
+      <label>
+        Username
+        <input type="text" id="loginUsername">
+      </label>
+      <label>
+        Password
+        <input type="password" id="loginPassword">
+      </label>
+      <button id="loginBtn" style="width:100%;">Enter Designer</button>
+      <div class="small-text">
+        This login is local only. Your data stays on this device.
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <h1>Space Sandal Boots Designer — Local Prototype</h1>
+  </header>
+
+  <main>
+    <section id="controls">
+      <h2>Design Controls</h2>
+
+      <h2 style="margin-top:1.0rem;">Brand Modules</h2>
+      <label>
+        Toe Module Brand
+        <select id="toeBrand">
+          <option value="none">None / Universal</option>
+          <option value="nike">Nike</option>
+          <option value="adidas">Adidas</option>
+          <option value="puma">Puma</option>
+          <option value="reebok">Reebok</option>
+          <option value="asics">Asics</option>
+        </select>
+      </label>
+
+      <label>
+        Strap Module Brand
+        <select id="strapBrand">
+          <option value="none">None / Universal</option>
+          <option value="nike">Nike</option>
+          <option value="adidas">Adidas</option>
+          <option value="puma">Puma</option>
+          <option value="reebok">Reebok</option>
+          <option value="asics">Asics</option>
+        </select>
+      </label>
+
+      <label>
+        Heel Module Brand
+        <select id="heelBrand">
+          <option value="none">None / Universal</option>
+          <option value="nike">Nike</option>
+          <option value="adidas">Adidas</option>
+          <option value="puma">Puma</option>
+          <option value="reebok">Reebok</option>
+          <option value="asics">Asics</option>
+        </select>
+      </label>
+
+      <label>
+        Boot body color
+        <input type="color" id="bodyColor" value="#3b82f6">
+      </label>
+      <label>
+        Sole color
+        <input type="color" id="soleColor" value="#111827">
+      </label>
+      <label>
+        Strap/accent color
+        <input type="color" id="strapColor" value="#f97316">
+      </label>
+      <label>
+        Faceplate frame color
+        <input type="color" id="faceplateColor" value="#e5e7eb">
+      </label>
+      <label>
+        Mode profile (for future suit logic)
+        <select id="modeProfile">
+          <option value="earth-casual">Earth Casual (toes in the sun)</option>
+          <option value="earth-training">Earth Training / Sim Mode</option>
+          <option value="space-habitat">Space Habitat (inside)</option>
+          <option value="space-eva">Space EVA (outside)</option>
+        </select>
+      </label>
+      <label>
+        <input type="checkbox" id="faceplateRemovable" checked>
+        Faceplate removable (open-toe option on Earth)
+      </label>
+      <label>
+        Custom name / call sign
+        <input type="text" id="bootName" placeholder="e.g. Aurora Step, Sandal-01">
+      </label>
+
+      <button id="generateBtn">Generate Dual QR Codes</button>
+      <button id="saveDesignBtn">Save Design Locally</button>
+      <button id="view3DBtn">Open 3D Viewer</button>
+
+      <div class="small-text">
+        This runs locally only. Designs are stored per local user profile.
+      </div>
+    </section>
+
+    <section id="preview">
+      <h2>Visual Preview</h2>
+      <div class="boot-preview">
+        <div class="boot-sole" id="sole"></div>
+        <div class="boot-body" id="body"></div>
+        <div class="boot-strap" id="strap"></div>
+        <div class="boot-faceplate" id="faceplate"></div>
+      </div>
+      <div class="mode-pill" id="modePill">Mode: Earth Casual</div>
+      <div class="small-text">
+        This is a stylized 2D preview, but the data behind it can drive a 3D model or manufacturing pipeline later.
+      </div>
+    </section>
+
+    <section id="qr-section">
+      <h2>Dual QR Tokens</h2>
+      <div class="qr-box">
+        <div class="qr-item">
+          <div><strong>Design Schematic QR</strong></div>
+          <div id="designQR"></div>
+          <div class="small-text">
+            Encodes colors, faceplate, name, brand modules — the “physical” design token.
+          </div>
+        </div>
+        <div class="qr-item">
+          <div><strong>Earth Logic / UI QR</strong></div>
+          <div id="logicQR"></div>
+          <div class="small-text">
+            Encodes mode profile, brand modules, and future UI behavior.
+          </div>
+        </div>
+      </div>
+      <h3 style="margin-top:1rem;font-size:1rem;">Raw Payloads</h3>
+      <pre id="payloadPreview"></pre>
+    </section>
+  </main>
+
+  <!-- Minimal fake QR generator (visual stand-in) -->
+  <script>
+  (function() {
+    function tinyQR(data, size, container) {
+      var canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0,0,size,size);
+      ctx.fillStyle = "#000";
+      var hash = 0;
+      for (var i = 0; i < data.length; i++) {
+        hash = (hash * 31 + data.charCodeAt(i)) & 0xffffffff;
+      }
+      var cells = 29;
+      var cellSize = Math.floor(size / cells);
+      for (var y = 0; y < cells; y++) {
+        for (var x = 0; x < cells; x++) {
+          var bit = (hash >> ((x + y*7) % 31)) & 1;
+          if (bit) {
+            ctx.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
+          }
+        }
+      }
+      container.innerHTML = "";
+      container.appendChild(canvas);
+    }
+    window.SimpleQR = tinyQR;
+  })();
+  </script>
+
+  <script>
+    // Login
+    const loginGate = document.getElementById('loginGate');
+    const loginUsername = document.getElementById('loginUsername');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginBtn = document.getElementById('loginBtn');
+
+    function completeLogin(username) {
+      localStorage.setItem('ssb_username', username);
+      loginGate.style.display = 'none';
+    }
+
+    loginBtn.addEventListener('click', () => {
+      const u = loginUsername.value.trim();
+      const p = loginPassword.value.trim();
+      if (!u || !p) {
+        alert('Enter a username and password (local only).');
+        return;
+      }
+      localStorage.setItem('ssb_userpass_' + u, btoa(p));
+      completeLogin(u);
+    });
+
+    const existingUser = localStorage.getItem('ssb_username');
+    if (existingUser) {
+      loginGate.style.display = 'none';
+    }
+
+    // Designer
+    const bodyEl = document.getElementById('body');
+    const soleEl = document.getElementById('sole');
+    const strapEl = document.getElementById('strap');
+    const faceplateEl = document.getElementById('faceplate');
+    const modePill = document.getElementById('modePill');
+
+    const bodyColorInput = document.getElementById('bodyColor');
+    const soleColorInput = document.getElementById('soleColor');
+    const strapColorInput = document.getElementById('strapColor');
+    const faceplateColorInput = document.getElementById('faceplateColor');
+    const modeProfileInput = document.getElementById('modeProfile');
+    const faceplateRemovableInput = document.getElementById('faceplateRemovable');
+    const bootNameInput = document.getElementById('bootName');
+
+    const toeBrandInput = document.getElementById('toeBrand');
+    const strapBrandInput = document.getElementById('strapBrand');
+    const heelBrandInput = document.getElementById('heelBrand');
+
+    const designQRDiv = document.getElementById('designQR');
+    const logicQRDiv = document.getElementById('logicQR');
+    const payloadPreview = document.getElementById('payloadPreview');
+    const generateBtn = document.getElementById('generateBtn');
+    const saveDesignBtn = document.getElementById('saveDesignBtn');
+    const view3DBtn = document.getElementById('view3DBtn');
+
+    function updatePreview() {
+      bodyEl.style.background = bodyColorInput.value;
+      soleEl.style.background = soleColorInput.value;
+      strapEl.style.background = strapColorInput.value;
+      strapEl.style.boxShadow = `0 0 8px ${strapColorInput.value}88`;
+      faceplateEl.style.borderColor = faceplateColorInput.value;
+      faceplateEl.style.display = faceplateRemovableInput.checked ? 'block' : 'none';
+
+      const modeLabel = modeProfileInput.options[modeProfileInput.selectedIndex].text;
+      modePill.textContent = "Mode: " + modeLabel;
+    }
+
+    function buildDesignPayload() {
+      return {
+        type: "space-sandal-boot-design",
+        version: 2,
+        name: bootNameInput.value || null,
+        colors: {
+          body: bodyColorInput.value,
+          sole: soleColorInput.value,
+          strap: strapColorInput.value,
+          faceplate: faceplateColorInput.value
+        },
+        faceplate: {
+          removable: faceplateRemovableInput.checked
+        },
+        modules: {
+          toe: toeBrandInput.value,
+          strap: strapBrandInput.value,
+          heel: heelBrandInput.value
+        },
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    function buildLogicPayload() {
+      return {
+        type: "space-sandal-boot-logic",
+        version: 2,
+        modeProfile: modeProfileInput.value,
+        uiHints: {
+          earthCasual: modeProfileInput.value === "earth-casual",
+          training: modeProfileInput.value === "earth-training",
+          spaceHabitat: modeProfileInput.value === "space-habitat",
+          spaceEVA: modeProfileInput.value === "space-eva"
+        },
+        brandModules: {
+          toe: toeBrandInput.value,
+          strap: strapBrandInput.value,
+          heel: heelBrandInput.value
+        },
+        bootsModeMapping: {
+          inside: ["earth-casual", "earth-training", "space-habitat"].includes(modeProfileInput.value),
+          outside: modeProfileInput.value === "space-eva"
+        },
+        timestamp: new Date().toISOString()
+      };
+    }
+
+    function generateQRs() {
+      const designPayload = buildDesignPayload();
+      const logicPayload = buildLogicPayload();
+
+      const designStr = JSON.stringify(designPayload);
+      const logicStr = JSON.stringify(logicPayload);
+
+      SimpleQR(designStr, 160, designQRDiv);
+      SimpleQR(logicStr, 160, logicQRDiv);
+
+      payloadPreview.textContent =
+        "Design payload:\n" + designStr + "\n\n" +
+        "Logic payload:\n" + logicStr + "\n";
+
+      console.log("Design payload:", designPayload);
+      console.log("Logic payload:", logicPayload);
+    }
+
+    function getCurrentDesignBundle() {
+      return {
+        design: buildDesignPayload(),
+        logic: buildLogicPayload()
+      };
+    }
+
+    saveDesignBtn.addEventListener('click', () => {
+      const bundle = getCurrentDesignBundle();
+      const username = localStorage.getItem('ssb_username') || 'guest';
+      const key = `ssb_design_${username}`;
+      localStorage.setItem(key, JSON.stringify(bundle));
+      alert('Design saved locally for user: ' + username);
+    });
+
+    view3DBtn.addEventListener('click', () => {
+      window.location.href = 'space_sandal_viewer.html';
+    });
+
+    bodyColorInput.addEventListener('input', updatePreview);
+    soleColorInput.addEventListener('input', updatePreview);
+    strapColorInput.addEventListener('input', updatePreview);
+    faceplateColorInput.addEventListener('input', updatePreview);
+    modeProfileInput.addEventListener('change', updatePreview);
+    faceplateRemovableInput.addEventListener('change', updatePreview);
+    bootNameInput.addEventListener('input', updatePreview);
+
+    toeBrandInput.addEventListener('change', updatePreview);
+    strapBrandInput.addEventListener('change', updatePreview);
+    heelBrandInput.addEventListener('change', updatePreview);
+
+    generateBtn.addEventListener('click', generateQRs);
+
+    updatePreview();
+  </script>
+</body>
+</html>
