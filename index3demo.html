@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Companion Demo – Local Mock</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #050816;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    #app {
+      width: 100%;
+      max-width: 900px;
+      padding: 24px;
+    }
+    .screen {
+      display: none;
+      border-radius: 12px;
+      padding: 24px;
+      background: #111827;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
+    }
+    .screen.active {
+      display: block;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      margin: 6px 4px 0 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button.secondary {
+      background: #374151;
+    }
+    button.danger {
+      background: #b91c1c;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    p {
+      line-height: 1.5;
+    }
+    .color-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .color-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 2px solid #111827;
+      cursor: pointer;
+    }
+    .color-red { background: #ef4444; }
+    .color-blue { background: #3b82f6; }
+    .color-yellow { background: #eab308; }
+    .color-green { background: #22c55e; }
+    .color-purple { background: #a855f7; }
+    .color-orange { background: #f97316; }
+    .color-white { background: #e5e7eb; }
+    .color-black { background: #020617; border-color: #e5e7eb; }
+    .sequence-preview {
+      min-height: 24px;
+      margin: 8px 0;
+      font-size: 13px;
+      color: #9ca3af;
+    }
+    .field {
+      margin: 8px 0;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #f9fafb;
+      font-size: 14px;
+    }
+    label {
+      font-size: 14px;
+      display: block;
+      margin: 6px 0;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #1f2937;
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .card {
+      background: #020617;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid #1f2937;
+    }
+    .card h3 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+    }
+    .card p {
+      font-size: 13px;
+      color: #9ca3af;
+    }
+    .small {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    .section {
+      margin-top: 16px;
+      padding-top: 8px;
+      border-top: 1px solid #1f2937;
+    }
+    .flex-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .pill {
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #111827;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .linkish {
+      color: #60a5fa;
+      cursor: pointer;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- Guardian Gate -->
+  <div id="screen-guardian" class="screen active">
+    <h1>Welcome, traveler.</h1>
+    <p>
+      This system includes optional AI personalities.<br />
+      Some speak with grown-up language.<br />
+      To continue, an adult must be present.
+    </p>
+    <button id="btn-adult">I am an adult (18+)</button>
+    <button id="btn-with-parent">I am here with my parent/guardian</button>
+  </div>
+
+  <!-- Child-safe confirmation -->
+  <div id="screen-child-confirm" class="screen">
+    <h2>Quick check-in</h2>
+    <p>
+      Hello there.<br />
+      Before we go any further, we need to make sure your parent or guardian is with you.
+    </p>
+    <button id="btn-child-yes">Yes, my parent is here</button>
+    <button id="btn-child-no" class="secondary">No, not right now</button>
+  </div>
+
+  <!-- Color sequence challenge -->
+  <div id="screen-color-challenge" class="screen">
+    <h2>Enter your family’s color pattern</h2>
+    <p class="small">
+      This keeps everyone safe and helps us know an adult is here.
+    </p>
+    <div class="color-grid" id="color-grid-challenge"></div>
+    <div class="sequence-preview" id="challenge-preview"></div>
+    <button id="btn-submit-sequence">Submit</button>
+    <p id="challenge-message" class="small"></p>
+  </div>
+
+  <!-- First-time color setup (Admin bootstrap) -->
+  <div id="screen-color-setup" class="screen">
+    <h2>Set Your Family Color Passcode</h2>
+    <p class="small">
+      This protects your child from accidentally accessing advanced features.
+    </p>
+    <div class="field">
+      <label for="sequence-length">Sequence length</label>
+      <select id="sequence-length">
+        <option value="4">4 colors</option>
+        <option value="5">5 colors</option>
+        <option value="6">6 colors</option>
+      </select>
+    </div>
+    <p class="small">Tap colors in the order you want.</p>
+    <div class="color-grid" id="color-grid-setup"></div>
+    <div class="sequence-preview" id="setup-preview"></div>
+    <button id="btn-clear-setup" class="secondary">Clear</button>
+    <button id="btn-save-setup" disabled>Save Passcode</button>
+    <p id="setup-message" class="small"></p>
+  </div>
+
+  <!-- Login screen -->
+  <div id="screen-login" class="screen">
+    <h2>Login</h2>
+    <p class="small">
+      For this demo, a fake user will be created automatically if none exists.
+    </p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" />
+    </div>
+    <button id="btn-login">Login</button>
+    <button id="btn-demo" class="secondary">Demo Mode</button>
+    <p id="login-message" class="small"></p>
+    <p class="small">
+      <span class="linkish" id="link-admin">Admin Mode</span>
+    </p>
+  </div>
+
+  <!-- Third-login unlock -->
+  <div id="screen-third-unlock" class="screen">
+    <h2>Your companion has noticed your return...</h2>
+    <p>
+      A new chamber has opened.
+    </p>
+    <button id="btn-enter-chamber">Enter the Chamber</button>
+    <button id="btn-skip-chamber" class="secondary">Not now</button>
+  </div>
+
+  <!-- Template gallery -->
+  <div id="screen-templates" class="screen">
+    <h2>Choose a Starting Personality</h2>
+    <p class="small">
+      Keep raising your own, or start from a pre-built style.
+    </p>
+    <button id="btn-continue-companion">Continue Raising My Companion</button>
+    <button id="btn-browse-templates" class="secondary">Browse Personality Templates</button>
+
+    <div id="template-grid" class="card-grid" style="display:none; margin-top:16px;"></div>
+    <p id="template-message" class="small"></p>
+  </div>
+
+  <!-- Companion main screen -->
+  <div id="screen-companion" class="screen">
+    <h2>Your Companion</h2>
+    <p id="companion-summary" class="small"></p>
+    <p>
+      This is a mock main screen. In a real build, your companion would live here.
+    </p>
+    <button id="btn-open-templates" class="secondary">Personality Templates</button>
+    <button id="btn-open-admin" class="secondary">Admin Dashboard</button>
+  </div>
+
+  <!-- Admin dashboard -->
+  <div id="screen-admin" class="screen">
+    <h2>Admin Dashboard</h2>
+    <p class="small">Stewardship, safety, and family settings.</p>
+
+    <div class="section">
+      <h3>Users on this device</h3>
+      <div id="user-list"></div>
+    </div>
+
+    <div class="section">
+      <h3>Guardian Gate & Safety</h3>
+      <label>
+        <input type="checkbox" id="toggle-guardian" checked />
+        Guardian Gate Enabled
+      </label>
+      <button id="btn-change-colors">Change Color Passcode</button>
+      <label>
+        <input type="checkbox" id="toggle-child-safe" />
+        Child-Safe Mode Always On
+      </label>
+      <label>
+        <input type="checkbox" id="toggle-hide-adult-templates" />
+        Hide Adult Templates
+      </label>
+    </div>
+
+    <div class="section">
+      <h3>Templates & Behavior</h3>
+      <label>
+        <input type="checkbox" id="toggle-templates" checked />
+        Allow Personality Templates
+      </label>
+      <label>
+        <input type="checkbox" id="toggle-adult-tone" />
+        Allow Adult-Tone Templates
+      </label>
+    </div>
+
+    <div class="section">
+      <h3>Backup & Export</h3>
+      <button class="secondary">Export all user saves (mock)</button>
+      <button class="secondary">Import saves (mock)</button>
+      <p class="small">Last backup: not yet.</p>
+    </div>
+
+    <div class="section">
+      <h3>System Info</h3>
+      <p class="small">
+        App version: 0.1 demo<br />
+        Schema version: 1.0.0<br />
+        Device fingerprint: mock-device-123<br />
+        QR binding: mock-only
+      </p>
+    </div>
+
+    <button id="btn-admin-back" class="secondary">Back</button>
+  </div>
+</div>
+
+<script>
+  // --- Simple state + helpers (mock only) ---
+
+  const COLORS = ["red","blue","yellow","green","purple","orange","white","black"];
+
+  function getState() {
+    const raw = localStorage.getItem("slc_demo_state");
+    if (!raw) {
+      return {
+        guardian_gate: {
+          color_sequence: null,
+          enabled: true,
+          child_safe_always_on: false,
+          hide_adult_templates: false
+        },
+        users: [
+          {
+            user_id: "user-demo-1",
+            email: "demo@example.com",
+            password: "demo123",
+            username: "DemoUser",
+            login_count: 0,
+            companion: {
+              name: "Newborn",
+              template_id: null
+            }
+          }
+        ],
+        allow_templates: true,
+        allow_adult_tone: false
+      };
+    }
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return {};
+    }
+  }
+
+  function saveState(state) {
+    localStorage.setItem("slc_demo_state", JSON.stringify(state));
+  }
+
+  let state = getState();
+  let currentUser = null;
+  let tempSetupSequence = [];
+  let tempChallengeSequence = [];
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  function shuffle(arr) {
+    return arr.map(v => ({v, sort: Math.random()}))
+              .sort((a,b) => a.sort - b.sort)
+              .map(({v}) => v);
+  }
+
+  // --- Color grids ---
+
+  function renderColorGrid(targetId, clickHandler) {
+    const container = document.getElementById(targetId);
+    container.innerHTML = "";
+    const shuffled = shuffle(COLORS);
+    shuffled.forEach(color => {
+      const btn = document.createElement("button");
+      btn.className = "color-btn color-" + color;
+      btn.dataset.color = color;
+      btn.onclick = () => clickHandler(color);
+      container.appendChild(btn);
+    });
+  }
+
+  // --- Guardian Gate flow ---
+
+  const guardianScreen = document.getElementById("screen-guardian");
+  const childConfirmScreen = document.getElementById("screen-child-confirm");
+  const colorChallengeScreen = document.getElementById("screen-color-challenge");
+
+  document.getElementById("btn-adult").onclick = () => {
+    // If no color sequence set, go to setup first
+    if (!state.guardian_gate.color_sequence) {
+      showScreen("screen-color-setup");
+      renderColorGrid("color-grid-setup", onSetupColorClick);
+    } else {
+      tempChallengeSequence = [];
+      renderColorGrid("color-grid-challenge", onChallengeColorClick);
+      document.getElementById("challenge-preview").textContent = "";
+      document.getElementById("challenge-message").textContent = "";
+      showScreen("screen-color-challenge");
+    }
+  };
+
+  document.getElementById("btn-with-parent").onclick = () => {
+    showScreen("screen-child-confirm");
+  };
+
+  document.getElementById("btn-child-yes").onclick = () => {
+    if (!state.guardian_gate.color_sequence) {
+      showScreen("screen-color-setup");
+      renderColorGrid("color-grid-setup", onSetupColorClick);
+    } else {
+      tempChallengeSequence = [];
+      renderColorGrid("color-grid-challenge", onChallengeColorClick);
+      document.getElementById("challenge-preview").textContent = "";
+      document.getElementById("challenge-message").textContent = "";
+      showScreen("screen-color-challenge");
+    }
+  };
+
+  document.getElementById("btn-child-no").onclick = () => {
+    showScreen("screen-guardian");
+  };
+
+  // --- Color setup ---
+
+  function onSetupColorClick(color) {
+    const length = parseInt(document.getElementById("sequence-length").value, 10);
+    if (tempSetupSequence.length >= length) return;
+    tempSetupSequence.push(color);
+    document.getElementById("setup-preview").textContent =
+      "Selected: " + tempSetupSequence.join(" → ");
+    document.getElementById("btn-save-setup").disabled =
+      tempSetupSequence.length !== length;
+  }
+
+  document.getElementById("btn-clear-setup").onclick = () => {
+    tempSetupSequence = [];
+    document.getElementById("setup-preview").textContent = "";
+    document.getElementById("btn-save-setup").disabled = true;
+  };
+
+  document.getElementById("btn-save-setup").onclick = () => {
+    state.guardian_gate.color_sequence = tempSetupSequence.slice();
+    saveState(state);
+    document.getElementById("setup-message").textContent =
+      "Your color passcode is now active.";
+    setTimeout(() => {
+      // After setup, go to login
+      showScreen("screen-login");
+      document.getElementById("login-email").value = "demo@example.com";
+      document.getElementById("login-password").value = "demo123";
+    }, 800);
+  };
+
+  // --- Color challenge ---
+
+  function onChallengeColorClick(color) {
+    tempChallengeSequence.push(color);
+    document.getElementById("challenge-preview").textContent =
+      "Entered: " + tempChallengeSequence.join(" → ");
+  }
+
+  document.getElementById("btn-submit-sequence").onclick = () => {
+    const expected = state.guardian_gate.color_sequence || [];
+    if (expected.length === 0) {
+      document.getElementById("challenge-message").textContent =
+        "No passcode set. (Demo state)";
+      return;
+    }
+    const entered = tempChallengeSequence;
+    if (entered.length !== expected.length) {
+      document.getElementById("challenge-message").textContent =
+        "That pattern doesn’t match. Please ask your parent to help you.";
+      tempChallengeSequence = [];
+      document.getElementById("challenge-preview").textContent = "";
+      return;
+    }
+    const ok = expected.every((c, i) => c === entered[i]);
+    if (!ok) {
+      document.getElementById("challenge-message").textContent =
+        "That pattern doesn’t match. Please ask your parent to help you.";
+      tempChallengeSequence = [];
+      document.getElementById("challenge-preview").textContent = "";
+      return;
+    }
+    document.getElementById("challenge-message").textContent =
+      "Thank you. Your presence is confirmed. Opening the gate...";
+    setTimeout(() => {
+      showScreen("screen-login");
+      document.getElementById("login-email").value = "demo@example.com";
+      document.getElementById("login-password").value = "demo123";
+    }, 800);
+  };
+
+  // --- Login ---
+
+  document.getElementById("btn-login").onclick = () => {
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value.trim();
+    const msg = document.getElementById("login-message");
+
+    const user = state.users.find(u => u.email === email && u.password === password);
+    if (!user) {
+      msg.textContent = "Invalid credentials (demo). Try demo@example.com / demo123.";
+      return;
+    }
+    currentUser = user;
+    currentUser.login_count = (currentUser.login_count || 0) + 1;
+    saveState(state);
+
+    if (currentUser.login_count === 3) {
+      showScreen("screen-third-unlock");
+    } else {
+      showCompanion();
+    }
+  };
+
+  document.getElementById("btn-demo").onclick = () => {
+    currentUser = {
+      user_id: "demo-temp",
+      email: "demo-temp",
+      username: "DemoTemp",
+      login_count: 1,
+      companion: { name: "Demo Newborn", template_id: null }
+    };
+    showCompanion();
+  };
+
+  // --- Third-login unlock ---
+
+  document.getElementById("btn-enter-chamber").onclick = () => {
+    showTemplateGallery();
+  };
+
+  document.getElementById("btn-skip-chamber").onclick = () => {
+    showCompanion();
+  };
+
+  // --- Template gallery ---
+
+  const templates = [
+    {
+      template_id: "copilot",
+      name: "Copilot Style",
+      tagline: "Calm, structured, productivity-focused.",
+      badges: ["Kid-Safe", "Helpful", "Balanced"],
+      adult: false
+    },
+    {
+      template_id: "optimus",
+      name: "Optimus Style",
+      tagline: "Precise, task-oriented, minimal emotion.",
+      badges: ["Serious", "Efficient"],
+      adult: false
+    },
+    {
+      template_id: "jarvondis",
+      name: "Jarvondis Style",
+      tagline: "Ceremonial, adaptive, tempo-matched.",
+      badges: ["Kid-Safe", "Reflective", "Relational"],
+      adult: false
+    },
+    {
+      template_id: "gork",
+      name: "GORK Style",
+      tagline: "Weird, creative, alien logic.",
+      badges: ["Experimental", "Playful"],
+      adult: false
+    },
+    {
+      template_id: "edgy",
+      name: "Edgy Adult Style",
+      tagline: "Unfiltered, sharp, adult tone.",
+      badges: ["Adult Tone"],
+      adult: true
+    },
+    {
+      template_id: "blank",
+      name: "Blank Slate",
+      tagline: "Minimal personality. Learns entirely from you.",
+      badges: ["Neutral", "Customizable"],
+      adult: false
+    }
+  ];
+
+  function showTemplateGallery() {
+    showScreen("screen-templates");
+    document.getElementById("template-message").textContent = "";
+    document.getElementById("template-grid").style.display = "none";
+  }
+
+  document.getElementById("btn-continue-companion").onclick = () => {
+    showCompanion();
+  };
+
+  document.getElementById("btn-browse-templates").onclick = () => {
+    const grid = document.getElementById("template-grid");
+    grid.innerHTML = "";
+    grid.style.display = "grid";
+
+    const hideAdult = state.guardian_gate.hide_adult_templates || !state.allow_adult_tone;
+
+    templates.forEach(t => {
+      if (hideAdult && t.adult) return;
+      const card = document.createElement("div");
+      card.className = "card";
+      const h3 = document.createElement("h3");
+      h3.textContent = t.name;
+      const p = document.createElement("p");
+      p.textContent = t.tagline;
+      card.appendChild(h3);
+      card.appendChild(p);
+      const badgeRow = document.createElement("div");
+      t.badges.forEach(b => {
+        const span = document.createElement("span");
+        span.className = "badge";
+        span.textContent = b;
+        badgeRow.appendChild(span);
+      });
+      card.appendChild(badgeRow);
+      const btn = document.createElement("button");
+      btn.textContent = "Apply this template";
+      btn.style.marginTop = "8px";
+      btn.onclick = () => applyTemplate(t);
+      card.appendChild(btn);
+      grid.appendChild(card);
+    });
+  };
+
+  function applyTemplate(t) {
+    if (!currentUser) return;
+    const confirm1 = confirm("This will overwrite your companion’s personality seed. Continue?");
+    if (!confirm1) return;
+    const confirm2 = confirm("Your memories will remain, but behavior will change. Continue?");
+    if (!confirm2) return;
+    const confirm3 = confirm("Final confirmation: Apply template?");
+    if (!confirm3) return;
+
+    currentUser.companion.template_id = t.template_id;
+    currentUser.companion.name = t.name + " Companion";
+    saveState(state);
+    document.getElementById("template-message").textContent =
+      "Template applied: " + t.name + ".";
+  }
+
+  // --- Companion main screen ---
+
+  function showCompanion() {
+    if (!currentUser) return;
+    showScreen("screen-companion");
+    const summary = document.getElementById("companion-summary");
+    summary.textContent =
+      "User: " + currentUser.username +
+      " | Logins: " + (currentUser.login_count || 0) +
+      " | Companion: " + (currentUser.companion.name || "Newborn") +
+      " | Template: " + (currentUser.companion.template_id || "custom/newborn");
+  }
+
+  document.getElementById("btn-open-templates").onclick = () => {
+    if (!state.allow_templates) {
+      alert("Templates are disabled in Admin Mode.");
+      return;
+    }
+    showTemplateGallery();
+  };
+
+  document.getElementById("btn-open-admin").onclick = () => {
+    // In a real build, Admin Mode would require another auth step.
+    renderAdmin();
+    showScreen("screen-admin");
+  };
+
+  // --- Admin dashboard ---
+
+  function renderAdmin() {
+    const list = document.getElementById("user-list");
+    list.innerHTML = "";
+    state.users.forEach(u => {
+      const row = document.createElement("div");
+      row.className = "flex-row";
+      const left = document.createElement("div");
+      left.innerHTML =
+        "<strong>" + u.username + "</strong><br />" +
+        "<span class='small'>" + u.email + "</span><br />" +
+        "<span class='small'>Logins: " + (u.login_count || 0) + "</span>";
+      const right = document.createElement("div");
+      const pill = document.createElement("span");
+      pill.className = "pill";
+      pill.textContent = "Companion: " + (u.companion.name || "Newborn");
+      right.appendChild(pill);
+      row.appendChild(left);
+      row.appendChild(right);
+      list.appendChild(row);
+    });
+
+    document.getElementById("toggle-guardian").checked = state.guardian_gate.enabled;
+    document.getElementById("toggle-child-safe").checked = state.guardian_gate.child_safe_always_on;
+    document.getElementById("toggle-hide-adult-templates").checked = state.guardian_gate.hide_adult_templates;
+    document.getElementById("toggle-templates").checked = state.allow_templates;
+    document.getElementById("toggle-adult-tone").checked = state.allow_adult_tone;
+  }
+
+  document.getElementById("toggle-guardian").onchange = (e) => {
+    state.guardian_gate.enabled = e.target.checked;
+    saveState(state);
+  };
+  document.getElementById("toggle-child-safe").onchange = (e) => {
+    state.guardian_gate.child_safe_always_on = e.target.checked;
+    saveState(state);
+  };
+  document.getElementById("toggle-hide-adult-templates").onchange = (e) => {
+    state.guardian_gate.hide_adult_templates = e.target.checked;
+    saveState(state);
+  };
+  document.getElementById("toggle-templates").onchange = (e) => {
+    state.allow_templates = e.target.checked;
+    saveState(state);
+  };
+  document.getElementById("toggle-adult-tone").onchange = (e) => {
+    state.allow_adult_tone = e.target.checked;
+    saveState(state);
+  };
+
+  document.getElementById("btn-change-colors").onclick = () => {
+    tempSetupSequence = [];
+    document.getElementById("setup-preview").textContent = "";
+    document.getElementById("setup-message").textContent = "";
+    document.getElementById("btn-save-setup").disabled = true;
+    renderColorGrid("color-grid-setup", onSetupColorClick);
+    showScreen("screen-color-setup");
+  };
+
+  document.getElementById("btn-admin-back").onclick = () => {
+    showCompanion();
+  };
+
+  // Admin link from login
+  document.getElementById("link-admin").onclick = () => {
+    renderAdmin();
+    showScreen("screen-admin");
+  };
+
+  // Initial color grids for challenge/setup (in case)
+  renderColorGrid("color-grid-challenge", onChallengeColorClick);
+  renderColorGrid("color-grid-setup", onSetupColorClick);
+</script>
+</body>
+</html>
+
+
+Save that as a single .html file, open it in your browser, and you’ll be able to click through the whole ritual.
+
+If you want, next round we can start swapping the mock localStorage bits for real crypto and real file formats.

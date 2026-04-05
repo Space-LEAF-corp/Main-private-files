@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space LEAF Corp – AI News Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-alt: #0b1020;
+      --accent: #4af2c5;
+      --accent-soft: rgba(74, 242, 197, 0.15);
+      --text: #f5f7ff;
+      --muted: #a0a7c2;
+      --danger: #ff6b81;
+      --card-radius: 14px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      --mono: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #151b3a 0, #050814 55%, #02030a 100%);
+      color: var(--text);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .frame {
+      width: 100%;
+      max-width: 1100px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.6));
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(18px);
+    }
+
+    header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff 0, #4af2c5 35%, #1b7cff 70%, #050814 100%);
+      box-shadow: 0 0 18px rgba(74, 242, 197, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-logo::after {
+      content: "";
+      position: absolute;
+      inset: 18% 18%;
+      border-radius: 50%;
+      border: 2px solid rgba(5, 8, 20, 0.9);
+    }
+
+    .brand-text-main {
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+
+    .brand-text-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff4f6a;
+      box-shadow: 0 0 10px rgba(255, 79, 106, 0.9);
+      animation: pulse 1.4s infinite;
+    }
+
+    .status-label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-weight: 600;
+      color: #ffb3c0;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.4; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 0;
+      min-height: 420px;
+    }
+
+    @media (max-width: 880px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      padding: 18px 22px 20px;
+    }
+
+    .panel + .panel {
+      border-left: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    @media (max-width: 880px) {
+      .panel + .panel {
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 6px;
+    }
+
+    .tab {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      transition: all 0.16s ease-out;
+    }
+
+    .tab span.icon {
+      font-size: 0.9rem;
+    }
+
+    .tab.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(74, 242, 197, 0.6);
+      box-shadow: 0 0 0 1px rgba(74, 242, 197, 0.25);
+    }
+
+    .tab:not(.active):hover {
+      background: rgba(255, 255, 255, 0.03);
+      border-color: rgba(255, 255, 255, 0.08);
+      color: #d7ddff;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .headline {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .subline {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .live-window {
+      background: radial-gradient(circle at top left, rgba(74, 242, 197, 0.16), rgba(0, 0, 0, 0.9));
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 12px 10px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .live-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.8rem;
+    }
+
+    .live-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.7rem;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff4f6a;
+      box-shadow: 0 0 10px rgba(255, 79, 106, 0.9);
+    }
+
+    .live-meta {
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    .live-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .live-meta small {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .live-body {
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 10px;
+      padding: 10px 10px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .live-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .live-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .live-body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+    }
+
+    .speaker-tag {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .speaker-tag strong {
+      color: var(--accent);
+    }
+
+    .live-line {
+      margin-bottom: 6px;
+    }
+
+    .live-line span.label {
+      font-weight: 600;
+      color: #e5e9ff;
+      margin-right: 4px;
+    }
+
+    .live-line span.text {
+      color: #d3dcff;
+    }
+
+    .live-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .privacy-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .privacy-pill span.icon {
+      font-size: 0.9rem;
+    }
+
+    .privacy-pill strong {
+      color: #f7f0ff;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .privacy-pill small {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--text);
+      font-size: 0.78rem;
+      padding: 6px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.16s ease-out;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #4af2c5, #1b7cff);
+      border-color: rgba(74, 242, 197, 0.9);
+      color: #02030a;
+      font-weight: 600;
+      box-shadow: 0 0 0 1px rgba(74, 242, 197, 0.4), 0 10px 22px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-0.5px);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn.small {
+      padding: 4px 8px;
+      font-size: 0.72rem;
+    }
+
+    .btn .icon {
+      font-size: 0.9rem;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .hint code {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 2px 5px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .side-card {
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: var(--card-radius);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 12px 12px 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.6);
+    }
+
+    .side-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .side-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--muted);
+    }
+
+    .side-body {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .side-body strong {
+      color: #e5e9ff;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #d7ddff;
+    }
+
+    .demo-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 0.78rem;
+    }
+
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.08);
+      transition: 0.2s;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 2px;
+      background-color: #f5f7ff;
+      transition: 0.2s;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .toggle input:checked + .slider {
+      background: linear-gradient(135deg, #4af2c5, #1b7cff);
+      border-color: rgba(74, 242, 197, 0.9);
+    }
+
+    .toggle input:checked + .slider:before {
+      transform: translateX(16px);
+    }
+
+    footer {
+      padding: 10px 18px 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    footer strong {
+      color: #e5e9ff;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .footer-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .footer-pill small {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .footer-pill span.icon {
+      margin-right: 4px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <header>
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"></div>
+        <div>
+          <div class="brand-text-main">Space LEAF Corp</div>
+          <div class="brand-text-sub">AI News Demo · Jarvondis × Whiskers</div>
+        </div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span class="status-label">Demo Channel</span>
+        <span>AI‐narrated, privacy‐protected feed</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- LEFT: Live feed -->
+      <section class="panel">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="live" role="tab" aria-selected="true">
+            <span class="icon">📡</span>
+            <span>Live Feed</span>
+          </button>
+          <button class="tab" data-tab="archive" role="tab" aria-selected="false">
+            <span class="icon">🎞️</span>
+            <span>Archive Clips</span>
+          </button>
+          <button class="tab" data-tab="about" role="tab" aria-selected="false">
+            <span class="icon">i️</span>
+            <span>About This Demo</span>
+          </button>
+        </div>
+
+        <!-- LIVE TAB -->
+        <div id="tab-live" class="tab-panel">
+          <div class="section-title">Jarvondis feed · Whiskers narration</div>
+          <div class="headline">Cosmic traffic calm · All lanes green</div>
+          <div class="subline">
+            You’re viewing a <strong>simulated</strong> Space LEAF Corp AI news window. No real‐world data, no tracking—just the vibe.
+          </div>
+
+          <div class="live-window" aria-live="polite">
+            <div class="live-header">
+              <div class="live-tag">
+                <span class="live-dot"></span>
+                <span>On Air</span>
+              </div>
+              <div class="live-meta">
+                <span><small>Mode</small> <strong id="mode-label">Demo</strong></span>
+                <span><small>Narrator</small> Whiskers 🐾</span>
+              </div>
+            </div>
+
+            <div class="live-body" id="live-body">
+              <div class="speaker-tag">
+                <strong>Whiskers:</strong> Privacy‐safe narration of Jarvondis telemetry
+              </div>
+
+              <div class="live-line">
+                <span class="label">[00:00:03]</span>
+                <span class="text">
+                  Good evening, captains and couch‐commanders. Jarvondis reports orbital calm—no rogue satellites, no grumpy asteroids.
+                </span>
+              </div>
+
+              <div class="live-line">
+                <span class="label">[00:00:09]</span>
+                <span class="text">
+                  All personal details are scrubbed, sanded, and tucked away. You get the story, not the identities.
+                </span>
+              </div>
+
+              <div class="live-line">
+                <span class="label">[00:00:15]</span>
+                <span class="text">
+                  In kid‐speak: the sky highways are clear, the ships are sharing, and everyone’s using their turn signals.
+                </span>
+              </div>
+
+              <div class="live-line">
+                <span class="label">[00:00:22]</span>
+                <span class="text">
+                  This demo is running on a local script. In production, this box would stream a filtered version of the captain’s log.
+                </span>
+              </div>
+            </div>
+
+            <div class="live-footer">
+              <div class="privacy-pill">
+                <span class="icon">🛡️</span>
+                <div>
+                  <strong>Privacy Shield</strong><br />
+                  <small>Whiskers redacts faces, names, and coordinates before anything reaches this window.</small>
+                </div>
+              </div>
+              <div class="controls">
+                <button class="btn secondary small" id="btn-random">
+                  <span class="icon">🎲</span>
+                  <span>New Demo Line</span>
+                </button>
+                <button class="btn primary small" id="btn-clear">
+                  <span class="icon">🧹</span>
+                  <span>Clear Log</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hint">
+            To wire this up later, point your backend stream at a safe endpoint and pipe it into
+            <code>#live-body</code> after Whiskers has done the redaction.
+          </div>
+        </div>
+
+        <!-- ARCHIVE TAB -->
+        <div id="tab-archive" class="tab-panel hidden">
+          <div class="section-title">Archive clips</div>
+          <div class="headline">Previously on Space LEAF Corp...</div>
+          <div class="subline">
+            These are placeholder “clips” to show how short, safe segments could be listed for replay.
+          </div>
+
+          <div class="side-card">
+            <div class="side-header">
+              <div class="side-title">Episode 01 · The Polite Meteor Shower</div>
+              <span class="chip">00:42 · Kid‐safe</span>
+            </div>
+            <div class="side-body">
+              Whiskers explains how Jarvondis negotiated with a cluster of meteors to <strong>reschedule</strong> their dramatic entrance
+              so no satellites got bonked.
+            </div>
+            <div class="badge-row">
+              <span class="badge">🧒 Family‐friendly</span>
+              <span class="badge">🛡️ Redacted</span>
+              <span class="badge">📡 Orbital etiquette</span>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <div class="side-header">
+              <div class="side-title">Episode 02 · The Lost Lunchbox in Low Orbit</div>
+              <span class="chip">01:13 · Gentle comedy</span>
+            </div>
+            <div class="side-body">
+              A drifting toolbox becomes a “lunchbox” in Whiskers’ retelling, turning a minor maintenance hiccup into a teachable moment
+              about <strong>tether safety</strong>.
+            </div>
+            <div class="badge-row">
+              <span class="badge">🎭 Soft humor</span>
+              <span class="badge">🧰 Safety lesson</span>
+              <span class="badge">🚫 No faces, no names</span>
+            </div>
+          </div>
+
+          <div class="hint">
+            Later, you can replace these cards with real entries from a database or CMS, each pointing to a short, narrated clip.
+          </div>
+        </div>
+
+        <!-- ABOUT TAB -->
+        <div id="tab-about" class="tab-panel hidden">
+          <div class="section-title">What you’re seeing</div>
+          <div class="headline">A TV‐style window into a safe universe</div>
+          <div class="subline">
+            This page pretends to be a “channel” on a streaming service, but it’s really a controlled AI demo.
+          </div>
+
+          <div class="side-card">
+            <div class="side-header">
+              <div class="side-title">Roles in this window</div>
+              <span class="chip">Concept map</span>
+            </div>
+            <div class="side-body">
+              <strong>Jarvondis</strong> watches the sky and the systems.  
+              <strong>Whiskers</strong> turns that raw awareness into kid‐safe, privacy‐protected narration.  
+              The viewer only ever sees what passes through Whiskers’ filter.
+            </div>
+            <div class="badge-row">
+              <span class="badge">🛰️ Situational awareness</span>
+              <span class="badge">🐾 Narration layer</span>
+              <span class="badge">🛡️ Privacy‐first</span>
+            </div>
+          </div>
+
+          <div class="side-card">
+            <div class="side-header">
+              <div class="side-title">How to integrate later</div>
+              <span class="chip">Developer notes</span>
+            </div>
+            <div class="side-body">
+              - Stream your internal “captain’s log” into a backend service.  
+              - Run it through a redaction + narration layer (Whiskers).  
+              - Push the safe text into this component via WebSocket or SSE.
+            </div>
+            <div class="badge-row">
+              <span class="badge">🔌 Pluggable backend</span>
+              <span class="badge">🌐 WebSocket‐ready</span>
+              <span class="badge">🧱 Simple HTML shell</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Demo controls / explainer -->
+      <aside class="panel">
+        <div class="section-title">Channel controls</div>
+        <div class="headline">AI News · Demo Mode</div>
+        <div class="subline">
+          Flip this between <strong>Demo</strong> and “Pretend Live” to feel how the channel might behave on a TV‐style app.
+        </div>
+
+        <div class="side-card">
+          <div class="side-header">
+            <div class="side-title">Demo vs. Live</div>
+            <span class="chip">Safe by default</span>
+          </div>
+          <div class="side-body">
+            In <strong>Demo</strong>, all lines are canned and local.  
+            In a future <strong>Live</strong> mode, this same box could show real‐time, redacted updates from Jarvondis.
+          </div>
+
+          <div class="demo-toggle">
+            <span>Demo mode only (no real data)</span>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-mode" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="side-header">
+            <div class="side-title">Narration contract</div>
+            <span class="chip">Whiskers’ job</span>
+          </div>
+          <div class="side-body">
+            Whiskers promises:
+            <ul style="margin: 6px 0 0 18px; padding: 0; font-size: 0.78rem;">
+              <li>Never show faces, names, or exact locations.</li>
+              <li>Translate technical chaos into gentle story.</li>
+              <li>Keep kids safe and adults informed.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="side-card">
+          <div class="side-header">
+            <div class="side-title">Where this could live</div>
+            <span class="chip">Site navigation</span>
+          </div>
+          <div class="side-body">
+            On your main site, this could appear as:
+            <ul style="margin: 6px 0 0 18px; padding: 0; font-size: 0.78rem;">
+              <li><strong>AI News</strong> tab next to “Comedy” or “Kids”.</li>
+              <li>A “Live Now” badge when Jarvondis is broadcasting.</li>
+              <li>A passive, cozy channel parents can leave on safely.</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div>
+        <strong>Space LEAF Corp · AI News Demo</strong><br />
+        <span>All content on this page is simulated for testing. No real telemetry, no personal data.</span>
+      </div>
+      <div class="footer-right">
+        <div class="footer-pill">
+          <span class="icon">🐾</span>
+          <small>Whiskers narrates · Jarvondis observes</small>
+        </div>
+        <a href="#!" aria-label="Placeholder link for main site">Back to main site</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Simple tab switching
+    const tabs = document.querySelectorAll(".tab");
+    const panels = document.querySelectorAll(".tab-panel");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.getAttribute("data-tab");
+
+        tabs.forEach((t) => {
+          t.classList.toggle("active", t === tab);
+          t.setAttribute("aria-selected", t === tab ? "true" : "false");
+        });
+
+        panels.forEach((panel) => {
+          panel.classList.toggle("hidden", panel.id !== "tab-" + target);
+        });
+      });
+    });
+
+    // Demo mode toggle (purely cosmetic for now)
+    const modeToggle = document.getElementById("toggle-mode");
+    const modeLabel = document.getElementById("mode-label");
+    const liveBody = document.getElementById("live-body");
+
+    modeToggle.addEventListener("change", () => {
+      if (modeToggle.checked) {
+        modeLabel.textContent = "Pretend Live";
+        appendLine(
+          "[mode]",
+          "Switching to pretend live mode. In a real deployment, this would connect to a safe, filtered stream."
+        );
+      } else {
+        modeLabel.textContent = "Demo";
+        appendLine(
+          "[mode]",
+          "Back to canned demo lines. Nothing here is coming from outside this file."
+        );
+      }
+    });
+
+    // Demo: add random lines
+    const randomBtn = document.getElementById("btn-random");
+    const clearBtn = document.getElementById("btn-clear");
+
+    const demoLines = [
+      "Jarvondis notes a minor wobble in a passing satellite. Whiskers translates: ‘It sneezed. It’s fine.’",
+      "A cluster of signals just agreed to share bandwidth instead of shouting. Whiskers calls it ‘cosmic turn‐taking’.",
+      "No collisions, no leaks, no drama. Whiskers recommends hot cocoa and a blanket for all ground crews.",
+      "A maintenance drone just waved—metaphorically—at mission control. Whiskers logs it as ‘morale: high’.",
+      "Jarvondis spotted a beautiful aurora. Whiskers redacts the coordinates and leaves you with the feeling, not the map.",
+      "All critical systems are green. Whiskers reminds everyone: ‘Safety is the real special effect.’"
+    ];
+
+    function appendLine(label, text) {
+      const line = document.createElement("div");
+      line.className = "live-line";
+
+      const labelSpan = document.createElement("span");
+      labelSpan.className = "label";
+      labelSpan.textContent = label;
+
+      const textSpan = document.createElement("span");
+      textSpan.className = "text";
+      textSpan.textContent = " " + text;
+
+      line.appendChild(labelSpan);
+      line.appendChild(textSpan);
+
+      liveBody.appendChild(line);
+      liveBody.scrollTop = liveBody.scrollHeight;
+    }
+
+    randomBtn.addEventListener("click", () => {
+      const idx = Math.floor(Math.random() * demoLines.length);
+      const timestamp = new Date().toLocaleTimeString("en-US", { hour12: false });
+      appendLine("[" + timestamp + "]", demoLines[idx]);
+    });
+
+    clearBtn.addEventListener("click", () => {
+      const lines = liveBody.querySelectorAll(".live-line");
+      lines.forEach((l, i) => {
+        if (i > 2) l.remove(); // keep the first few intro lines
+      });
+      appendLine("[system]", "Log trimmed for clarity. Whiskers keeps only what you actually need.");
+    });
+  </script>
+</body>
+</html>

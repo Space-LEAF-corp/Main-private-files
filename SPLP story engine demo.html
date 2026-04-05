@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Leif Park × South Park Story Engine</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: #eee;
+        padding: 20px;
+    }
+    input, textarea, button {
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        font-size: 16px;
+    }
+    button {
+        background: #4caf50;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #45a049;
+    }
+    .engine-output {
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        white-space: pre-wrap;
+    }
+</style>
+</head>
+<body>
+
+<h1>Chaotic Grounded Story Engine</h1>
+<p>Enter your prompts and generate three different story versions.</p>
+
+<label>Movie Title</label>
+<input id="titleInput" placeholder="Enter the movie title">
+
+<label>Sub‐Plot</label>
+<input id="subplotInput" placeholder="Enter the subplot">
+
+<label>Extra Details</label>
+<textarea id="detailsInput" placeholder="Enter extra details"></textarea>
+
+<button onclick="generateStories()">Generate Story Variants</button>
+
+<div id="output1" class="engine-output"></div>
+<div id="output2" class="engine-output"></div>
+<div id="output3" class="engine-output"></div>
+
+<script>
+function generateStories() {
+    const title = document.getElementById("titleInput").value;
+    const subplot = document.getElementById("subplotInput").value;
+    const details = document.getElementById("detailsInput").value;
+
+    // Engine 1 — Chaotic South Park Logic
+    const engine1 = `
+🔥 CHAOTIC ENGINE (South Park Logic)
+
+Title: ${title}
+Sub‐Plot: ${subplot}
+
+In classic South Park fashion, everything goes sideways immediately.
+The kids misunderstand the entire premise, Cartman weaponizes the idea,
+Kyle tries to stop him, Stan is reluctantly involved, and Kenny is the
+only one who actually understands the ${details} part — but nobody listens.
+
+The town panics, Randy makes it worse, and the situation spirals into
+a ridiculous chain reaction that somehow still lands emotionally.`;
+
+
+    // Engine 2 — Grounded Leif Park Logic
+    const engine2 = `
+🌱 GROUNDED ENGINE (Leif Park Logic)
+
+Title: ${title}
+Sub‐Plot: ${subplot}
+
+This version treats the story with calm structure and ceremonial logic.
+The ${details} element becomes a stabilizing force rather than chaos.
+The kids from Leif Park approach the situation with curiosity,
+emotional grounding, and a sense of stewardship.
+
+The conflict resolves through clarity, communication, and a subtle
+moment of humor that honors both worlds.`;
+
+
+    // Engine 3 — Hybrid Dimension Engine Logic
+    const engine3 = `
+🌀 DIMENSION ENGINE (Hybrid Logic)
+
+Title: ${title}
+Sub‐Plot: ${subplot}
+
+The story unfolds across two parallel interpretations:
+South Park's chaotic version and Leif Park's structured version.
+The ${details} component becomes the dimensional hinge point.
+
+Scenes flicker between tones — absurdity in one dimension,
+ceremony in the other — until the Dimension Engine stabilizes
+the narrative and both worlds acknowledge each other without merging.`;
+
+
+    document.getElementById("output1").textContent = engine1;
+    document.getElementById("output2").textContent = engine2;
+    document.getElementById("output3").textContent = engine3;
+}
+</script>
+
+</body>
+</html>
