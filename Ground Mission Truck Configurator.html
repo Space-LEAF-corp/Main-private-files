@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ground Mission Truck Configurator</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#0b0f14; color:#f5f5f5; margin:0; padding:20px; }
+    h1, h2 { margin:0 0 10px; }
+    .grid { display:grid; grid-template-columns: 1.2fr 1fr; gap:20px; }
+    .card { background:#141a22; padding:15px; border-radius:8px; border:1px solid #222b36; }
+    label { display:block; margin:6px 0 2px; font-size:0.9rem; }
+    input, select { width:100%; padding:6px; border-radius:4px; border:1px solid #333; background:#0f141b; color:#f5f5f5; }
+    .row { display:flex; gap:10px; }
+    .row > div { flex:1; }
+    .modules { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    .module-pill { padding:6px 10px; border-radius:999px; border:1px solid #444; font-size:0.8rem; cursor:pointer; }
+    .module-pill.active { background:#1f8fff; border-color:#1f8fff; }
+    button { padding:8px 14px; border-radius:4px; border:none; cursor:pointer; font-weight:600; }
+    .primary { background:#1f8fff; color:#fff; }
+    .secondary { background:#222b36; color:#f5f5f5; }
+    textarea { width:100%; height:140px; background:#05070a; color:#9fe3ff; border-radius:4px; border:1px solid #333; padding:8px; font-family:monospace; font-size:0.8rem; }
+  </style>
+</head>
+<body>
+  <h1>Ground Mission Truck — Digital Blueprint</h1>
+  <p>Configure your Earth‐mode mission truck, name your PNI guardian, and export a buildable blueprint.</p>
+
+  <div class="grid">
+    <!-- LEFT: CONFIG -->
+    <div class="card">
+      <h2>Core Identity</h2>
+      <label>Vehicle Name</label>
+      <input id="vehicleName" placeholder="e.g. SFT‐Ground Mk.I" />
+
+      <label>PNI Guardian Name</label>
+      <input id="pniName" placeholder="e.g. Aurora, Atlas, Willow" />
+
+      <div class="row">
+        <div>
+          <label>Primary Body Color</label>
+          <input id="bodyColor" type="color" value="#1f8fff" />
+        </div>
+        <div>
+          <label>Accent Color</label>
+          <input id="accentColor" type="color" value="#ffb347" />
+        </div>
+      </div>
+
+      <h2>Mission Modules</h2>
+      <div class="modules" id="modulesGround">
+        <!-- toggle pills -->
+      </div>
+
+      <h2>Accounts & Networks (Placeholders)</h2>
+      <label>Gaming / Platform Link</label>
+      <input id="gamingAccount" placeholder="e.g. Xbox / PSN / Steam ID" />
+
+      <label>Secure Spider Frame Network ID</label>
+      <input id="spiderId" placeholder="e.g. family‐cluster‐alpha" />
+
+      <div style="margin-top:12px; display:flex; gap:10px;">
+        <button class="primary" onclick="exportBlueprint()">Export Blueprint JSON</button>
+        <button class="secondary" onclick="clearForm()">Reset</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: OUTPUT -->
+    <div class="card">
+      <h2>Blueprint Preview</h2>
+      <textarea id="blueprintOutput" readonly></textarea>
+      <p style="font-size:0.8rem; opacity:0.7;">
+        Save this JSON as a file (e.g. <code>ground_mission_truck_blueprint.json</code>) to share with a dealership or fabricator.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const groundModules = [
+      "Roll Cage + Micro‐Suspension Cabin",
+      "Magnetic Bed Steps (Accessible Entry)",
+      "Side Bay Doors + Tool Panels",
+      "Magnetic Hover Platform (Earth Assist)",
+      "Four‐Bay Modular Engine Housing",
+      "Independent Wheel Motors (Quad‐Drive)",
+      "Steering‐Wheel Family Debrief Buttons",
+      "Kid Seat Consoles (Comms + Entertainment)",
+      "Glove‐Box Co‐Pilot Console (Gaming + Ops)",
+      "PNI Guardian (Earth Mode)",
+    ];
+
+    const selectedModules = new Set();
+
+    function initModules() {
+      const container = document.getElementById("modulesGround");
+      groundModules.forEach((name, index) => {
+        const pill = document.createElement("div");
+        pill.className = "module-pill";
+        pill.textContent = name;
+        pill.onclick = () => toggleModule(index, pill);
+        container.appendChild(pill);
+      });
+    }
+
+    function toggleModule(index, pill) {
+      const name = groundModules[index];
+      if (selectedModules.has(name)) {
+        selectedModules.delete(name);
+        pill.classList.remove("active");
+      } else {
+        selectedModules.add(name);
+        pill.classList.add("active");
+      }
+      exportBlueprint(false);
+    }
+
+    function exportBlueprint(showAlert = true) {
+      const blueprint = {
+        mode: "EARTH",
+        vehicleName: document.getElementById("vehicleName").value || "Unnamed Ground Mission Truck",
+        pniGuardianName: document.getElementById("pniName").value || "Unnamed PNI",
+        colors: {
+          body: document.getElementById("bodyColor").value,
+          accent: document.getElementById("accentColor").value,
+        },
+        modules: Array.from(selectedModules),
+        accounts: {
+          gaming: document.getElementById("gamingAccount").value || null,
+          spiderFrameNetworkId: document.getElementById("spiderId").value || null,
+        },
+        notes: "This JSON represents a configurable digital blueprint for a Ground Mission Truck. Use as a seed for BOM + fabrication.",
+      };
+
+      const output = document.getElementById("blueprintOutput");
+      output.value = JSON.stringify(blueprint, null, 2);
+      if (showAlert) alert("Blueprint generated. Copy and save the JSON from the preview.");
+    }
+
+    function clearForm() {
+      document.getElementById("vehicleName").value = "";
+      document.getElementById("pniName").value = "";
+      document.getElementById("gamingAccount").value = "";
+      document.getElementById("spiderId").value = "";
+      selectedModules.clear();
+      document.querySelectorAll(".module-pill").forEach(p => p.classList.remove("active"));
+      document.getElementById("blueprintOutput").value = "";
+    }
+
+    initModules();
+  </script>
+</body>
+</html>
