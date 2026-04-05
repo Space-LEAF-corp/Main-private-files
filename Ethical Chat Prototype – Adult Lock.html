@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ethical Chat Prototype – Adult Lock</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #151a2b;
+      border-radius: 16px;
+      padding: 24px;
+      width: 360px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 1.2rem;
+      margin: 0 0 8px;
+      text-align: center;
+    }
+    p {
+      font-size: 0.85rem;
+      color: #c3c7e0;
+      text-align: center;
+      margin: 0 0 16px;
+    }
+    .lock-screen, .chat-screen {
+      display: none;
+    }
+    .visible {
+      display: block;
+    }
+    .passcode-input {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .passcode-input input {
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      border: 1px solid #333a5a;
+      background: #0f1424;
+      color: #f5f5f5;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    button.secondary {
+      background: #374151;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .status {
+      font-size: 0.8rem;
+      text-align: center;
+      min-height: 18px;
+      margin-bottom: 8px;
+    }
+    .status.error { color: #f97373; }
+    .status.success { color: #4ade80; }
+    .chat-box {
+      border-radius: 8px;
+      background: #0f1424;
+      padding: 8px;
+      height: 180px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input-row input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #333a5a;
+      background: #0f1424;
+      color: #f5f5f5;
+      font-size: 0.85rem;
+    }
+    .system {
+      color: #a5b4fc;
+    }
+    .warning {
+      color: #facc15;
+    }
+    .cooldown {
+      color: #f97373;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ethical Chat Prototype</h1>
+    <p>Adult‐locked prototype. Local‐only. Use “bullshit” wisely to flag issues.</p>
+
+    <!-- Lock / Setup Screen -->
+    <div id="lockScreen" class="lock-screen visible">
+      <div class="status" id="lockStatus"></div>
+      <p id="lockSubtitle"></p>
+      <div class="passcode-input" id="passcodeInputs"></div>
+      <button id="primaryBtn"></button>
+      <button id="resetBtn" class="secondary">Reset Passcode</button>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chatScreen" class="chat-screen">
+      <div class="status" id="chatStatus"></div>
+      <div class="chat-box" id="chatBox"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="Type a message (e.g., 'bullshit @user')">
+        <button id="sendBtn">Send</button>
+      </div>
+      <button id="lockBtn" class="secondary" style="margin-top:8px;">Lock Screen</button>
+    </div>
+  </div>
+
+  <script>
+    // Simple front-end ethics config
+    const BAD_WORD = "bullshit";
+    const INAPPROPRIATE_KEYWORDS = ["race", "racial", "ethnic", "slur"];
+    const WARNING_THRESHOLD = 2;
+    const OVERUSE_THRESHOLD = 3;
+    const COOLDOWN_DURATION_MS = 30 * 60 * 1000; // 30 minutes
+
+    let chatHistory = []; // {sender, message, timestamp}
+    let usesAgainst = {}; // key: "me->target", value: count
+    let cooldownUntil = null;
+
+    const lockScreen = document.getElementById('lockScreen');
+    const chatScreen = document.getElementById('chatScreen');
+    const lockStatus = document.getElementById('lockStatus');
+    const lockSubtitle = document.getElementById('lockSubtitle');
+    const passcodeInputsContainer = document.getElementById('passcodeInputs');
+    const primaryBtn = document.getElementById('primaryBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const chatStatus = document.getElementById('chatStatus');
+    const chatBox = document.getElementById('chatBox');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const lockBtn = document.getElementById('lockBtn');
+
+    const PASSCODE_KEY = 'ethical_chat_passcode';
+
+    function getStoredPasscode() {
+      return localStorage.getItem(PASSCODE_KEY);
+    }
+
+    function setStoredPasscode(code) {
+      localStorage.setItem(PASSCODE_KEY, code);
+    }
+
+    function clearStoredPasscode() {
+      localStorage.removeItem(PASSCODE_KEY);
+    }
+
+    function createPasscodeInputs() {
+      passcodeInputsContainer.innerHTML = '';
+      const inputs = [];
+      for (let i = 0; i < 5; i++) {
+        const input = document.createElement('input');
+        input.type = 'password';
+        input.maxLength = 1;
+        input.inputMode = 'numeric';
+        input.pattern = '[0-9]*';
+        input.addEventListener('input', () => {
+          if (input.value && i < 4) {
+            inputs[i + 1].focus();
+          }
+        });
+        inputs.push(input);
+        passcodeInputsContainer.appendChild(input);
+      }
+      return inputs;
+    }
+
+    function readPasscode(inputs) {
+      return inputs.map(i => i.value).join('');
+    }
+
+    function showLockScreen() {
+      lockScreen.classList.add('visible');
+      chatScreen.classList.remove('visible');
+      lockStatus.textContent = '';
+      lockStatus.className = 'status';
+      const stored = getStoredPasscode();
+      const inputs = createPasscodeInputs();
+
+      if (stored) {
+        lockSubtitle.textContent = 'Enter your 5‐digit adult passcode to unlock.';
+        primaryBtn.textContent = 'Unlock';
+        primaryBtn.onclick = () => {
+          const code = readPasscode(inputs);
+          if (code.length !== 5 || !/^\d{5}$/.test(code)) {
+            lockStatus.textContent = 'Passcode must be 5 digits.';
+            lockStatus.className = 'status error';
+            return;
+          }
+          if (code === stored) {
+            lockStatus.textContent = 'Unlocked.';
+            lockStatus.className = 'status success';
+            setTimeout(showChatScreen, 300);
+          } else {
+            lockStatus.textContent = 'Incorrect passcode.';
+            lockStatus.className = 'status error';
+          }
+        };
+      } else {
+        lockSubtitle.textContent = 'Set a new 5‐digit adult passcode (local to this device).';
+        primaryBtn.textContent = 'Set Passcode';
+        primaryBtn.onclick = () => {
+          const code = readPasscode(inputs);
+          if (code.length !== 5 || !/^\d{5}$/.test(code)) {
+            lockStatus.textContent = 'Passcode must be 5 digits.';
+            lockStatus.className = 'status error';
+            return;
+          }
+          setStoredPasscode(code);
+          lockStatus.textContent = 'Passcode set. Use this to unlock next time.';
+          lockStatus.className = 'status success';
+          setTimeout(showChatScreen, 400);
+        };
+      }
+
+      resetBtn.onclick = () => {
+        clearStoredPasscode();
+        lockStatus.textContent = 'Passcode cleared. Set a new one.';
+        lockStatus.className = 'status success';
+        showLockScreen();
+      };
+
+      // Focus first input
+      setTimeout(() => {
+        const first = passcodeInputsContainer.querySelector('input');
+        if (first) first.focus();
+      }, 100);
+    }
+
+    function showChatScreen() {
+      lockScreen.classList.remove('visible');
+      chatScreen.classList.add('visible');
+      chatStatus.textContent = 'Adult session active. Local prototype only.';
+      chatStatus.className = 'status';
+      chatInput.value = '';
+      chatInput.focus();
+    }
+
+    function appendChatLine(text, cls = '') {
+      const div = document.createElement('div');
+      if (cls) div.classList.add(cls);
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function isOnCooldown() {
+      if (!cooldownUntil) return false;
+      const now = Date.now();
+      if (now >= cooldownUntil) {
+        cooldownUntil = null;
+        appendChatLine('[SYSTEM] Cooldown ended. You may send messages again.', 'system');
+        return false;
+      }
+      return true;
+    }
+
+    function evaluateMessage(message) {
+      const lower = message.toLowerCase();
+      const actions = [];
+
+      if (isOnCooldown()) {
+        actions.push({ type: 'block', reason: 'You are on cooldown. Wait before sending more messages.' });
+        return actions;
+      }
+
+      if (!lower.includes(BAD_WORD)) {
+        return actions;
+      }
+
+      // Inappropriate context
+      if (INAPPROPRIATE_KEYWORDS.some(kw => lower.includes(kw))) {
+        actions.push({ type: 'ban', reason: "Inappropriate racial use of 'bullshit'. (Prototype: local-only ban simulation)" });
+        return actions;
+      }
+
+      // Mentions
+      const mentions = Array.from(message.matchAll(/@([\w\-]+)/g)).map(m => m[1]);
+      mentions.forEach(target => {
+        const key = `me->${target}`;
+        usesAgainst[key] = (usesAgainst[key] || 0) + 1;
+        const uses = usesAgainst[key];
+
+        if (uses === WARNING_THRESHOLD) {
+          actions.push({ type: 'warn', reason: `Warning: overusing 'bullshit' toward @${target}.` });
+        } else if (uses === OVERUSE_THRESHOLD) {
+          cooldownUntil = Date.now() + COOLDOWN_DURATION_MS;
+          actions.push({ type: 'cooldown', reason: `Cooldown: repeated 'bullshit' toward @${target}. You are paused for 30 minutes.` });
+        } else if (uses > OVERUSE_THRESHOLD) {
+          actions.push({ type: 'ban', reason: `Ban (simulated): persistent misuse of 'bullshit' toward @${target}.` });
+        }
+      });
+
+      if (lower.startsWith(BAD_WORD) && mentions.length > 0) {
+        const target = mentions[0];
+        actions.push({ type: 'flag', reason: `Flagged @${target} for review (prototype).` });
+      }
+
+      return actions;
+    }
+
+    sendBtn.onclick = () => {
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+
+      const actions = evaluateMessage(msg);
+
+      // If blocked by cooldown
+      if (actions.some(a => a.type === 'block')) {
+        const a = actions.find(a => a.type === 'block');
+        chatStatus.textContent = a.reason;
+        chatStatus.className = 'status cooldown';
+        return;
+      }
+
+      // Show user message
+      appendChatLine(`You: ${msg}`);
+
+      // Apply actions
+      actions.forEach(a => {
+        if (a.type === 'warn') {
+          appendChatLine(`[SYSTEM] ${a.reason}`, 'warning');
+        } else if (a.type === 'cooldown') {
+          appendChatLine(`[SYSTEM] ${a.reason}`, 'cooldown');
+        } else if (a.type === 'ban') {
+          appendChatLine(`[SYSTEM] ${a.reason}`, 'cooldown');
+        } else if (a.type === 'flag') {
+          appendChatLine(`[SYSTEM] ${a.reason}`, 'system');
+        }
+      });
+
+      chatInput.value = '';
+      chatInput.focus();
+    };
+
+    lockBtn.onclick = () => {
+      showLockScreen();
+    };
+
+    // Init
+    showLockScreen();
+  </script>
+</body>
+</html>
