@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jarvondis System Architecture • Space LEAF Corp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050814;
+      --panel: #0f172a;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.12);
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border-soft: #1f2937;
+      --success: #4ade80;
+      --warn: #facc15;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+    h1, h2, h3 {
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    h1 {
+      font-size: 1.9rem;
+      margin-bottom: 0.25rem;
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin: 1.75rem 0 0.75rem;
+    }
+    h3 {
+      font-size: 1rem;
+      margin: 1.25rem 0 0.5rem;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: rgba(15,23,42,0.9);
+      color: var(--text-soft);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+    }
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(74,222,128,0.8);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 1.5rem;
+      margin-top: 1.75rem;
+    }
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    .card {
+      background: linear-gradient(145deg, rgba(15,23,42,0.96), rgba(15,23,42,0.88));
+      border-radius: 1rem;
+      border: 1px solid var(--border-soft);
+      padding: 1.25rem 1.3rem;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.9);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.35rem;
+    }
+    .tag {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.4);
+      color: var(--text-soft);
+      background: rgba(15,23,42,0.9);
+    }
+    .tag--accent {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .tag--warn {
+      border-color: var(--warn);
+      color: var(--warn);
+      background: rgba(250,204,21,0.08);
+    }
+    p {
+      margin: 0.25rem 0 0.4rem;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+    ul {
+      margin: 0.4rem 0 0.2rem 1.1rem;
+      padding: 0;
+      font-size: 0.88rem;
+      color: var(--text-soft);
+    }
+    li { margin-bottom: 0.25rem; }
+    code {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.8rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.35rem;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(30,64,175,0.7);
+      color: #bfdbfe;
+    }
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-soft);
+      margin-bottom: 0.35rem;
+    }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .flow-step {
+      padding: 0.35rem 0.6rem;
+      border-radius: 999px;
+      border: 1px dashed rgba(148,163,184,0.6);
+      font-size: 0.75rem;
+      color: var(--text-soft);
+      background: rgba(15,23,42,0.9);
+    }
+    .flow-arrow::after {
+      content: "→";
+      margin-left: 0.35rem;
+      opacity: 0.7;
+    }
+    .metric-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    .metric {
+      min-width: 120px;
+      padding: 0.5rem 0.7rem;
+      border-radius: 0.7rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.18), rgba(15,23,42,0.95));
+    }
+    .metric-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+      margin-bottom: 0.15rem;
+    }
+    .metric-value {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .metric-note {
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      opacity: 0.8;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.9);
+    }
+    .legend-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+    }
+    .swatch-core { background: var(--accent); }
+    .swatch-edge { background: #a855f7; }
+    .swatch-student { background: #4ade80; }
+    .swatch-admin { background: #f97316; }
+  </style>
+</head>
+<!-- ========================= -->
+<!--  JSON SCHEMA LIVE PANEL   -->
+<!-- ========================= -->
+<section class="card" id="schema-panel">
+  <div class="card-header">
+    <div>
+      <div class="card-title">07 • Live Schema Panel</div>
+      <p>Auto-loads the latest API schema from <code>/openapi.json</code> or <code>/schema</code>.</p>
+    </div>
+    <span class="tag tag--accent">live</span>
+  </div>
+
+  <button id="schema-toggle"
+          style="margin-bottom:0.75rem; padding:0.4rem 0.75rem; border-radius:0.5rem;
+                 border:1px solid rgba(148,163,184,0.4); background:rgba(15,23,42,0.9);
+                 color:#9ca3af; cursor:pointer; font-size:0.8rem;">
+    Show Schema ▼
+  </button>
+
+  <pre id="schema-output"
+       style="display:none; font-size:0.78rem; line-height:1.45; background:rgba(15,23,42,0.9);
+              border-radius:0.75rem; padding:0.9rem 1rem; border:1px solid rgba(30,64,175,0.7);
+              overflow:auto; max-height:420px;">
+Loading schema...
+  </pre>
+</section>
+<script>
+(async function loadSchema() {
+  const output = document.getElementById("schema-output");
+  const toggle = document.getElementById("schema-toggle");
+
+  // Toggle visibility
+  toggle.addEventListener("click", () => {
+    const isHidden = output.style.display === "none";
+    output.style.display = isHidden ? "block" : "none";
+    toggle.textContent = isHidden ? "Hide Schema ▲" : "Show Schema ▼";
+  });
+
+  // Helper: pretty-print JSON with syntax coloring
+  function syntaxHighlight(json) {
+    if (!json) return "";
+    json = json.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return json.replace(
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+      match => {
+        let cls = "number";
+        if (/^"/.test(match)) {
+          cls = /:$/.test(match) ? "key" : "string";
+        } else if (/true|false/.test(match)) {
+          cls = "boolean";
+        } else if (/null/.test(match)) {
+          cls = "null";
+        }
+        return `<span class="${cls}">${match}</span>`;
+      }
+    );
+  }
+
+  // Try endpoints in order
+  const endpoints = ["/openapi.json", "/schema"];
+
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      const pretty = JSON.stringify(data, null, 2);
+
+      output.innerHTML = syntaxHighlight(pretty);
+      return;
+    } catch (err) {
+      // Try next endpoint
+    }
+  }
+
+  // If all fail
+  output.textContent = "No schema available at /openapi.json or /schema.";
+})();
+</script>
+
+<style>
+  /* Syntax highlighting for JSON */
+  #schema-output .string  { color: #a5f3fc; }
+  #schema-output .number  { color: #fca5a5; }
+  #schema-output .boolean { color: #fcd34d; }
+  #schema-output .null    { color: #c4b5fd; }
+  #schema-output .key     { color: #93c5fd; }
+</style>
+<body>
+  <main>
+    <header>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Jarvondis • Virtual Campus Runtime</span>
+      </div>
+      <h1>Jarvondis System Architecture</h1>
+      <p>
+        High-level code structure for the Jarvondis learning universe—student-facing, staff-facing, and planetary services
+        stitched into one emotionally safe campus fabric.
+      </p>
+    </header>
+
+    <!-- 1. Top-level code layout -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">01 • Repository layout</div>
+          <p>Monorepo sketch for Jarvondis services, clients, and shared contracts.</p>
+        </div>
+        <span class="tag tag--accent">source layout</span>
+      </div>
+
+      <pre style="font-size:0.78rem; line-height:1.45; background:rgba(15,23,42,0.9); border-radius:0.75rem; padding:0.9rem 1rem; border:1px solid rgba(30,64,175,0.7); overflow:auto;">
+jarvondis/
+  apps/
+    student-portal/          # Web/mobile front door for learners
+    staff-console/           # Advising, financial aid, admin tools
+    campus-orchestrator/     # Ops cockpit, routing, feature flags
+  services/
+    identity/                # AuthN/AuthZ, roles, lineage-aware profiles
+    lms-core/                # Courses, modules, assessments, AI co-pilots
+    advising/                # Appointments, case notes, nudges
+    financial-aid/           # Aid packages, eligibility, workflows
+    admissions/              # Applications, review, decisions
+    messaging/               # Notifications, inbox, chat
+    analytics/               # Events, KPIs, equity dashboards
+  packages/
+    ui-kit/                  # Shared components, design tokens
+    domain-models/           # Type-safe entities, DTOs, validation
+    workflows/               # Reusable orchestration logic (sagas, state machines)
+  infra/
+    k8s/                     # Manifests, Helm charts
+    terraform/               # Cloud infra as code
+    pipelines/               # CI/CD definitions
+  docs/
+    adr/                     # Architecture decision records
+    playbooks/               # Runbooks, ceremonies, rituals
+      </pre>
+    </section>
+
+    <!-- 2. Core runtime modules -->
+    <section class="grid">
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">02 • Core services</div>
+            <p>Back-end services that define the Jarvondis “laws of physics”.</p>
+          </div>
+          <span class="tag">backend</span>
+        </div>
+
+        <h3>Identity service</h3>
+        <p>
+          Handles authentication, authorization, and persona switching (student, mentor, guardian, staff).
+        </p>
+        <ul>
+          <li><code>POST /auth/login</code>, <code>/auth/refresh</code>, <code>/auth/impersonate</code></li>
+          <li><code>GET /profiles/:id</code> with lineage, consent, and safety flags</li>
+        </ul>
+
+        <h3>LMS core</h3>
+        <p>
+          Course graph, modules, assessments, and AI-powered learning companions.
+        </p>
+        <ul>
+          <li><code>GET /courses/:id</code>, <code>/courses/:id/modules</code></li>
+          <li><code>POST /sessions/:id/events</code> for engagement tracking</li>
+          <li><code>POST /ai/tutor</code> for context-aware guidance</li>
+        </ul>
+
+        <h3>Messaging & notifications</h3>
+        <p>
+          Unified inbox and multi-channel notifications (in-app, email, SMS, push).
+        </p>
+        <ul>
+          <li><code>POST /messages</code>, <code>GET /threads</code></li>
+          <li>Event-driven fan-out via message bus (e.g., <code>student.at_risk</code>)</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">03 • Student & staff apps</div>
+            <p>Front-ends that sit on top of the core services.</p>
+          </div>
+          <span class="tag">frontend</span>
+        </div>
+
+        <h3>Student portal</h3>
+        <p>
+          “Digital front door” for Jarvondis: schedule, courses, aid, advising, and campus life.
+        </p>
+        <ul>
+          <li>Tech: React / Next.js (web), React Native / Expo (mobile)</li>
+          <li>State: query layer over <code>/lms-core</code>, <code>/advising</code>, <code>/financial-aid</code></li>
+        </ul>
+
+        <h3>Staff console</h3>
+        <p>
+          Unified view for advisors, faculty, and operations.
+        </p>
+        <ul>
+          <li>Role-based dashboards (advising, financial aid, admissions)</li>
+          <li>Embedded analytics from <code>analytics</code> service</li>
+        </ul>
+
+        <h3>Campus orchestrator</h3>
+        <p>
+          Feature flags, experiments, and routing rules for different cohorts and campuses.
+        </p>
+        <ul>
+          <li>Config-driven “playbooks” for onboarding, nudges, and interventions</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- 3. Experience flow -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">04 • End-to-end student journey</div>
+          <p>How requests flow through Jarvondis from a learner’s perspective.</p>
+        </div>
+        <span class="tag tag--accent">experience flow</span>
+      </div>
+
+      <div class="section-label">Example: “I need help with my course + aid”</div>
+      <div class="flow">
+        <div class="flow-step flow-arrow">Student portal</div>
+        <div class="flow-step flow-arrow">Identity</div>
+        <div class="flow-step flow-arrow">LMS core</div>
+        <div class="flow-step flow-arrow">Advising</div>
+        <div class="flow-step flow-arrow">Financial aid</div>
+        <div class="flow-step">Messaging + Analytics</div>
+      </div>
+
+      <p>
+        Each step is a concrete API call + event emission. The UI stays simple; the orchestration lives in
+        <code>workflows/</code> and the <code>campus-orchestrator</code> app.
+      </p>
+
+      <div class="legend">
+        <div class="legend-item">
+          <span class="legend-swatch swatch-core"></span>
+          <span>Core services</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch swatch-edge"></span>
+          <span>Edge/orchestration</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch swatch-student"></span>
+          <span>Student-facing</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-swatch swatch-admin"></span>
+          <span>Staff/admin-facing</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Metrics & equity -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">05 • Analytics & equity guardrails</div>
+          <p>How Jarvondis tracks impact and keeps the campus emotionally safe.</p>
+        </div>
+        <span class="tag tag--warn">observability</span>
+      </div>
+
+      <p>
+        The <code>analytics</code> service consumes events from all domains and exposes cohort-aware dashboards.
+      </p>
+
+      <div class="metric-row">
+        <div class="metric">
+          <div class="metric-label">Equitable software access</div>
+          <div class="metric-value">100%</div>
+          <div class="metric-note">Device-agnostic, mobile-first, offline-tolerant flows.</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Reduction in lab costs</div>
+          <div class="metric-value">70%</div>
+          <div class="metric-note">Virtual labs + shared compute pools.</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Positive student feedback</div>
+          <div class="metric-value">95%</div>
+          <div class="metric-note">Continuous pulse surveys + in-context prompts.</div>
+        </div>
+      </div>
+
+      <ul>
+        <li><code>POST /events</code> from all apps and services</li>
+        <li><code>GET /dashboards/:cohortId</code> for leadership and staff</li>
+        <li>Redaction and privacy rules baked into <code>domain-models/</code></li>
+      </ul>
+    </section>
+
+    <!-- 5. Safety & rituals -->
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">06 • Emotional safety & rituals</div>
+          <p>Where Jarvondis encodes ceremonies, pause modes, and kid-safe defaults.</p>
+        </div>
+        <span class="tag">culture layer</span>
+      </div>
+
+      <p>
+        Safety is treated as code, not vibes. Rituals and constraints live in explicit modules.
+      </p>
+
+      <ul>
+        <li>
+          <code>workflows/safety/</code> — rate limits, escalation paths, “ceremonial pause” flows.
+        </li>
+        <li>
+          <code>ui-kit/components/SafeZone*</code> — components that enforce copy, tone, and visibility rules.
+        </li>
+        <li>
+          <code>docs/playbooks/</code> — operational ceremonies for launches, incidents, and recognition.
+        </li>
+      </ul>
+    </section>
+
+    <footer style="margin-top:2.5rem; font-size:0.75rem; color:var(--text-soft); text-align:center;">
+      <p>
+        This document is an architectural map, not a full code dump. Keep it in sync with the live Jarvondis repos.
+      </p>
+    </footer>
+  </main>
+</body>
+</html>
