@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Living QR Code</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .frame-wrapper {
+      width: min(90vw, 600px);
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+      border: 2px solid #444;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .link-fallback {
+      margin-top: 16px;
+      font-size: 0.9rem;
+    }
+    .link-fallback a {
+      color: #4fd1ff;
+      text-decoration: none;
+    }
+    .link-fallback a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame-wrapper">
+    <iframe
+      src="https://meta.ai/media-share/wR4jI8CkaHQ?utm_source=ios_cl"
+      title="Living QR Code"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <div class="link-fallback">
+    If the QR doesn’t load, open it directly:
+    <a href="https://meta.ai/media-share/wR4jI8CkaHQ?utm_source=ios_cl" target="_blank" rel="noopener noreferrer">
+      Open living QR code
+    </a>
+  </div>
+</body>
+</html>
