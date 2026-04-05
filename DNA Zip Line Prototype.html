@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DNA Zip Line Prototype</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    .panel {
+      background: #151a2c;
+      border-radius: 12px;
+      padding: 1.5rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    input, select, button {
+      margin-top: 0.25rem;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #333a55;
+      background: #0f1424;
+      color: #f5f5f5;
+      font-size: 0.95rem;
+    }
+
+    button {
+      margin-top: 1.25rem;
+      background: #2b7cff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background: #1f63d1;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      margin-top: 1.25rem;
+      gap: 0.75rem;
+    }
+
+    .status-light {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #555;
+      box-shadow: 0 0 6px rgba(0,0,0,0.6);
+    }
+
+    .status-light.green {
+      background: #00d26a;
+      box-shadow: 0 0 12px rgba(0,210,106,0.8);
+    }
+
+    .status-light.red {
+      background: #ff4b4b;
+      box-shadow: 0 0 12px rgba(255,75,75,0.8);
+    }
+
+    .status-text {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .log {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      opacity: 0.8;
+      max-height: 120px;
+      overflow-y: auto;
+      border-top: 1px solid #333a55;
+      padding-top: 0.75rem;
+    }
+
+    .log-entry {
+      margin-bottom: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>DNA Zip Line Console</h1>
+  <div class="panel">
+    <p style="font-size:0.9rem; opacity:0.85;">
+      Enter a safe DNA sequence and choose a whitelisted sector. 
+      The zip line only activates when all systems are green.
+    </p>
+
+    <!-- DNA INPUT -->
+    <label for="dnaInput">DNA sequence (A, C, G, T only):</label>
+    <input id="dnaInput" type="text" placeholder="e.g. ACGTACGTACGT" />
+
+    <!-- DESTINATION SELECTOR (WHITELIST ONLY) -->
+    <label for="sectorSelect">Destination sector:</label>
+    <select id="sectorSelect">
+      <!-- All options are pre‐approved; no free‐text destinations -->
+      <option value="playground_north">Playground — North Canopy</option>
+      <option value="playground_south">Playground — South Climbing Zone</option>
+      <option value="uni_science">University — Science Lab Cluster</option>
+      <option value="uni_library">University — Library of Alexandria Node</option>
+      <option value="uni_art">University — Art & Story Studio</option>
+    </select>
+
+    <!-- LAUNCH BUTTON -->
+    <button id="launchBtn">Launch DNA Zip Line</button>
+
+    <!-- STATUS INDICATOR -->
+    <div class="status-row">
+      <div id="statusLight" class="status-light"></div>
+      <div id="statusText" class="status-text">Awaiting input...</div>
+    </div>
+
+    <!-- SIMPLE LOG -->
+    <div id="log" class="log"></div>
+  </div>
+
+  <script>
+    // Whitelisted sectors with extra metadata for future safety rules
+    const SECTOR_WHITELIST = {
+      "playground_north":  { label: "Playground — North Canopy",   type: "playground", ageMin: 5,  ageMax: 12 },
+      "playground_south":  { label: "Playground — South Climbing", type: "playground", ageMin: 5,  ageMax: 12 },
+      "uni_science":       { label: "University — Science Lab",    type: "classroom",  ageMin: 8,  ageMax: 16 },
+      "uni_library":       { label: "University — Library",        type: "library",    ageMin: 6,  ageMax: 99 },
+      "uni_art":           { label: "University — Art & Story",    type: "studio",     ageMin: 5,  ageMax: 16 }
+    };
+
+    const dnaInput    = document.getElementById('dnaInput');
+    const sectorSelect = document.getElementById('sectorSelect');
+    const launchBtn   = document.getElementById('launchBtn');
+    const statusLight = document.getElementById('statusLight');
+    const statusText  = document.getElementById('statusText');
+    const logEl       = document.getElementById('log');
+
+    // Basic DNA validation: only A/C/G/T, minimum length
+    function isValidDNA(seq) {
+      const cleaned = seq.trim().toUpperCase();
+      if (cleaned.length < 8) return false; // safety: require some length
+      return /^[ACGT]+$/.test(cleaned);
+    }
+
+    // Simulated "safety engine" — returns {ok, reason}
+    function safetyCheck(dnaSeq, sectorKey) {
+      if (!isValidDNA(dnaSeq)) {
+        return { ok: false, reason: "Invalid DNA sequence. Use A, C, G, T only, length ≥ 8." };
+      }
+
+      const sector = SECTOR_WHITELIST[sectorKey];
+      if (!sector) {
+        return { ok: false, reason: "Destination not whitelisted. Zip line locked." };
+      }
+
+      // Example extra rule: very simple "checksum" style guard
+      const cleaned = dnaSeq.trim().toUpperCase();
+      const uniqueBases = new Set(cleaned.split('')).size;
+      if (uniqueBases < 2) {
+        return { ok: false, reason: "DNA sequence too simple. Add more variety for a safe lock." };
+      }
+
+      // All checks passed
+      return { ok: true, reason: `Route cleared to ${sector.label}.` };
+    }
+
+    function setStatus(ok, message) {
+      statusLight.classList.remove('green', 'red');
+      if (ok === true) {
+        statusLight.classList.add('green');
+      } else if (ok === false) {
+        statusLight.classList.add('red');
+      }
+      statusText.textContent = message;
+    }
+
+    function log(message) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = new Date().toLocaleTimeString() + " — " + message;
+      logEl.prepend(entry);
+    }
+
+    launchBtn.addEventListener('click', () => {
+      const dnaSeq = dnaInput.value;
+      const sectorKey = sectorSelect.value;
+
+      const result = safetyCheck(dnaSeq, sectorKey);
+
+      if (result.ok) {
+        setStatus(true, "ALL GREEN — Zip line ready. " + result.reason);
+        log("SAFE: " + result.reason);
+        // Here is where you would actually "activate" the zip line:
+        // e.g., navigate to a scene, call a game engine, etc.
+      } else {
+        setStatus(false, "LOCKED — " + result.reason);
+        log("BLOCKED: " + result.reason);
+      }
+    });
+  </script>
+</body>
+</html>
