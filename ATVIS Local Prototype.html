@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ATVIS Local Prototype</title>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #1b2735, #090a0f);
+      color: #e0f7ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    .shell {
+      max-width: 900px;
+      margin: 0 auto;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+    h1 {
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 18px;
+      margin-top: 0;
+    }
+    .row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .panel {
+      flex: 1;
+      min-width: 260px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(10, 20, 30, 0.7);
+    }
+    label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9fdcff;
+    }
+    input, button {
+      margin-top: 4px;
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      background: rgba(0, 0, 0, 0.6);
+      color: #e0f7ff;
+      font-size: 13px;
+    }
+    button {
+      cursor: pointer;
+    }
+    button:hover {
+      background: rgba(0, 255, 255, 0.15);
+    }
+    #log {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .status {
+      font-size: 12px;
+      color: #9fdcff;
+      margin-bottom: 8px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 255, 255, 0.4);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <h1>ATVIS Prototype <span class="tag">Local</span></h1>
+
+    <div class="status" id="status">Status: Locked · User: —</div>
+
+    <div class="row">
+      <div class="panel">
+        <label>QR–DNA Authentication</label><br>
+        <input id="qr" placeholder="QR code (try ATVIS-QR-123)">
+        <br>
+        <input id="dna" placeholder="DNA token (try DNA-OK)">
+        <br>
+        <button onclick="auth()">Authenticate</button>
+        <button onclick="lockDown()">Lock Down</button>
+      </div>
+
+      <div class="panel">
+        <label>Voice Command</label><br>
+        <input id="voice" placeholder="e.g. open workspace, prepare next steps">
+        <br>
+        <button onclick="sendVoice()">Send Voice</button>
+      </div>
+
+      <div class="panel">
+        <label>Gestures</label><br>
+        <button onclick="gesture('summon')">Summon Workspace</button>
+        <button onclick="gesture('branch')">Branch Timeline</button>
+        <button onclick="gesture('lock')">Lock Down</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <label>ATVIS Holographic Console</label>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      authenticated: false,
+      userId: null
+    };
+
+    function log(message) {
+      const logEl = document.getElementById('log');
+      const time = new Date().toLocaleTimeString();
+      logEl.textContent += `[${time}] ${message}\n`;
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function updateStatus() {
+      const statusEl = document.getElementById('status');
+      const status = state.authenticated ? "Unlocked" : "Locked";
+      const user = state.userId || "—";
+      statusEl.textContent = `Status: ${status} · User: ${user}`;
+    }
+
+    function auth() {
+      const qr = document.getElementById('qr').value.trim();
+      const dna = document.getElementById('dna').value.trim();
+
+      if (qr === "ATVIS-QR-123" && dna === "DNA-OK") {
+        state.authenticated = true;
+        state.userId = "Jarvondis-User";
+        log("Auth success: session opened for Jarvondis-User.");
+      } else {
+        state.authenticated = false;
+        state.userId = null;
+        log("Auth failed: invalid QR or DNA token.");
+      }
+      updateStatus();
+    }
+
+    function lockDown() {
+      state.authenticated = false;
+      state.userId = null;
+      log("ATVIS: Lock down engaged. Sensitive panels hidden, session locked.");
+      updateStatus();
+    }
+
+    function sendVoice() {
+      const text = document.getElementById('voice').value.trim();
+      if (!text) return;
+
+      if (!state.authenticated) {
+        log("ATVIS: Access locked. Perform QR–DNA auth first.");
+        return;
+      }
+
+      const lower = text.toLowerCase();
+      if (lower.includes("open workspace")) {
+        log("ATVIS: Summoning current mission workspace in holographic layout (simulated).");
+      } else if (lower.includes("prepare next steps")) {
+        log("ATVIS: Analyzing context and preparing next three steps (simulated planning).");
+      } else if (lower.includes("lock down")) {
+        lockDown();
+      } else {
+        log(`ATVIS: I heard your intent: "${text}". No specific skill mapped yet.`);
+      }
+    }
+
+    function gesture(type) {
+      if (!state.authenticated) {
+        log("ATVIS: Gesture ignored. Session is not authenticated.");
+        return;
+      }
+
+      if (type === "summon") {
+        log("ATVIS: [Gesture] Summon workspace → bringing panels into view (simulated).");
+      } else if (type === "branch") {
+        log("ATVIS: [Gesture] Branch timeline → creating scenario branch (simulated).");
+      } else if (type === "lock") {
+        log("ATVIS: [Gesture] Lock down → hiding sensitive panels, session locked.");
+        lockDown();
+      }
+    }
+
+    // Initial
+    updateStatus();
+    log("ATVIS: Prototype online. Perform QR–DNA auth to begin. Built, LEIF TUF.");
+  </script>
+</body>
+</html>
