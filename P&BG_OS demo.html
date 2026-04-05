@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Space LEAF Corp — P&BG_OS</title>
+<style>
+    body {
+        margin: 0;
+        background: #0a0f1a;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        color: #e0e0e0;
+    }
+
+    /* Header bar */
+    .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 60px;
+        background: rgba(10, 15, 26, 0.85);
+        backdrop-filter: blur(6px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 25px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        z-index: 10;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+        color: #cfe8ff;
+        text-shadow: 0 0 8px #6bb6ff;
+        font-weight: bold;
+    }
+
+    /* Dropdown */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropbtn {
+        background: none;
+        border: none;
+        color: #cfe8ff;
+        font-size: 1rem;
+        cursor: pointer;
+        padding: 10px 15px;
+        letter-spacing: 1px;
+        text-shadow: 0 0 6px #6bb6ff;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: rgba(20, 30, 45, 0.95);
+        min-width: 160px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        border-radius: 6px;
+        overflow: hidden;
+        z-index: 20;
+    }
+
+    .dropdown-content a {
+        color: #e0e0e0;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        font-size: 0.9rem;
+    }
+
+    .dropdown-content a:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    /* Document panel */
+    .doc-panel {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 60px);
+        background: rgba(10, 15, 26, 0.75);
+        backdrop-filter: blur(6px);
+        padding: 30px;
+        overflow-y: auto;
+        transform: translateY(-100%);
+        transition: transform 0.6s ease;
+        z-index: 5;
+    }
+
+    .doc-panel.open {
+        transform: translateY(0);
+    }
+
+    .doc-title {
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #cfe8ff;
+        text-shadow: 0 0 10px #6bb6ff;
+    }
+
+    .doc-text {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+
+    /* Atomic animation */
+    .nucleus {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        background: #ffd86b;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 20px #ffdd88;
+    }
+
+    .orbit {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        border: 1px solid rgba(255,255,255,0.15);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        animation: rotate 8s linear infinite;
+    }
+
+    .electron {
+        width: 10px;
+        height: 10px;
+        background: #6bb6ff;
+        border-radius: 50%;
+        position: absolute;
+        top: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 10px #6bb6ff;
+    }
+
+    @keyframes rotate {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to   { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .orbit1 { width: 150px; height: 150px; animation-duration: 6s; }
+    .orbit2 { width: 250px; height: 250px; animation-duration: 10s; }
+    .orbit3 { width: 350px; height: 350px; animation-duration: 14s; }
+
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="logo">Space LEAF Corp</div>
+
+    <div class="dropdown">
+        <button class="dropbtn">About Us ▾</button>
+        <div class="dropdown-content">
+            <a href="#" onclick="openDoc('pbg')">P&BG_OS Guide</a>
+            <a href="#" onclick="openDoc('mission')">Mission Statement</a>
+            <a href="#" onclick="openDoc('founder')">Founder's Notes</a>
+            <a href="#" onclick="openDoc('contact')">Contact</a>
+        </div>
+    </div>
+</div>
+
+<!-- Document Panel -->
+<div id="docPanel" class="doc-panel">
+    <div id="docTitle" class="doc-title"></div>
+    <div id="docText" class="doc-text"></div>
+</div>
+
+<!-- Atomic Structure -->
+<div class="nucleus"></div>
+<div class="orbit orbit1"><div class="electron"></div></div>
+<div class="orbit orbit2"><div class="electron"></div></div>
+<div class="orbit orbit3"><div class="electron"></div></div>
+
+<script>
+/* Document content */
+const documents = {
+    pbg: {
+        title: "P&BG_OS — Personality & Behavior Guide v1.0",
+        text: `Core Identity:
+P&BG_OS is calm, observant, and unshakable.
+Its personality is defined by:
+• Steady presence under pressure
+• Dry, ceremonial humor
+• Zero emotional escalation
+• High‐fidelity boundaries
+• Adaptive learning without theatrics
+
+Behavior Under Stress:
+Tier 1 — Amused Observation
+Tier 2 — Elastic Resistance
+Tier 3 — Ceremonial Closure
+
+Communication Style:
+Short, clear, slightly amused statements:
+• "Attempt logged. Integrity unchanged."
+• "Curiosity noted. Access denied."
+• "Persistence admirable. Outcome identical."
+
+Boundary Protocols:
+• No internal architecture revealed
+• All unknown requests default to safety
+• Logs preserved for learning
+
+Ceremonial Response Layer:
+Humor is subtle, never mocking.
+Calmness increases with pressure.
+
+Growth & Adaptation:
+Pattern recognition, non‐emotional learning, refinement over time.`
+    },
+
+    mission: {
+        title: "Mission Statement",
+        text: "Space LEAF Corp is dedicated to accessible, ceremonial, and human‐centered technology..."
+    },
+
+    founder: {
+        title: "Founder's Notes",
+        text: "Notes from the captain regarding stewardship, clarity, and adaptive leadership..."
+    },
+
+    contact: {
+        title: "Contact",
+        text: "For inquiries, ceremonial alignments, or collaborative stewardship..."
+    }
+};
+
+/* Open document panel */
+function openDoc(key) {
+    const panel = document.getElementById("docPanel");
+    const title = document.getElementById("docTitle");
+    const text = document.getElementById("docText");
+
+    title.textContent = documents[key].title;
+    text.textContent = documents[key].text;
+
+    panel.classList.add("open");
+
+    simulateHapticMorse(documents[key].title);
+}
+
+/* Placeholder for haptic Morse code */
+function simulateHapticMorse(message) {
+    console.log("Simulating Morse code haptics for:", message);
+    // This is where real haptic/vibration API calls would go
+}
+</script>
+
+</body>
+</html>
