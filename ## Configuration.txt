@@ -1,0 +1,12 @@
+
+## Configuration
+
+All identity and ceremonial settings live in `config.py`:
+
+- Admin name
+- Core laws
+- Banner title + subtitle
+
+## License
+
+MIT (or your preferred license)
