@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TTT Local Console – Tri-Truck-Trio</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #05060a;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      padding: 16px 24px;
+      background: #0b0f1a;
+      border-bottom: 1px solid #222838;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.04em;
+    }
+    main {
+      padding: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #101522;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #222838;
+      box-shadow: 0 0 0 1px #05060a;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .field {
+      flex: 1 1 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a8b3d1;
+    }
+    input, textarea {
+      background: #05060a;
+      border-radius: 6px;
+      border: 1px solid #30384a;
+      padding: 8px 10px;
+      color: #f5f5f5;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    input:focus, textarea:focus {
+      border-color: #4f8cff;
+      box-shadow: 0 0 0 1px #4f8cff33;
+    }
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    button {
+      border-radius: 999px;
+      border: 1px solid #4f8cff;
+      background: #4f8cff;
+      color: #05060a;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    button.secondary {
+      background: transparent;
+      color: #f5f5f5;
+      border-color: #606a82;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .preview {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #05060f;
+      border: 1px dashed #30384a;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.8rem;
+      word-break: break-all;
+    }
+    .preview-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a8b3d1;
+      margin-bottom: 4px;
+    }
+    .status {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #9ad0ff;
+    }
+    footer {
+      margin-top: 24px;
+      font-size: 0.75rem;
+      color: #6f7a96;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>TTT Local Console · Tri-Truck-Trio Backstage</h1>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2 style="margin-top:0;font-size:1.1rem;">Create a TTT Project Snapshot</h2>
+      <p style="font-size:0.9rem;color:#c3c9dd;">
+        Draft your idea locally, preview its future network layout URL, and download it as a project file.
+        Nothing is published from this console—this is your private pre-reveal workspace.
+      </p>
+
+      <div class="row">
+        <div class="field">
+          <label for="planetSystem">Planet / System</label>
+          <input id="planetSystem" type="text" placeholder="e.g. earth-orbit, mars, sol-system" />
+        </div>
+        <div class="field">
+          <label for="projectName">Project Name</label>
+          <input id="projectName" type="text" placeholder="e.g. OrbitalToyDrop, RailRunner, StarCrate" />
+        </div>
+        <div class="field">
+          <label for="username">Username / Handle</label>
+          <input id="username" type="text" placeholder="e.g. leif, captain01, steward-alpha" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="content">Project Notes / Idea Blueprint</label>
+        <textarea id="content" placeholder="Describe the TTT project: purpose, lanes (Ground/Rail/Space), reveal logic, kid-wonder flow, etc."></textarea>
+      </div>
+
+      <div class="buttons">
+        <button id="generatePreview">Generate Preview URL</button>
+        <button id="downloadProject" class="secondary" disabled>Download Project File</button>
+      </div>
+
+      <div class="preview" id="previewBox" style="display:none;">
+        <div class="preview-label">Preview Network Layout URL</div>
+        <div id="previewUrl"></div>
+      </div>
+
+      <div class="status" id="statusMsg"></div>
+    </section>
+
+    <footer>
+      TTT Local Console · Typing-only backstage · Projects are saved as downloadable files under your control.
+    </footer>
+  </main>
+
+  <script>
+    function sanitizeSegment(value) {
+      return value
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9\-]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    }
+
+    function buildPreviewUrl(protocol, planetSystem, projectName, username) {
+      const ps = sanitizeSegment(planetSystem) || "earth";
+      const pn = sanitizeSegment(projectName) || "untitled";
+      const un = sanitizeSegment(username) || "anonymous";
+      return protocol + "TTT." + ps + "-" + pn + "-" + un + "/spiderframework.net";
+    }
+
+    function buildFilename(projectName, username) {
+      const pn = sanitizeSegment(projectName) || "untitled";
+      const un = sanitizeSegment(username) || "anonymous";
+      return pn + "-" + un + ".tttproj.json";
+    }
+
+    document.getElementById("generatePreview").addEventListener("click", function () {
+      const planetSystem = document.getElementById("planetSystem").value;
+      const projectName = document.getElementById("projectName").value;
+      const username = document.getElementById("username").value;
+      const content = document.getElementById("content").value;
+
+      const status = document.getElementById("statusMsg");
+      const previewBox = document.getElementById("previewBox");
+      const previewUrlEl = document.getElementById("previewUrl");
+      const downloadBtn = document.getElementById("downloadProject");
+
+      if (!projectName.trim()) {
+        status.textContent = "Please enter at least a project name before generating a preview.";
+        previewBox.style.display = "none";
+        downloadBtn.disabled = true;
+        return;
+      }
+
+      const protocol = "https://"; // you can switch to "http://" if desired
+      const previewUrl = buildPreviewUrl(protocol, planetSystem, projectName, username);
+
+      previewUrlEl.textContent = previewUrl;
+      previewBox.style.display = "block";
+      status.textContent = "Preview generated. You can now download this snapshot as a project file.";
+      downloadBtn.disabled = false;
+
+      // Store current data in memory for download
+      window._tttCurrentProject = {
+        planetSystem: planetSystem,
+        projectName: projectName,
+        username: username,
+        content: content,
+        previewUrl: previewUrl,
+        createdAt: new Date().toISOString(),
+        schema: "TTT_PROJECT_SNAPSHOT_v1"
+      };
+    });
+
+    document.getElementById("downloadProject").addEventListener("click", function () {
+      const status = document.getElementById("statusMsg");
+      if (!window._tttCurrentProject) {
+        status.textContent = "No project data available. Generate a preview first.";
+        return;
+      }
+
+      const project = window._tttCurrentProject;
+      const filename = buildFilename(project.projectName, project.username);
+
+      const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      status.textContent = "Project file downloaded as \"" + filename + "\". You can store or publish it later at your discretion.";
+    });
+  </script>
+</body>
+</html>
