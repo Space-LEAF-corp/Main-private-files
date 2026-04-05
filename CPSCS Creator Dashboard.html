@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CPSCS Creator Dashboard – Captain Leif William Sogge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #05060a;
+      --panel: #0c1018;
+      --accent: #6cf0ff;
+      --accent-soft: rgba(108, 240, 255, 0.2);
+      --danger: #ff4b81;
+      --ok: #7dff9b;
+      --text-main: #f5f7ff;
+      --text-soft: #a9b0c7;
+      --diamond: #b18cff;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #151a2b 0, #05060a 55%);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, #0b0f18, #05060a);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+      padding: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(108, 240, 255, 0.08), transparent 55%);
+      pointer-events: none;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle, #151a2b, #05060a);
+      box-shadow: 0 0 12px rgba(108, 240, 255, 0.4);
+      font-size: 1.4rem;
+    }
+
+    .sidebar-header h1 {
+      font-size: 0.95rem;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+    }
+
+    .sidebar-header h2 {
+      font-size: 0.9rem;
+      margin: 0.15rem 0 0;
+      color: var(--accent);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(108, 240, 255, 0.08);
+      border: 1px solid rgba(108, 240, 255, 0.35);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+      margin-bottom: 1rem;
+    }
+
+    .tag span.icon {
+      font-size: 0.8rem;
+    }
+
+    .nav-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-soft);
+      margin: 0.75rem 0 0.4rem;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-item {
+      margin-bottom: 0.35rem;
+    }
+
+    .nav-button {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-soft);
+      padding: 0.45rem 0.7rem;
+      font-size: 0.8rem;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .nav-button span.label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-button span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(169, 176, 199, 0.7);
+    }
+
+    .nav-button.active {
+      background: rgba(108, 240, 255, 0.12);
+      border-color: rgba(108, 240, 255, 0.6);
+      color: var(--accent);
+    }
+
+    .nav-button:hover {
+      background: rgba(108, 240, 255, 0.08);
+      border-color: rgba(108, 240, 255, 0.3);
+      color: var(--text-main);
+    }
+
+    .nav-button .status-pill {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(125, 255, 155, 0.5);
+      color: var(--ok);
+      background: rgba(125, 255, 155, 0.08);
+    }
+
+    .nav-footer {
+      margin-top: 1.5rem;
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 0.75rem;
+    }
+
+    .nav-footer code {
+      font-size: 0.7rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .main-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .main-header h1 {
+      font-size: 1.05rem;
+      margin: 0;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .main-header span.sub {
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--text-soft);
+    }
+
+    .badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1rem;
+    }
+
+    .subpanel-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-soft);
+      margin-bottom: 0.5rem;
+    }
+
+    .dual-meter {
+      position: relative;
+      height: 140px;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, rgba(108, 240, 255, 0.12), #05060a);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .dual-meter-bar {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff4b81, #6cf0ff, #7dff9b);
+      opacity: 0.7;
+    }
+
+    .dual-meter-indicator {
+      position: absolute;
+      top: -4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      background: radial-gradient(circle, #6cf0ff, #151a2b);
+      box-shadow: 0 0 10px rgba(108, 240, 255, 0.7);
+      transform: translateX(-50%);
+      transition: left 0.4s ease;
+    }
+
+    .dual-meter-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      margin-top: 0.35rem;
+    }
+
+    .dual-meter-status {
+      font-size: 0.75rem;
+      color: var(--ok);
+    }
+
+    .firewall-panel {
+      border-radius: 14px;
+      background: radial-gradient(circle at top, rgba(177, 140, 255, 0.18), #05060a);
+      border: 1px solid rgba(177, 140, 255, 0.6);
+      padding: 0.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .firewall-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--diamond);
+      margin-bottom: 0.4rem;
+    }
+
+    .firewall-status {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+      margin-bottom: 0.4rem;
+    }
+
+    .firewall-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .chip {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .chip .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--diamond);
+    }
+
+    .firewall-button {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(177, 140, 255, 0.8);
+      background: rgba(177, 140, 255, 0.12);
+      color: var(--text-main);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: 0.18s ease;
+    }
+
+    .firewall-button:hover {
+      background: rgba(177, 140, 255, 0.2);
+      box-shadow: 0 0 12px rgba(177, 140, 255, 0.5);
+    }
+
+    .log-panel {
+      margin-top: 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 0.6rem 0.75rem;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      margin-bottom: 0.25rem;
+      opacity: 0.9;
+    }
+
+    .log-entry span.time {
+      color: var(--accent);
+      margin-right: 0.35rem;
+    }
+
+    .log-entry span.tag {
+      color: var(--diamond);
+      margin-right: 0.35rem;
+    }
+
+    @media (max-width: 880px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- SIDEBAR -->
+    <aside class="panel">
+      <div class="sidebar-header">
+        <div class="avatar">🦇</div>
+        <div>
+          <h1>CPSCS CREATOR DASHBOARD</h1>
+          <h2>Captain Leif William Sogge</h2>
+        </div>
+      </div>
+
+      <div class="tag">
+        <span class="icon">⚛️</span>
+        <span>CERTIFIED CPSCS ORIGIN NODE</span>
+      </div>
+
+      <div>
+        <p class="nav-section-title">Navigation Threads</p>
+        <ul class="nav-list">
+          <li class="nav-item">
+            <button class="nav-button active">
+              <span class="label">
+                <span class="dot"></span>
+                <span>Dashboard Overview</span>
+              </span>
+              <span class="status-pill">STABLE</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-button">
+              <span class="label">
+                <span class="dot"></span>
+                <span>Duality Compass</span>
+              </span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-button">
+              <span class="label">
+                <span class="dot"></span>
+                <span>WWW.UNI Access</span>
+              </span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-button">
+              <span class="label">
+                <span class="dot"></span>
+                <span>Defensive Cyber Webbing</span>
+              </span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-button">
+              <span class="label">
+                <span class="dot"></span>
+                <span>IWS – Invisible Web Sense</span>
+              </span>
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="nav-footer">
+        <div>Graduation Command:</div>
+        <div style="margin-top: 0.25rem;">
+          <code>CCC – CD – WWW</code>
+        </div>
+        <div style="margin-top: 0.4rem;">
+          Creator Access Pattern:
+        </div>
+        <div style="margin-top: 0.25rem;">
+          <code>WWW.CyberSpiderBat.uni/Leif-CPSCS</code>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="panel">
+      <div class="main-header">
+        <div>
+          <h1>CPSCS CORE STATUS</h1>
+          <span class="sub">Diamond Firewall · Duality Compass · WWW.UNI Linkage</span>
+        </div>
+      </div>
+
+      <div class="badge-row">
+        <div class="badge">
+          <span class="dot"></span>
+          <span>ANCHOR: LOCAL TEST ENVIRONMENT</span>
+        </div>
+        <div class="badge">
+          <span class="dot"></span>
+          <span>CAPTAIN: LEIF WILLIAM SOGGE</span>
+        </div>
+        <div class="badge">
+          <span class="dot"></span>
+          <span>MODE: PROTOTYPE BOOTUP</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Duality Meter -->
+        <section>
+          <div class="subpanel-title">Duality Compass · Cyber‐Spider‐Bat Alignment</div>
+          <div class="dual-meter" id="dualMeter">
+            <div>
+              <div class="dual-meter-bar">
+                <div class="dual-meter-indicator" id="dualIndicator" style="left: 50%;"></div>
+              </div>
+              <div class="dual-meter-labels">
+                <span>Shadow / Instinct</span>
+                <span>Balanced</span>
+                <span>Light / Clarity</span>
+              </div>
+            </div>
+            <div class="dual-meter-status" id="dualStatus">
+              Status: Balanced · No cross‐world drift detected.
+            </div>
+          </div>
+
+          <div class="log-panel" id="logPanel">
+            <div class="log-entry">
+              <span class="time">[00:00]</span>
+              <span class="tag">BOOT</span>
+              <span>Diamond Firewall prototype initialized for Captain Leif William Sogge.</span>
+            </div>
+            <div class="log-entry">
+              <span class="time">[00:01]</span>
+              <span class="tag">CCC</span>
+              <span>Graduation protocol ready · CCC – CD – WWW available.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Diamond Firewall -->
+        <section>
+          <div class="firewall-panel">
+            <div class="firewall-title">Diamond Firewall · Bootup Module</div>
+            <div class="firewall-status" id="firewallStatus">
+              Status: STANDBY · Awaiting captain authorization.
+            </div>
+            <div class="firewall-chip-row">
+              <div class="chip">
+                <span class="dot"></span>
+                <span>CCC Integrity</span>
+              </div>
+              <div class="chip">
+                <span class="dot"></span>
+                <span>Duality Drift Watch</span>
+              </div>
+              <div class="chip">
+                <span class="dot"></span>
+                <span>WWW.UNI Gate</span>
+              </div>
+              <div class="chip">
+                <span class="dot"></span>
+                <span>IWS Camouflage Sync</span>
+              </div>
+            </div>
+            <button class="firewall-button" id="firewallButton">
+              <span>🛡️ Initialize Diamond Firewall</span>
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const dualIndicator = document.getElementById("dualIndicator");
+      const dualStatus = document.getElementById("dualStatus");
+      const firewallButton = document.getElementById("firewallButton");
+      const firewallStatus = document.getElementById("firewallStatus");
+      const logPanel = document.getElementById("logPanel");
+
+      let firewallActive = false;
+
+      function log(message, tag = "SYS") {
+        const time = new Date();
+        const t =
+          "[" +
+          String(time.getHours()).padStart(2, "0") +
+          ":" +
+          String(time.getMinutes()).padStart(2, "0") +
+          "]";
+        const div = document.createElement("div");
+        div.className = "log-entry";
+        div.innerHTML =
+          '<span class="time">' +
+          t +
+          '</span><span class="tag">' +
+          tag +
+          "</span><span>" +
+          message +
+          "</span>";
+        logPanel.appendChild(div);
+        logPanel.scrollTop = logPanel.scrollHeight;
+      }
+
+      function setDuality(position, text) {
+        const clamped = Math.max(0, Math.min(100, position));
+        dualIndicator.style.left = clamped + "%";
+        dualStatus.textContent = "Status: " + text;
+      }
+
+      firewallButton.addEventListener("click", () => {
+        if (!firewallActive) {
+          firewallActive = true;
+          firewallStatus.textContent =
+            "Status: ACTIVE · Diamond Firewall shielding CPSCS creator layer.";
+          log(
+            "Diamond Firewall activated · CPSCS creator layer protected for Captain Leif William Sogge.",
+            "DFW"
+          );
+          setDuality(50, "Balanced · Diamond Firewall online · No cross‐world drift detected.");
+        } else {
+          firewallActive = false;
+          firewallStatus.textContent =
+            "Status: STANDBY · Firewall relaxed for local prototype testing.";
+          log("Diamond Firewall set to standby for local prototype testing.", "DFW");
+          setDuality(50, "Balanced · Monitoring only · Prototype mode.");
+        }
+      });
+
+      // Initial subtle animation to show life
+      setTimeout(() => {
+        setDuality(48, "Balanced · Micro‐oscillation within safe CPSCS range.");
+        log("Duality Compass micro‐calibration complete · CPSCS range confirmed.", "DCP");
+      }, 1200);
+    })();
+  </script>
+</body>
+</html>
