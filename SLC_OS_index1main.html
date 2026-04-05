@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Story Engine – Movie / Game Generator</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1rem 1.5rem;
+      background: #141a33;
+      border-bottom: 1px solid #252b4a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    header span {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1px;
+      background: #252b4a;
+    }
+    .sidebar {
+      background: #111628;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .mode-select {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .mode-select button {
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      background: #181f3a;
+      color: #f5f5f5;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .mode-select button.active {
+      background: #2b3a7a;
+      border-color: #6f8cff;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .field label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .field textarea,
+    .field input,
+    .field select {
+      background: #0b1020;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      color: #f5f5f5;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .field small {
+      font-size: 0.7rem;
+      opacity: 0.6;
+    }
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .actions button {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      background: #1f2744;
+      color: #f5f5f5;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .actions button.primary {
+      background: #6f8cff;
+      border-color: #9fb4ff;
+      color: #050814;
+      font-weight: 600;
+    }
+    .output {
+      background: #050814;
+      padding: 1rem 1.25rem;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85rem;
+    }
+    footer {
+      padding: 0.5rem 1.5rem;
+      background: #141a33;
+      border-top: 1px solid #252b4a;
+      font-size: 0.75rem;
+      opacity: 0.7;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    /* Login / handshake overlay */
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 8, 20, 0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    #login-panel {
+      background: #111628;
+      border-radius: 10px;
+      border: 1px solid #3a4268;
+      padding: 1.25rem 1.5rem;
+      width: min(420px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    #login-panel h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    #login-panel p {
+      margin: 0;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    .login-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .login-row button {
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      background: #181f3a;
+      color: #f5f5f5;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .login-row button.selected {
+      background: #2b3a7a;
+      border-color: #6f8cff;
+    }
+    #morse-display {
+      min-height: 1.4rem;
+      font-size: 0.85rem;
+      background: #050814;
+      border-radius: 6px;
+      border: 1px solid #3a4268;
+      padding: 0.25rem 0.5rem;
+      display: flex;
+      align-items: center;
+    }
+    #save-list {
+      font-size: 0.75rem;
+      max-height: 4.5rem;
+      overflow-y: auto;
+      margin-top: 0.25rem;
+    }
+    #save-list div {
+      padding: 0.15rem 0;
+      border-bottom: 1px solid #252b4a;
+      cursor: pointer;
+    }
+    #qr-placeholder {
+      font-size: 0.7rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Story Engine</h1>
+    <span id="user-label">Not logged in</span>
+  </header>
+
+  <!-- LOGIN / HANDSHAKE OVERLAY -->
+  <div id="login-overlay">
+    <div id="login-panel">
+      <h2>Family 1ST Handshake</h2>
+      <p>Local-only identity. Choose orientation, then complete any handshake path to enter.</p>
+
+      <div class="field">
+        <label>Display name</label>
+        <input id="login-name" placeholder="e.g. Captain Leif" />
+      </div>
+
+      <div class="field">
+        <label>Orientation</label>
+        <select id="orientation-select">
+          <option value="kid">Kid</option>
+          <option value="adult">Adult</option>
+          <option value="guardian">Guardian</option>
+        </select>
+        <small>Used to filter saves and gate features. Family 1ST Always!!!</small>
+      </div>
+
+      <div class="field">
+        <label>Handshake options (any one can succeed)</label>
+        <small>Passphrase, symbol tap, or Morse ending (three final taps).</small>
+      </div>
+
+      <div class="field">
+        <label>Passphrase</label>
+        <input id="passphrase-input" placeholder="Family 1ST Always!!!" />
+      </div>
+
+      <div class="field">
+        <label>Symbol tap</label>
+        <div class="login-row">
+          <button data-symbol="🌙" class="symbol-btn">🌙</button>
+          <button data-symbol="⭐" class="symbol-btn">⭐</button>
+          <button data-symbol="🌀" class="symbol-btn">🌀</button>
+          <button data-symbol="🔥" class="symbol-btn">🔥</button>
+        </div>
+        <small>Tap a symbol three times in a row to confirm.</small>
+      </div>
+
+      <div class="field">
+        <label>Morse code ending (3 taps)</label>
+        <div class="login-row">
+          <button id="morse-tap-btn">Tap</button>
+          <span id="morse-display"></span>
+        </div>
+        <small>Just tap three times. This is your “final beat note”.</small>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="login-confirm-btn">Enter engine</button>
+      </div>
+
+      <div class="field">
+        <label>Identity QR (placeholder)</label>
+        <div id="qr-placeholder">
+          After successful login, you can screenshot this screen as your “identity token”.<br>
+          (Local-only visual marker, not a real backend credential.)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="sidebar">
+      <div class="mode-select">
+        <strong style="font-size:0.8rem;opacity:0.8;">Mode</strong>
+        <button id="mode-movie" class="active">🎬 Movie Generator</button>
+        <button id="mode-game">🎮 Game Engine Generator</button>
+      </div>
+
+      <div class="field">
+        <label for="title-input">Title / Working Name</label>
+        <input id="title-input" placeholder="e.g. Ready Player Two: Temporal Drift" />
+      </div>
+
+      <div class="field">
+        <label for="prompt-input">Core idea / vibe</label>
+        <textarea id="prompt-input" rows="4"
+          placeholder="Describe the tone, key characters, or central paradox."></textarea>
+        <small>Seed example: “Doc + Captain + time bubble + van between Earth and Moon.”</small>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="generate-btn">Generate skeleton</button>
+        <button id="clear-btn">Clear</button>
+      </div>
+
+      <div class="field">
+        <label>Save / Load</label>
+        <div class="actions">
+          <button id="save-btn">Save skeleton</button>
+          <button id="load-btn">Reload list</button>
+        </div>
+        <div id="save-list"></div>
+        <small>Only saves matching your orientation are shown. Guardian sees all.</small>
+      </div>
+    </section>
+
+    <section class="output" id="output">
+      <!-- Generated skeleton appears here -->
+    </section>
+  </main>
+
+  <footer>
+    <span>Local-only demo. No network, no backend. Just structure you can extend.</span>
+    <span id="orientation-label"></span>
+  </footer>
+
+  <script>
+    // --- ELEMENTS ---
+    const modeMovieBtn = document.getElementById("mode-movie");
+    const modeGameBtn = document.getElementById("mode-game");
+    const generateBtn = document.getElementById("generate-btn");
+    const clearBtn = document.getElementById("clear-btn");
+    const outputEl = document.getElementById("output");
+    const titleInput = document.getElementById("title-input");
+    const promptInput = document.getElementById("prompt-input");
+    const saveBtn = document.getElementById("save-btn");
+    const loadBtn = document.getElementById("load-btn");
+    const saveListEl = document.getElementById("save-list");
+
+    const loginOverlay = document.getElementById("login-overlay");
+    const loginNameInput = document.getElementById("login-name");
+    const orientationSelect = document.getElementById("orientation-select");
+    const passphraseInput = document.getElementById("passphrase-input");
+    const symbolButtons = document.querySelectorAll(".symbol-btn");
+    const morseTapBtn = document.getElementById("morse-tap-btn");
+    const morseDisplay = document.getElementById("morse-display");
+    const loginConfirmBtn = document.getElementById("login-confirm-btn");
+    const userLabel = document.getElementById("user-label");
+    const orientationLabel = document.getElementById("orientation-label");
+
+    let currentMode = "movie";
+    let currentUser = null; // { name, orientation }
+    let morseTapCount = 0;
+    let selectedSymbol = null;
+    let symbolTapCount = 0;
+
+    // --- MODE SWITCHING ---
+    modeMovieBtn.addEventListener("click", () => {
+      currentMode = "movie";
+      modeMovieBtn.classList.add("active");
+      modeGameBtn.classList.remove("active");
+      renderHint();
+    });
+
+    modeGameBtn.addEventListener("click", () => {
+      currentMode = "game";
+      modeGameBtn.classList.add("active");
+      modeMovieBtn.classList.remove("active");
+      renderHint();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      outputEl.textContent = "";
+      titleInput.value = "";
+      promptInput.value = "";
+    });
+
+    generateBtn.addEventListener("click", () => {
+      const title = titleInput.value.trim() || "Untitled Project";
+      const seed = promptInput.value.trim() || "No specific prompt given.";
+      if (currentMode === "movie") {
+        outputEl.textContent = generateMovieSkeleton(title, seed, currentUser);
+      } else {
+        outputEl.textContent = generateGameSkeleton(title, seed, currentUser);
+      }
+    });
+
+    function renderHint() {
+      if (!outputEl.textContent.trim()) {
+        outputEl.textContent =
+          currentMode === "movie"
+            ? "Movie mode selected.\n\nDescribe your idea on the left, then click “Generate skeleton”."
+            : "Game mode selected.\n\nDescribe your idea on the left, then click “Generate skeleton”.";
+      }
+    }
+
+    // --- LOGIN / HANDSHAKE LOGIC ---
+
+    symbolButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sym = btn.getAttribute("data-symbol");
+        if (selectedSymbol === sym) {
+          symbolTapCount++;
+        } else {
+          selectedSymbol = sym;
+          symbolTapCount = 1;
+        }
+        symbolButtons.forEach(b => b.classList.toggle("selected", b === btn));
+      });
+    });
+
+    morseTapBtn.addEventListener("click", () => {
+      morseTapCount++;
+      morseDisplay.textContent = "Taps: " + morseTapCount;
+    });
+
+    loginConfirmBtn.addEventListener("click", () => {
+      const name = loginNameInput.value.trim() || "Anonymous";
+      const orientation = orientationSelect.value;
+
+      const passphrase = passphraseInput.value.trim().toLowerCase();
+      const passphraseOk = passphrase.includes("family 1st");
+
+      const symbolOk = symbolTapCount >= 3 && !!selectedSymbol;
+      const morseOk = morseTapCount >= 3;
+
+      if (!passphraseOk && !symbolOk && !morseOk) {
+        alert("Handshake failed.\nUse passphrase, symbol taps (3x), or Morse taps (3x).");
+        return;
+      }
+
+      currentUser = { name, orientation };
+      userLabel.textContent = `${name} (${orientation})`;
+      orientationLabel.textContent = `Orientation: ${orientation} • Family 1ST Always!!!`;
+
+      // Reset handshake state
+      morseTapCount = 0;
+      morseDisplay.textContent = "";
+      symbolTapCount = 0;
+      selectedSymbol = null;
+      symbolButtons.forEach(b => b.classList.remove("selected"));
+
+      // Hide overlay
+      loginOverlay.style.display = "none";
+
+      // Initial hint
+      renderHint();
+
+      // Load saves for this orientation
+      renderSaveList();
+    });
+
+    // --- SAVE / LOAD LOGIC ---
+
+    function getAllSaves() {
+      try {
+        const raw = localStorage.getItem("storyEngine.saves");
+        if (!raw) return [];
+        return JSON.parse(raw);
+      } catch {
+        return [];
+      }
+    }
+
+    function setAllSaves(saves) {
+      localStorage.setItem("storyEngine.saves", JSON.stringify(saves));
+    }
+
+    saveBtn.addEventListener("click", () => {
+      if (!currentUser) {
+        alert("Login required before saving.");
+        return;
+      }
+      const title = titleInput.value.trim() || "Untitled Project";
+      const seed = promptInput.value.trim() || "No specific prompt given.";
+      const output = outputEl.textContent.trim();
+      if (!output) {
+        alert("Generate a skeleton before saving.");
+        return;
+      }
+
+      const saves = getAllSaves();
+      const id = Date.now().toString();
+      const entry = {
+        id,
+        title,
+        mode: currentMode,
+        prompt: seed,
+        output,
+        timestamp: Date.now(),
+        orientation: currentUser.orientation,
+        tags: [
+          currentMode,
+          "family1st",
+          currentUser.orientation,
+          "story"
+        ]
+      };
+      saves.push(entry);
+      setAllSaves(saves);
+      renderSaveList();
+      alert("Skeleton saved.");
+    });
+
+    loadBtn.addEventListener("click", () => {
+      renderSaveList();
+    });
+
+    function renderSaveList() {
+      saveListEl.innerHTML = "";
+      if (!currentUser) return;
+      const saves = getAllSaves();
+      const filtered = saves.filter(s => {
+        if (currentUser.orientation === "guardian") return true;
+        return s.orientation === currentUser.orientation;
+      });
+      if (!filtered.length) {
+        saveListEl.textContent = "No saves yet for this orientation.";
+        return;
+      }
+      filtered
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .forEach(s => {
+          const div = document.createElement("div");
+          const date = new Date(s.timestamp).toLocaleString();
+          div.textContent = `[${s.mode}] ${s.title} — ${date}`;
+          div.addEventListener("click", () => {
+            titleInput.value = s.title;
+            promptInput.value = s.prompt;
+            outputEl.textContent = s.output;
+            currentMode = s.mode;
+            if (currentMode === "movie") {
+              modeMovieBtn.classList.add("active");
+              modeGameBtn.classList.remove("active");
+            } else {
+              modeGameBtn.classList.add("active");
+              modeMovieBtn.classList.remove("active");
+            }
+          });
+          saveListEl.appendChild(div);
+        });
+    }
+
+    // --- MOVIE SKELETON GENERATOR ---
+
+    function generateMovieSkeleton(title, seed, user) {
+      const orientation = user ? user.orientation : "unknown";
+      const name = user ? user.name : "Unknown";
+      return [
+        `=== MOVIE SKELETON: ${title} ===`,
+        ``,
+        `USER CONTEXT:`,
+        `  • Name: ${name}`,
+        `  • Orientation: ${orientation}`,
+        `  • Tag: Family 1ST Always!!!`,
+        ``,
+        `CORE IDEA / VIBE:`,
+        `${seed}`,
+        ``,
+        `STRUCTURE: 3 ACTS + MIDPOINT TWIST`,
+        ``,
+        `ACT I – SETUP`,
+        `  • Opening Image:`,
+        `    - Establish the world tone (e.g. Doc + Captain in the lab, time bubble not yet revealed).`,
+        `  • Theme Stated:`,
+        `    - A line that hints at the core idea (e.g. “You can’t be in two places at once... yet.”).`,
+        `  • Setup:`,
+        `    - Introduce main characters, their dynamic, and the core tech (time engine, van, etc.).`,
+        `    - Show normal life before the paradox hits.`,
+        `  • Catalyst:`,
+        `    - A tear in space, a strange reading, or a digital/real mismatch that can’t be ignored.`,
+        `  • Debate:`,
+        `    - Should they engage? Is this a glitch, a threat, or an opportunity?`,
+        ``,
+        `ACT II – CONFRONTATION`,
+        `  • Break into Two:`,
+        `    - They commit to the mission (e.g. take the van, investigate the Starbridge tear).`,
+        `  • Fun & Games:`,
+        `    - Show off systems, tech, and banter (van tour, wearable seats, ICU glasses, bead modules).`,
+        `    - The promise of the premise: time, space, and humor colliding.`,
+        `  • Midpoint (Your big twist):`,
+        `    - Realization: digital world is doing time travel too.`,
+        `    - “We can’t be in two places at once... no wonder they copied the car.”`,
+        `    - Reveal the time bubble: “We never left the lab.”`,
+        `    - Closed vs open timelines, multiple selves, compressed experience.`,
+        ``,
+        `  • Bad Guys Close In:`,
+        `    - The tear worsens, timelines desync, digital and real begin to overlap dangerously.`,
+        `    - Emotional pressure: Doc questions his sanity; Captain reveals prior deaths/iterations.`,
+        `  • All Is Lost:`,
+        `    - A moment where it seems the bubble will fail or the tear will consume the Starbridge.`,
+        `  • Dark Night of the Soul:`,
+        `    - Quiet scene (e.g. awkward lunch order, 10 McChickens + 10 McDoubles).`,
+        `    - Explanation of hunger as multi-self energy cost.`,
+        `    - “I’m just hungry, Doc.” – simple truth after complex explanation.`,
+        ``,
+        `ACT III – RESOLUTION`,
+        `  • Break into Three:`,
+        `    - New synthesis: use both open and closed timeline logic to stabilize the tear.`,
+        `    - Doc finally understands the Captain’s role and experience.`,
+        `  • Finale:`,
+        `    - Execute the plan: van + bubble + digital/real sync.`,
+        `    - Doc’s realization: “We’re bending time around us, not bending around time.”`,
+        `    - “We have all the time in the world!” shouted into the multiverse.`,
+        `  • Final Image:`,
+        `    - Contrast with opening: same lab or van, but now with mutual respect and integrated tech.`,
+        `    - Optional: quiet beat, maybe a new paradox hinted at, or a joke about lunch.`,
+        ``,
+        `DIALOGUE / SCENE HOOKS (FILLABLE):`,
+        `  • Doc’s first reaction to the van: ________________________________`,
+        `  • Captain explaining the time bubble: _____________________________`,
+        `  • The “three people in one” explanation: _________________________`,
+        `  • Doc’s response to “I’m just hungry, Doc.”: _____________________`,
+        ``,
+        `NOTES FOR COLLABORATORS:`,
+        `  • Treat this as a skeleton, not a script. Swap scenes, add beats, or change tech details.`,
+        `  • Keep the core emotional logic:`,
+        `    - Doc = open chaos, legacy genius.`,
+        `    - Captain = closed bubble, multi-self anchor.`,
+        `  • Humor should land on truth, not randomness.`,
+        `  • Leave room for others to plug in their own paradoxes, tech, or character beats.`,
+        ``
+      ].join("\n");
+    }
+
+    // --- GAME SKELETON GENERATOR ---
+
+    function generateGameSkeleton(title, seed, user) {
+      const orientation = user ? user.orientation : "unknown";
+      const name = user ? user.name : "Unknown";
+      return [
+        `=== GAME ENGINE SKELETON: ${title} ===`,
+        ``,
+        `USER CONTEXT:`,
+        `  • Name: ${name}`,
+        `  • Orientation: ${orientation}`,
+        `  • Tag: Family 1ST Always!!!`,
+        ``,
+        `CORE IDEA / VIBE:`,
+        `${seed}`,
+        ``,
+        `GAME TYPE:`,
+        `  • Narrative-driven adventure with time/space mechanics.`,
+        `  • Player can experience “open timeline” (Doc-style) and “closed bubble” (Captain-style) states.`,
+        ``,
+        `CORE ENTITIES:`,
+        `  • PlayerCharacter:`,
+        `    - Attributes: timelineState (open/closed), hungerLevel, focus, timelineIterations.`,
+        `  • Vehicle: SpaceVan (Space LEAF Corp prototype)`,
+        `    - Modules: timeBubbleCore, magneticDock, coolingBay, grillMode, seatHarnessSystem.`,
+        `  • Locations:`,
+        `    - Lab (safe hub, time bubble capable).`,
+        `    - Starbridge Corridor (Earth–Moon).`,
+        `    - TearZone (unstable space-time region).`,
+        `    - DigitalLayer (OASIS-like simulation).`,
+        ``,
+        `STATE MACHINE (HIGH LEVEL):`,
+        `  • STATE: LAB_IDLE`,
+        `    - Player can: talk to Doc, configure van, toggle bubble, accept missions.`,
+        `  • STATE: VAN_TRANSIT`,
+        `    - Player can: drive/pilot, manage modules, choose routes (Starbridge, orbit, etc.).`,
+        `  • STATE: STARBRIDGE_INVESTIGATION`,
+        `    - Player can: scan tear, deploy probes, switch between open/closed timeline modes.`,
+        `  • STATE: DIGITAL_OVERLAY`,
+        `    - Player can: interact with digital copies (e.g. copied DeLorean), hack, sync timelines.`,
+        `  • STATE: HUB_BREAK (LUNCH SCENE)`,
+        `    - Player can: restore hunger, trigger deep dialogue, unlock multi-self lore.`,
+        `  • STATE: FINALE_OPERATION`,
+        `    - Player can: execute final stabilization plan, choose outcomes, lock or free timelines.`,
+        ``,
+        `EXAMPLE DATA STRUCTURES (PSEUDO-CODE):`,
+        ``,
+        `  PlayerCharacter = {`,
+        `    name: "Captain",`,
+        `    timelineState: "closed", // "open" or "closed"`,
+        `    hungerLevel: 0,`,
+        `    timelineIterations: 3, // e.g. died twice, third run`,
+        `  };`,
+        ``,
+        `  SpaceVan = {`,
+        `    name: "Space LEAF Van",`,
+        `    modules: {`,
+        `      timeBubbleCore: true,`,
+        `      magneticDock: true,`,
+        `      coolingBay: { mode: "idle" }, // "cold" | "hot"`,
+        `      grillMode: false,`,
+        `      seatHarnessSystem: true,`,
+        `    },`,
+        `  };`,
+        ``,
+        `  function enterLunchState(player) {`,
+        `    // Closed timeline = higher hunger cost`,
+        `    if (player.timelineState === "closed") {`,
+        `      player.hungerLevel += player.timelineIterations * 5;`,
+        `    } else {`,
+        `      player.hungerLevel += 2;`,
+        `    }`,
+        `    // Trigger dialogue: "I'm just hungry, Doc."`,
+        `  }`,
+        ``,
+        `HOOKS FOR IMPLEMENTATION:`,
+        `  • onTearDetected() -> transition LAB_IDLE -> VAN_TRANSIT -> STARBRIDGE_INVESTIGATION`,
+        `  • onDigitalCopySeen() -> transition STARBRIDGE_INVESTIGATION -> DIGITAL_OVERLAY`,
+        `  • onPlayerOverloaded() -> suggest HUB_BREAK (lunch scene)`,
+        `  • onFinalPlanReady() -> transition to FINALE_OPERATION`,
+        ``,
+        `DESIGN NOTES:`,
+        `  • Keep systems modular: van modules, player states, locations, and events should be pluggable.`,
+        `  • Use the same emotional logic as the movie skeleton:`,
+        `    - Open timeline = more chaos, less compression.`,
+        `    - Closed timeline = more control, more personal cost.`,
+        `  • Leave gaps for collaborators to define:`,
+        `    - Specific missions, side quests, NPCs, and paradox types.`,
+        `    - Different vehicles, labs, or corporations beyond Space LEAF.`,
+        ``
+      ].join("\n");
+    }
+
+    // Initial state: show login overlay
+    renderHint();
+  </script>
+</body>
+</html>
