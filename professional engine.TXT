@@ -1,0 +1,46 @@
+[SONG TITLE]: (optional)
+
+[GENRE / STYLE]:
+(e.g., pop-rock, cinematic ballad, folk, EDM, acoustic soul)
+
+[TEMPO & FEEL]:
+(e.g., 92 bpm, steady groove, light swing, driving 4/4)
+
+[STRUCTURE]:
+- Intro (4 bars)
+- Verse 1 (16 bars)
+- Pre-Chorus (8 bars)
+- Chorus (8 bars)
+- Verse 2 (16 bars)
+- Bridge (8 bars)
+- Final Chorus + Tag (12 bars)
+
+[RHYTHMIC BLUEPRINT]:
+Verse lines: 7–8 syllables, emphasis on beats 1, 4, 7  
+Chorus lines: 5–6 syllables, strong downbeat, chantable  
+Bridge: freer rhythm, longer phrases
+
+[MELODY CONTOUR]:
+- Verses: stepwise, low register  
+- Chorus: leaps on key words, higher register  
+- Bridge: minor shift, softer dynamics
+
+[DYNAMIC ARC]:
+- Start soft  
+- Build in Pre-Chorus  
+- Big Chorus  
+- Drop for Bridge  
+- Final Chorus biggest
+
+[INSTRUMENT MAP]:
+Intro: guitar + pads  
+Verses: add bass + light drums  
+Chorus: full band  
+Bridge: strip to piano + voice  
+Final: full band + harmonies
+
+[THEMATIC PALETTE]:
+(e.g., nostalgia, winter night, neon lights, heartbreak, triumph)
+
+[LYRIC CONTENT REQUEST]:
+(e.g., story of someone finding courage, metaphor of storms clearing)
