@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UISS‐OS Modular Console</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0b0f17;
+            color: #e0e6f0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #111827;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #1f2937;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #1a2233;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
+        }
+        h2 {
+            margin-top: 30px;
+            border-bottom: 1px solid #2d3748;
+            padding-bottom: 10px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: none;
+            background-color: #2d3748;
+            color: #e0e6f0;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #3b82f6;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>UISS‐OS Modular Console</h1>
+    <p>Universal International Space Station Operating System</p>
+</header>
+
+<div class="container">
+
+    <h2>Login</h2>
+    <p>Create or access your role‐based profile.</p>
+
+    <label>Username</label>
+    <input type="text" placeholder="Enter username">
+
+    <label>12‐Digit Password</label>
+    <input type="password" placeholder="Enter 12‐digit password">
+
+    <label>Select Your Role</label>
+    <select>
+        <option value="civilian">Civilian Student</option>
+        <option value="creator">Captain Creator</option>
+        <option value="maintenance">Maintenance Crew Member</option>
+        <option value="steward">Planetary Steward</option>
+    </select>
+
+    <button>Login / Create Profile</button>
+
+
+    <h2>Five‐Word Star Key Sync</h2>
+    <p>Unlock modular tools, extensions, and local system features.</p>
+    <input type="text" placeholder="Enter your 5‐word star key phrase">
+    <button>Sync Key</button>
+
+
+    <h2>QR Module Loader</h2>
+    <p>Scan or paste a QR code payload to load a module (artifact, script, extension, or link).</p>
+    <textarea placeholder="Paste QR payload here..."></textarea>
+    <button>Load Module</button>
+
+
+    <h2>Recovery Access</h2>
+    <p>For creators, administrators, and public figures.</p>
+    <input type="text" placeholder="Enter your 12‐word recovery phrase">
+    <button>Request Recovery Validation</button>
+
+</div>
+
+<footer>
+    <p>For recovery validation or collaborative webmaster support, contact:</p>
+    <p><strong>spaceleafcorp@outlook.com</strong></p>
+    <p>This system is built through public collaboration, shared stewardship, and privacy‐respecting design.</p>
+</footer>
+
+</body>
+</html>
