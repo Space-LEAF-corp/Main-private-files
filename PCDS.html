@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PDCS – Public Digital Communion Space</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --pdcs-bg: #0f172a;        /* deep neutral */
+      --pdcs-bg-soft: #111827;
+      --pdcs-accent: #38bdf8;   /* gentle cyan */
+      --pdcs-text: #e5e7eb;
+      --pdcs-muted: #9ca3af;
+      --pdcs-focus: #facc15;    /* soft gold for focus */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #020617;
+      color: var(--pdcs-text);
+    }
+
+    /* NAV WRAPPER */
+    .pdcs-nav {
+      background: linear-gradient(90deg, #020617, #0f172a, #020617);
+      border-bottom: 1px solid #1f2937;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .pdcs-nav-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    /* BRAND / TITLE */
+    .pdcs-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--pdcs-text);
+    }
+
+    .pdcs-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: radial-gradient(circle at 30% 20%, #38bdf8, #0f172a 55%, #020617);
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.3);
+    }
+
+    .pdcs-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .pdcs-subtitle {
+      font-size: 0.7rem;
+      color: var(--pdcs-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* NAV LINKS */
+    .pdcs-links {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pdcs-link {
+      position: relative;
+      padding: 0.4rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--pdcs-muted);
+      text-decoration: none;
+      transition: color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+    }
+
+    .pdcs-link::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 -2px 0;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, var(--pdcs-accent), transparent);
+      opacity: 0;
+      transform: scaleX(0.6);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .pdcs-link:hover,
+    .pdcs-link:focus-visible {
+      color: var(--pdcs-text);
+      background: rgba(15, 23, 42, 0.9);
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .pdcs-link:hover::after,
+    .pdcs-link:focus-visible::after {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    .pdcs-link:focus-visible {
+      box-shadow: 0 0 0 2px var(--pdcs-focus);
+    }
+
+    /* PRIMARY ACTION */
+    .pdcs-link-primary {
+      border-radius: 999px;
+      background: radial-gradient(circle at 0 0, #38bdf8, #0ea5e9);
+      color: #0b1120;
+      font-weight: 600;
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.25);
+    }
+
+    .pdcs-link-primary:hover,
+    .pdcs-link-primary:focus-visible {
+      background: radial-gradient(circle at 0 0, #e0f2fe, #38bdf8);
+      color: #020617;
+    }
+
+    .pdcs-link-primary::after {
+      display: none;
+    }
+
+    /* MOBILE */
+    @media (max-width: 720px) {
+      .pdcs-nav-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .pdcs-links {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="pdcs-nav" aria-label="PDCS main navigation">
+    <div class="pdcs-nav-inner">
+      <!-- Brand / Home -->
+      <a href="#home" class="pdcs-brand">
+        <div class="pdcs-logo" aria-hidden="true"></div>
+        <div>
+          <div class="pdcs-title">PDCS</div>
+          <div class="pdcs-subtitle">Public Digital Communion Space</div>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="pdcs-links" aria-label="Primary">
+        <a href="#home" class="pdcs-link">Home</a>
+        <a href="#constitution" class="pdcs-link">Constitution</a>
+        <a href="#cultural-safety" class="pdcs-link">Cultural Safety</a>
+        <a href="#ceremonies" class="pdcs-link">Ceremonies</a>
+        <a href="#standards" class="pdcs-link">Standards &amp; Protocols</a>
+        <a href="#identity" class="pdcs-link">Identity &amp; Access</a>
+        <a href="#commons" class="pdcs-link">Learning Commons</a>
+        <a href="#about" class="pdcs-link">About</a>
+        <a href="#begin" class="pdcs-link pdcs-link-primary">Begin Your Framework</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Example sections to match the anchors -->
+  <main style="max-width: 1120px; margin: 2rem auto; padding: 0 1rem 4rem;">
+    <section id="home">
+      <h1>Public Digital Communion Space (PDCS)</h1>
+      <p>Neutral, emotionally safe, culturally inclusive digital commons.</p>
+    </section>
+
+    <section id="constitution">
+      <h2>Constitution Architecture</h2>
+      <p>Create your own civic and ceremonial foundations.</p>
+    </section>
+
+    <section id="cultural-safety">
+      <h2>Cultural Safety</h2>
+      <p>Design emotional safety and non-competitive coexistence.</p>
+    </section>
+
+    <section id="ceremonies">
+      <h2>Ceremonies</h2>
+      <p>Craft inclusive, lineage-safe rituals and flows.</p>
+    </section>
+
+    <section id="standards">
+      <h2>Standards &amp; Protocols</h2>
+      <p>Shared agreements for neutrality and sovereignty.</p>
+    </section>
+
+    <section id="identity">
+      <h2>Identity &amp; Access</h2>
+      <p>Crest evolution, access layers, and gentle boundaries.</p>
+    </section>
+
+    <section id="commons">
+      <h2>Learning Commons</h2>
+      <p>Templates, guides, and cultural exchange materials.</p>
+    </section>
+
+    <section id="about">
+      <h2>About PDCS</h2>
+      <p>A public digital communion space for all cultures, without competition.</p>
+    </section>
+
+    <section id="begin">
+      <h2>Begin Your Framework</h2>
+      <p>Choose a lane: constitution, safety, standards, or ceremonies.</p>
+    </section>
+  </main>
+
+</body>
+</html>
