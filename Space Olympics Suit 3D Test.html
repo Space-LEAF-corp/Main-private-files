@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space Olympics Suit 3D Test</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #050814;
+      color: #f5f7ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      overflow: hidden;
+    }
+    #ui {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: rgba(5, 8, 20, 0.9);
+      border: 1px solid #1b223b;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+    #ui label {
+      display: block;
+      margin-bottom: 4px;
+    }
+    #ui input[type="color"],
+    #ui select {
+      margin-bottom: 6px;
+      width: 120px;
+      font-size: 11px;
+      background: #050814;
+      color: #f5f7ff;
+      border: 1px solid #1b223b;
+      border-radius: 4px;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<div id="ui">
+  <div><strong>3D Suit Test</strong></div>
+  <label>Core Color <input type="color" id="coreColor" value="#222b5a" /></label>
+  <label>Helmet Color <input type="color" id="helmetColor" value="#151b3a" /></label>
+  <label>Visor Color <input type="color" id="visorColor" value="#4af2c5" /></label>
+  <label>Wing Inner <input type="color" id="wingInnerColor" value="#4af2c5" /></label>
+  <label>Wing Set
+    <select id="wingSet">
+      <option value="station">Station</option>
+      <option value="deep">Deep Space</option>
+      <option value="storm">Storm</option>
+    </select>
+  </label>
+</div>
+
+<canvas id="suitCanvas"></canvas>
+
+<!-- Three.js + loaders from CDN -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<script>
+  // Basic config (you can sync this with your main builder later)
+  const suitConfig = {
+    colors: {
+      core: "#222b5a",
+      helmet: "#151b3a",
+      visor: "#4af2c5",
+      wingInner: "#4af2c5",
+    },
+    wingSet: "station",
+  };
+  window.suitConfig = suitConfig;
+
+  const canvas = document.getElementById("suitCanvas");
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x050814);
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.set(0, 1.6, 3.5);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.target.set(0, 1.4, 0);
+
+  // Lights
+  const hemiLight = new THREE.HemisphereLight(0x88aaff, 0x050814, 0.7);
+  scene.add(hemiLight);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+  dirLight.position.set(3, 5, 2);
+  scene.add(dirLight);
+
+  const loader = new THREE.GLTFLoader();
+
+  let suitModel = null;
+  let currentWings = null;
+
+  function resizeRenderer() {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resizeRenderer);
+  resizeRenderer();
+
+  // Load main suit
+  loader.load("models/suit.glb", (gltf) => {
+    suitModel = gltf.scene;
+    suitModel.traverse((obj) => {
+      if (obj.isMesh) {
+        obj.castShadow = true;
+        obj.receiveShadow = true;
+        if (!obj.material) return;
+        obj.material = new THREE.MeshStandardMaterial({
+          color: obj.material.color || new THREE.Color(0xffffff),
+          metalness: 0.4,
+          roughness: 0.4,
+        });
+      }
+    });
+    scene.add(suitModel);
+    applyColorsToSuit();
+    loadWingSet(suitConfig.wingSet);
+  });
+
+  function loadWingSet(type) {
+    if (!type) type = "station";
+    if (currentWings) {
+      scene.remove(currentWings);
+      currentWings = null;
+    }
+    loader.load("models/wings_" + type + ".glb", (gltf) => {
+      currentWings = gltf.scene;
+      currentWings.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.castShadow = true;
+          obj.receiveShadow = true;
+          obj.material = new THREE.MeshStandardMaterial({
+            color: obj.material.color || new THREE.Color(0xffffff),
+            metalness: 0.5,
+            roughness: 0.35,
+          });
+        }
+      });
+      // Position wings relative to suit origin
+      currentWings.position.set(0, 1.4, 0); // adjust to match your rig
+      scene.add(currentWings);
+      applyWingInnerColor();
+    });
+  }
+
+  function applyColorsToSuit() {
+    if (!suitModel) return;
+    suitModel.traverse((obj) => {
+      if (!obj.isMesh || !obj.material) return;
+      if (obj.name === "Torso") {
+        obj.material.color.set(suitConfig.colors.core);
+      } else if (obj.name === "Helmet") {
+        obj.material.color.set(suitConfig.colors.helmet);
+      } else if (obj.name === "Visor") {
+        obj.material.emissive = new THREE.Color(suitConfig.colors.visor);
+        obj.material.emissiveIntensity = 1.2;
+        obj.material.color.set("#000000");
+      }
+    });
+  }
+
+  function applyWingInnerColor() {
+    if (!currentWings) return;
+    currentWings.traverse((obj) => {
+      if (!obj.isMesh || !obj.material) return;
+      if (obj.name === "WingInner") {
+        obj.material.color.set(suitConfig.colors.wingInner);
+      }
+    });
+  }
+
+  // UI wiring
+  const coreColorInput = document.getElementById("coreColor");
+  const helmetColorInput = document.getElementById("helmetColor");
+  const visorColorInput = document.getElementById("visorColor");
+  const wingInnerColorInput = document.getElementById("wingInnerColor");
+  const wingSetSelect = document.getElementById("wingSet");
+
+  coreColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.core = e.target.value;
+    applyColorsToSuit();
+  });
+  helmetColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.helmet = e.target.value;
+    applyColorsToSuit();
+  });
+  visorColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.visor = e.target.value;
+    applyColorsToSuit();
+  });
+  wingInnerColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.wingInner = e.target.value;
+    applyWingInnerColor();
+  });
+  wingSetSelect.addEventListener("change", (e) => {
+    suitConfig.wingSet = e.target.value;
+    loadWingSet(suitConfig.wingSet);
+  });
+
+  // Render loop
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+</script>
+</body>
+</html>
