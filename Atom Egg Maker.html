@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom Egg Maker</title>
+
+    <style>
+        body {
+            background: #0d0d0d;
+            color: #e6e6e6;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .egg-preview {
+            width: 200px;
+            height: 260px;
+            margin: 30px auto;
+            border-radius: 50% 50% 45% 45%;
+            background: radial-gradient(circle at 50% 40%, #ffffff, #999999);
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+            transition: all 0.4s ease;
+        }
+
+        .controls {
+            margin-top: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        input[type="color"],
+        input[type="range"],
+        input[type="text"] {
+            width: 100%;
+        }
+
+        .download-btn {
+            margin-top: 30px;
+            padding: 12px 20px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #e6e6e6;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Atom Egg Maker</h1>
+    <p>Create your own symbolic atom egg — a digital seed of intention.</p>
+
+    <div id="egg" class="egg-preview"></div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="eggColor">Egg Color</label>
+            <input type="color" id="eggColor" value="#ffffff">
+        </div>
+
+        <div class="control-group">
+            <label for="glowIntensity">Glow Intensity</label>
+            <input type="range" id="glowIntensity" min="0" max="50" value="20">
+        </div>
+
+        <div class="control-group">
+            <label for="eggName">Egg Name</label>
+            <input type="text" id="eggName" placeholder="Name your egg...">
+        </div>
+    </div>
+
+    <button class="download-btn" onclick="downloadEgg()">Download Egg</button>
+
+    <script>
+        const egg = document.getElementById("egg");
+        const colorPicker = document.getElementById("eggColor");
+        const glowSlider = document.getElementById("glowIntensity");
+
+        function updateEgg() {
+            egg.style.background = colorPicker.value;
+            egg.style.boxShadow = `0 0 ${glowSlider.value}px ${colorPicker.value}`;
+        }
+
+        colorPicker.addEventListener("input", updateEgg);
+        glowSlider.addEventListener("input", updateEgg);
+
+        function downloadEgg() {
+            html2canvas(egg).then(canvas => {
+                const link = document.createElement("a");
+                link.download = (document.getElementById("eggName").value || "atom-egg") + ".png";
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+
+    <!-- HTML2Canvas for image export -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+</body>
+</html>
