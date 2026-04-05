@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DNA Zip Line + Gyro Index</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #050814;
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+      gap: 1.5rem;
+    }
+
+    h1 {
+      margin-bottom: 0.25rem;
+    }
+
+    h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      max-width: 1100px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .panel {
+      background: #151a2c;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    }
+
+    label {
+      display: block;
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    input, select, button {
+      margin-top: 0.25rem;
+      width: 100%;
+      padding: 0.45rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid #333a55;
+      background: #0f1424;
+      color: #f5f5f5;
+      font-size: 0.9rem;
+    }
+
+    button {
+      margin-top: 1rem;
+      background: #2b7cff;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background: #1f63d1;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      margin-top: 1rem;
+      gap: 0.75rem;
+    }
+
+    .status-light {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #555;
+      box-shadow: 0 0 6px rgba(0,0,0,0.6);
+    }
+
+    .status-light.green {
+      background: #00d26a;
+      box-shadow: 0 0 12px rgba(0,210,106,0.8);
+    }
+
+    .status-light.red {
+      background: #ff4b4b;
+      box-shadow: 0 0 12px rgba(255,75,75,0.8);
+    }
+
+    .status-text {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .log {
+      margin-top: 0.75rem;
+      font-size: 0.78rem;
+      opacity: 0.8;
+      max-height: 120px;
+      overflow-y: auto;
+      border-top: 1px solid #333a55;
+      padding-top: 0.5rem;
+    }
+
+    .log-entry {
+      margin-bottom: 0.25rem;
+    }
+
+    .subrow {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .subcol {
+      flex: 1 1 120px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    input[type="range"] {
+      width: 100%;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      border: 1px solid #333a55;
+      opacity: 0.85;
+      margin-top: 0.25rem;
+    }
+
+    .pill.on {
+      border-color: #00d26a;
+      color: #00d26a;
+    }
+
+    .pill.off {
+      border-color: #ffb84b;
+      color: #ffb84b;
+    }
+
+    .adult-locked {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jarvondis Transit Console</h1>
+  <div style="font-size:0.9rem; opacity:0.85; margin-bottom:0.5rem;">
+    Kid Zip Line on the left. Adult Gyro Index on the right. All‐green only when both agree.
+  </div>
+
+  <div class="row">
+    <!-- KID PANEL -->
+    <div class="panel">
+      <h2>Kid Panel — DNA Zip Line</h2>
+      <p style="font-size:0.85rem; opacity:0.85;">
+        Enter a safe DNA sequence and choose a whitelisted sector.
+        The zip line only activates when all systems are green and the adult gyro profile allows it.
+      </p>
+
+      <label for="dnaInput">DNA sequence (A, C, G, T only):</label>
+      <input id="dnaInput" type="text" placeholder="e.g. ACGTACGTACGT" />
+
+      <label for="sectorSelect">Destination sector:</label>
+      <select id="sectorSelect">
+        <option value="playground_north">Playground — North Canopy</option>
+        <option value="playground_south">Playground — South Climbing Zone</option>
+        <option value="uni_science">University — Science Lab Cluster</option>
+        <option value="uni_library">University — Library of Alexandria Node</option>
+        <option value="uni_art">University — Art & Story Studio</option>
+      </select>
+
+      <button id="launchBtn">Launch DNA Zip Line</button>
+
+      <div class="status-row">
+        <div id="statusLight" class="status-light"></div>
+        <div id="statusText" class="status-text">Awaiting input...</div>
+      </div>
+
+      <div id="log" class="log"></div>
+    </div>
+
+    <!-- ADULT PANEL -->
+    <div class="panel">
+      <h2>Adult Panel — Gyroscopic Index</h2>
+      <p style="font-size:0.85rem; opacity:0.85;">
+        Configure roles, vectors, and security posture. This profile gates what the kid zip line can do.
+      </p>
+
+      <!-- SIMPLE ADULT PIN GATE -->
+      <label for="adultPin">Adult access PIN (demo: 1234):</label>
+      <input id="adultPin" type="password" placeholder="Enter PIN to unlock controls" />
+      <button id="unlockAdultBtn">Unlock Adult Controls</button>
+
+      <div id="adultLockNotice" style="font-size:0.78rem; opacity:0.8; margin-top:0.35rem;">
+        Controls are locked until a valid PIN is entered.
+      </div>
+
+      <div id="adultControls" class="adult-locked">
+        <label for="adultRole">Adult role:</label>
+        <select id="adultRole">
+          <option value="parent">Parent / Guardian</option>
+          <option value="teacher">Teacher</option>
+          <option value="admin">System Steward</option>
+        </select>
+
+        <div class="subrow">
+          <div class="subcol">
+            <div class="slider-label">
+              <span>Exploration</span>
+              <span>Restriction</span>
+            </div>
+            <input id="exploreSlider" type="range" min="0" max="100" value="60" />
+            <div id="explorePill" class="pill on">Exploration‐leaning</div>
+          </div>
+
+          <div class="subcol">
+            <div class="slider-label">
+              <span>Daytime only</span>
+              <span>Any time</span>
+            </div>
+            <input id="timeSlider" type="range" min="0" max="100" value="40" />
+            <div id="timePill" class="pill off">Daytime‐preferred</div>
+          </div>
+        </div>
+
+        <label>
+          <input id="advancedToggle" type="checkbox" />
+          Allow advanced features (future tools, labs, and creative modules)
+        </label>
+
+        <div style="font-size:0.8rem; opacity:0.85; margin-top:0.5rem;">
+          Current security posture:
+          <span id="securitySummary" style="font-weight:600;">Balanced, kid‐friendly, supervised.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- DATA MODELS ----------
+    const SECTOR_WHITELIST = {
+      "playground_north":  { label: "Playground — North Canopy",   type: "playground", ageMin: 5,  ageMax: 12 },
+      "playground_south":  { label: "Playground — South Climbing", type: "playground", ageMin: 5,  ageMax: 12 },
+      "uni_science":       { label: "University — Science Lab",    type: "classroom",  ageMin: 8,  ageMax: 16 },
+      "uni_library":       { label: "University — Library",        type: "library",    ageMin: 6,  ageMax: 99 },
+      "uni_art":           { label: "University — Art & Story",    type: "studio",     ageMin: 5,  ageMax: 16 }
+    };
+
+    const ADULT_PIN = "1234"; // demo only; replace with real auth later
+
+    const kid = {
+      // placeholder for future age/profile
+      age: 10
+    };
+
+    const adultProfile = {
+      unlocked: false,
+      role: "parent",
+      explorationLevel: 60, // 0 = strict, 100 = free
+      timeFlex: 40,         // 0 = daytime only, 100 = any time
+      allowAdvanced: false
+    };
+
+    // ---------- DOM ----------
+    const dnaInput      = document.getElementById('dnaInput');
+    const sectorSelect  = document.getElementById('sectorSelect');
+    const launchBtn     = document.getElementById('launchBtn');
+    const statusLight   = document.getElementById('statusLight');
+    const statusText    = document.getElementById('statusText');
+    const logEl         = document.getElementById('log');
+
+    const adultPinInput   = document.getElementById('adultPin');
+    const unlockAdultBtn  = document.getElementById('unlockAdultBtn');
+    const adultControls   = document.getElementById('adultControls');
+    const adultLockNotice = document.getElementById('adultLockNotice');
+
+    const adultRoleSelect = document.getElementById('adultRole');
+    const exploreSlider   = document.getElementById('exploreSlider');
+    const timeSlider      = document.getElementById('timeSlider');
+    const advancedToggle  = document.getElementById('advancedToggle');
+    const explorePill     = document.getElementById('explorePill');
+    const timePill        = document.getElementById('timePill');
+    const securitySummary = document.getElementById('securitySummary');
+
+    // ---------- KID DNA VALIDATION ----------
+    function isValidDNA(seq) {
+      const cleaned = seq.trim().toUpperCase();
+      if (cleaned.length < 8) return false;
+      return /^[ACGT]+$/.test(cleaned);
+    }
+
+    function dnaSafetyCheck(dnaSeq, sectorKey) {
+      if (!isValidDNA(dnaSeq)) {
+        return { ok: false, reason: "Invalid DNA sequence. Use A, C, G, T only, length ≥ 8." };
+      }
+
+      const sector = SECTOR_WHITELIST[sectorKey];
+      if (!sector) {
+        return { ok: false, reason: "Destination not whitelisted. Zip line locked." };
+      }
+
+      const cleaned = dnaSeq.trim().toUpperCase();
+      const uniqueBases = new Set(cleaned.split('')).size;
+      if (uniqueBases < 2) {
+        return { ok: false, reason: "DNA sequence too simple. Add more variety for a safe lock." };
+      }
+
+      return { ok: true, reason: `Route cleared to ${sector.label}.` };
+    }
+
+    // ---------- ADULT GYRO LOGIC ----------
+    function updateAdultProfileFromUI() {
+      adultProfile.role = adultRoleSelect.value;
+      adultProfile.explorationLevel = parseInt(exploreSlider.value, 10);
+      adultProfile.timeFlex = parseInt(timeSlider.value, 10);
+      adultProfile.allowAdvanced = advancedToggle.checked;
+
+      // Update pills
+      explorePill.textContent =
+        adultProfile.explorationLevel >= 60 ? "Exploration‐leaning" :
+        adultProfile.explorationLevel <= 40 ? "Restriction‐leaning" :
+        "Balanced";
+
+      explorePill.classList.toggle('on', adultProfile.explorationLevel >= 50);
+      explorePill.classList.toggle('off', adultProfile.explorationLevel < 50);
+
+      timePill.textContent =
+        adultProfile.timeFlex >= 60 ? "Any‐time access" :
+        adultProfile.timeFlex <= 40 ? "Daytime‐preferred" :
+        "Flexible hours";
+
+      timePill.classList.toggle('on', adultProfile.timeFlex >= 50);
+      timePill.classList.toggle('off', adultProfile.timeFlex < 50);
+
+      // Summary
+      let summary = [];
+      if (adultProfile.explorationLevel >= 60) summary.push("exploratory");
+      else if (adultProfile.explorationLevel <= 40) summary.push("protective");
+      else summary.push("balanced");
+
+      if (adultProfile.timeFlex <= 40) summary.push("daytime‐focused");
+      else if (adultProfile.timeFlex >= 60) summary.push("time‐flexible");
+
+      if (adultProfile.allowAdvanced) summary.push("advanced‐ready");
+      else summary.push("core‐only");
+
+      securitySummary.textContent =
+        summary.join(", ") + " profile (" + adultProfile.role + ").";
+    }
+
+    function adultPolicyCheck(sectorKey) {
+      if (!adultProfile.unlocked) {
+        return { ok: false, reason: "Adult gyro profile locked. A grown‐up must unlock controls first." };
+      }
+
+      const sector = SECTOR_WHITELIST[sectorKey];
+      if (!sector) {
+        return { ok: false, reason: "Sector not recognized by adult profile." };
+      }
+
+      // Example rule: younger kids + strict exploration = no science lab
+      if (sector.type === "classroom" && kid.age < 9 && adultProfile.explorationLevel < 50) {
+        return { ok: false, reason: "Adult profile currently restricts access to this classroom sector." };
+      }
+
+      // Example rule: advanced features required for some future sectors (not yet wired)
+      // Here we just demonstrate the hook:
+      if (sector.type === "classroom" && !adultProfile.allowAdvanced) {
+        // Soft warning, not a hard block for now:
+        return { ok: true, reason: "Route allowed, but advanced features remain off in this sector." };
+      }
+
+      // Time‐of‐day rule (demo only, not strict):
+      const hour = new Date().getHours();
+      if (adultProfile.timeFlex <= 40 && (hour < 7 || hour > 20)) {
+        return { ok: false, reason: "Adult profile limits access to daytime hours." };
+      }
+
+      return { ok: true, reason: "Adult gyro profile allows this route." };
+    }
+
+    // ---------- UI HELPERS ----------
+    function setStatus(ok, message) {
+      statusLight.classList.remove('green', 'red');
+      if (ok === true) {
+        statusLight.classList.add('green');
+      } else if (ok === false) {
+        statusLight.classList.add('red');
+      }
+      statusText.textContent = message;
+    }
+
+    function log(message) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.textContent = new Date().toLocaleTimeString() + " — " + message;
+      logEl.prepend(entry);
+    }
+
+    // ---------- EVENT WIRING ----------
+    unlockAdultBtn.addEventListener('click', () => {
+      const pin = adultPinInput.value.trim();
+      if (pin === ADULT_PIN) {
+        adultProfile.unlocked = true;
+        adultControls.classList.remove('adult-locked');
+        adultLockNotice.textContent = "Adult controls unlocked. Adjust vectors as needed.";
+        log("ADULT: Gyro profile unlocked.");
+        updateAdultProfileFromUI();
+      } else {
+        adultProfile.unlocked = false;
+        adultControls.classList.add('adult-locked');
+        adultLockNotice.textContent = "Invalid PIN. Controls remain locked.";
+        log("ADULT: Invalid PIN attempt.");
+      }
+    });
+
+    adultRoleSelect.addEventListener('change', updateAdultProfileFromUI);
+    exploreSlider.addEventListener('input', updateAdultProfileFromUI);
+    timeSlider.addEventListener('input', updateAdultProfileFromUI);
+    advancedToggle.addEventListener('change', updateAdultProfileFromUI);
+
+    launchBtn.addEventListener('click', () => {
+      const dnaSeq = dnaInput.value;
+      const sectorKey = sectorSelect.value;
+
+      const dnaResult = dnaSafetyCheck(dnaSeq, sectorKey);
+      if (!dnaResult.ok) {
+        setStatus(false, "LOCKED — " + dnaResult.reason);
+        log("BLOCKED (DNA): " + dnaResult.reason);
+        return;
+      }
+
+      const adultResult = adultPolicyCheck(sectorKey);
+      if (!adultResult.ok) {
+        setStatus(false, "LOCKED — " + adultResult.reason);
+        log("BLOCKED (ADULT): " + adultResult.reason);
+        return;
+      }
+
+      // Both passed
+      setStatus(true, "ALL GREEN — Zip line ready. " + dnaResult.reason + " " + adultResult.reason);
+      log("SAFE: " + dnaResult.reason + " " + adultResult.reason);
+      // Hook: here you’d trigger the actual scene/transition.
+    });
+
+    // Initialize adult summary
+    updateAdultProfileFromUI();
+  </script>
+</body>
+</html>
