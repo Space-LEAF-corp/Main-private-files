@@ -359,7 +359,10 @@ def quick_start():
         print("DEMO 1: User Registration")
         print("=" * 60)
         result = playground.demo_registration("quickstart_user")
-        print(json.dumps(result, indent=2))
+        safe_result = dict(result)
+        if "password" in safe_result:
+            safe_result["password"] = "***"
+        print(json.dumps(safe_result, indent=2))
         
         print("\n" + "=" * 60)
         print("DEMO 2: Multi-Layer Login")
