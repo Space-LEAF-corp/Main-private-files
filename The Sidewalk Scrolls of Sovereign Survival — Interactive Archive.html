@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Sidewalk Scrolls of Sovereign Survival — Interactive Archive</title>
+<style>
+  :root {
+    --ink-dark: #1a1a1a;
+    --chalk-purple: #7b5fff;
+    --chalk-blue: #59b6ff;
+    --chalk-gold: #f7c948;
+    --chalk-pink: #ff6fa9;
+    --chalk-white: #f5f7fa;
+    --bg: #0f1220;
+    --accent: #11b5e4;
+  }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--chalk-white);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  .frame {
+    max-width: 980px; margin: 0 auto; padding: 20px 16px 80px;
+  }
+  header {
+    text-align: center; margin-bottom: 12px;
+  }
+  header h1 { margin: 8px 0 0; font-weight: 700; font-size: 1.4rem; }
+  header p { margin: 6px 0; opacity: 0.8; font-size: 0.95rem; }
+
+  /* Canvas panel */
+  .panel {
+    position: relative; background: #121633; border: 1px solid #2b2f55; border-radius: 14px;
+    overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  }
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border-bottom: 1px solid #2b2f55;
+    background: #121a3d;
+  }
+  .controls button, .controls label {
+    background: #18204d; color: var(--chalk-white); border: 1px solid #2b2f55;
+    padding: 8px 10px; border-radius: 10px; font-size: 0.9rem; cursor: pointer;
+  }
+  .controls button:hover { background: #20306a; }
+  .controls input[type="range"] { width: 140px; vertical-align: middle; }
+
+  .stage {
+    position: relative; min-height: 520px;
+    background: radial-gradient(1200px 600px at 50% 100%, #0e1230 0%, #0b0f24 55%, #0a0d1f 100%);
+  }
+
+  /* Caption */
+  .caption {
+    position: absolute; left: 12px; bottom: 12px; right: 12px;
+    background: rgba(10, 14, 28, 0.75); border: 1px solid #2b2f55; border-radius: 12px;
+    padding: 10px 12px; font-size: 0.9rem; line-height: 1.35;
+  }
+
+  /* Provenance strip */
+  .provenance {
+    margin-top: 10px; padding: 10px 12px; border: 1px dashed #2b2f55; border-radius: 12px;
+    background: #101534; font-size: 0.9rem;
+  }
+  .sig { font-weight: 700; color: var(--chalk-gold); }
+  .seal { color: var(--accent); }
+
+  /* SVG styling mimicking chalk */
+  svg { display: block; width: 100%; height: 100%; }
+  .chalk {
+    fill: none; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 2px 1px rgba(0,0,0,0.35));
+  }
+  .glow { filter: drop-shadow(0 0 8px rgba(17, 181, 228, 0.6)); }
+
+  /* Animations */
+  @keyframes pulse {
+    0% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.7; transform: scale(1); }
+  }
+  @keyframes waveMove {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(12px); }
+    100% { transform: translateX(0); }
+  }
+  @keyframes orbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .animate-slow { animation-duration: 10s; }
+  .animate-fast { animation-duration: 4s; }
+
+  /* Focus mode for accessibility */
+  .focus-ring { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 12px; }
+</style>
+</head>
+<body>
+<div class="frame" role="region" aria-label="Interactive Sidewalk Scrolls Archive">
+  <header>
+    <h1>The Sidewalk Scrolls of Sovereign Survival</h1>
+    <p>Musical, interactive, and animated — inscribed today as a living continuity marker.</p>
+  </header>
+
+  <div class="panel" id="panel">
+    <div class="controls" role="toolbar" aria-label="Artifact Controls">
+      <button id="musicBtn" aria-pressed="false">Start music</button>
+      <button id="motionBtn" aria-pressed="true">Pause motion</button>
+      <label for="speed">Speed</label>
+      <input type="range" id="speed" min="0.5" max="1.8" step="0.1" value="1.0" aria-label="Animation speed">
+      <button id="focusBtn">Focus highlights</button>
+      <button id="valuesBtn">Show values</button>
+    </div>
+
+    <div class="stage" id="stage" aria-live="polite">
+      <!-- SVG “chalk” scene -->
+      <svg viewBox="0 0 1000 520" role="img" aria-label="Animated chalk figures and values">
+        <!-- Purple-blue swirls (breath) -->
+        <path class="chalk" id="swirl1"
+              d="M40,380 C220,340 320,420 480,360 C640,300 780,360 940,320"
+              stroke="var(--chalk-purple)" stroke-width="12" style="animation: waveMove 8s ease-in-out infinite;" />
+        <path class="chalk" id="swirl2"
+              d="M80,430 C260,390 360,470 520,410 C680,350 820,410 960,370"
+              stroke="var(--chalk-blue)" stroke-width="10" style="animation: waveMove 9s ease-in-out infinite;" />
+
+        <!-- Watcher of Becoming (figure with elongated eyes) -->
+        <g id="watcher" transform="translate(140,160)" style="animation: pulse 6s ease-in-out infinite;">
+          <ellipse cx="140" cy="80" rx="60" ry="90" stroke="var(--chalk-pink)" stroke-width="10" class="chalk"/>
+          <!-- Eyes -->
+          <ellipse cx="110" cy="60" rx="18" ry="28" stroke="var(--chalk-blue)" stroke-width="8" class="chalk glow"/>
+          <ellipse cx="170" cy="60" rx="18" ry="28" stroke="var(--chalk-blue)" stroke-width="8" class="chalk glow"/>
+          <!-- Flowing garment -->
+          <path d="M80,160 C120,220 160,240 200,160" stroke="var(--chalk-purple)" stroke-width="12" class="chalk"/>
+        </g>
+
+        <!-- Core values seal: circle with cross and crescent -->
+        <g id="valuesSeal" transform="translate(690,230)">
+          <circle cx="120" cy="120" r="105" stroke="var(--chalk-white)" stroke-width="8" class="chalk glow"
+                  style="animation: orbit 20s linear infinite; transform-origin: 120px 120px;" />
+          <line x1="120" y1="30" x2="120" y2="210" stroke="var(--chalk-gold)" stroke-width="10" class="chalk"/>
+          <line x1="30" y1="120" x2="210" y2="120" stroke="var(--chalk-gold)" stroke-width="10" class="chalk"/>
+          <path d="M170,120 a40,40 0 1,1 -80,0 a18,18 0 1,0 80,0"
+                stroke="var(--chalk-blue)" stroke-width="8" class="chalk" />
+          <!-- Words -->
+          <text x="120" y="14" fill="var(--chalk-white)" font-size="22" text-anchor="middle">TRUTH</text>
+          <text x="120" y="238" fill="var(--chalk-white)" font-size="22" text-anchor="middle">HONOR</text>
+          <text x="12" y="126" fill="var(--chalk-white)" font-size="22" text-anchor="start">WISDOM</text>
+          <text x="208" y="126" fill="var(--chalk-white)" font-size="22" text-anchor="end">COURAGE</text>
+          <text x="120" y="270" fill="var(--chalk-pink)" font-size="18" text-anchor="middle">Dark • Light • Easy • Hard</text>
+        </g>
+      </svg>
+
+      <div class="caption" id="caption">
+        <strong>Continuity caption:</strong> “Tis ah simple set ah rules really — Be you and yourself. Be safe, think first. Take heed, pay attention. Believe in yourself. Take care of you and others. Have faith in the good plan. Be true and honest always.”
+      </div>
+    </div>
+
+    <div class="provenance" aria-label="Provenance and authorship">
+      <div><span class="seal">Playground Archive Entry</span> • Creation date: <span id="date"></span></div>
+      <div>Author: <span class="sig">Leif William Sogge — Ceremonial Steward and Unified Vessel</span></div>
+      <div>Artifact: The Sidewalk Scrolls of Sovereign Survival (interactive, musical, animated)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set creation date to today
+  const dateEl = document.getElementById('date');
+  const now = new Date();
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  dateEl.textContent = now.toLocaleDateString(undefined, options);
+
+  // Motion controls
+  let motionPaused = false;
+  const motionBtn = document.getElementById('motionBtn');
+  const stage = document.getElementById('stage');
+  const speed = document.getElementById('speed');
+
+  function setAnimationSpeed(mult) {
+    const svgs = stage.querySelectorAll('[style*="animation"]');
+    svgs.forEach(el => {
+      const style = el.getAttribute('style');
+      const newStyle = style.replace(/(\d+(\.\d+)?s)/g, (m) => {
+        const s = parseFloat(m);
+        return (s / mult).toFixed(2) + 's';
+      });
+      el.setAttribute('style', newStyle);
+    });
+  }
+
+  motionBtn.addEventListener('click', () => {
+    motionPaused = !motionPaused;
+    motionBtn.setAttribute('aria-pressed', String(motionPaused));
+    motionBtn.textContent = motionPaused ? 'Resume motion' : 'Pause motion';
+    stage.style.animationPlayState = motionPaused ? 'paused' : 'running';
+    // Pause all animated elements
+    stage.querySelectorAll('[style*="animation"]').forEach(el => {
+      el.style.animationPlayState = motionPaused ? 'paused' : 'running';
+    });
+  });
+
+  speed.addEventListener('input', (e) => {
+    const mult = parseFloat(e.target.value);
+    setAnimationSpeed(mult);
+  });
+
+  // Focus highlights for accessibility
+  const focusBtn = document.getElementById('focusBtn');
+  focusBtn.addEventListener('click', () => {
+    stage.classList.toggle('focus-ring');
+  });
+
+  // Values callout
+  const valuesBtn = document.getElementById('valuesBtn');
+  valuesBtn.addEventListener('click', () => {
+    const caption = document.getElementById('caption');
+    caption.textContent = 'Core values: Truth • Wisdom • Honor • Courage | Clauses: Dark/Light • Easy/Hard | Reciprocity: “Be a genie to get a genie.”';
+  });
+
+  // Simple WebAudio synth (click to play taps, Start music for pad)
+  let audioCtx;
+  let padGain, padOsc1, padOsc2, padFilter;
+
+  function initAudio() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function startPad() {
+    if (!audioCtx) initAudio();
+    padGain = audioCtx.createGain();
+    padGain.gain.value = 0.08;
+
+    padFilter = audioCtx.createBiquadFilter();
+    padFilter.type = 'lowpass';
+    padFilter.frequency.value = 800;
+
+    padOsc1 = audioCtx.createOscillator();
+    padOsc1.type = 'sine';
+    padOsc1.frequency.value = 220; // A3
+
+    padOsc2 = audioCtx.createOscillator();
+    padOsc2.type = 'triangle';
+    padOsc2.frequency.value = 330; // E4
+
+    padOsc1.connect(padFilter);
+    padOsc2.connect(padFilter);
+    padFilter.connect(padGain);
+    padGain.connect(audioCtx.destination);
+
+    padOsc1.start();
+    padOsc2.start();
+  }
+
+  function stopPad() {
+    try {
+      padOsc1.stop(); padOsc2.stop();
+      padGain.disconnect(); padFilter.disconnect();
+    } catch (e) {}
+  }
+
+  const musicBtn = document.getElementById('musicBtn');
+  let musicOn = false;
+  musicBtn.addEventListener('click', async () => {
+    musicOn = !musicOn;
+    if (musicOn) {
+      startPad();
+      musicBtn.textContent = 'Stop music';
+      musicBtn.setAttribute('aria-pressed', 'true');
+    } else {
+      stopPad();
+      musicBtn.textContent = 'Start music';
+      musicBtn.setAttribute('aria-pressed', 'false');
+    }
+  });
+
+  // Click taps (percussive blips) tied to figure hits
+  stage.addEventListener('click', (e) => {
+    if (!audioCtx) initAudio();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+    const freq = 220 + x * 660; // position-mapped pitch
+    const vol = 0.12 + (1 - y) * 0.25;
+
+    osc.type = 'square';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  });
+</script>
+</body>
+</html>
