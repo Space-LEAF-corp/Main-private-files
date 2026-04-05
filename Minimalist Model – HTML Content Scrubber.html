@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Minimalist Model – HTML Content Scrubber</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 2rem;
+      line-height: 1.6;
+      background: #fafafa;
+      color: #111;
+    }
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1, h2, h3, h4 {
+      margin-top: 2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.2rem; }
+    p { margin: 0.4rem 0 0.8rem; }
+    ul {
+      margin: 0.4rem 0 1rem 1.2rem;
+      padding-left: 1rem;
+    }
+    li { margin: 0.2rem 0; }
+    .tagline {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+    .flow {
+      padding: 0.75rem 1rem;
+      border-left: 3px solid #222;
+      background: #fff;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    .flow span {
+      display: inline-block;
+      margin: 0.1rem 0;
+    }
+    .pill {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      border: 1px solid #ccc;
+      margin-right: 0.4rem;
+      margin-bottom: 0.2rem;
+      background: #fff;
+    }
+    .callout {
+      border-radius: 4px;
+      padding: 0.75rem 1rem;
+      background: #f0f0f0;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+    .result {
+      font-weight: 600;
+    }
+    .no-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    .no-list li::before {
+      content: "• ";
+      color: #999;
+    }
+    .section-label {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.75rem;
+      color: #777;
+      margin-bottom: 0.2rem;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.85rem;
+      background: #eee;
+      padding: 0.1rem 0.3rem;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+<main>
+
+  <header>
+    <h1>Adding a Content Scrubber to the Minimalist Model</h1>
+    <p class="tagline">Ethical publishing without ceremony, bypasses, or performative rules.</p>
+    <p><strong>Design goal (non‐negotiable):</strong> Publishing stays simple — but responsibility is enforced at the boundary. The scrubber exists only at finalize‐time, not during creative flow.</p>
+  </header>
+
+  <section>
+    <h2>Updated publishing flow</h2>
+    <div class="flow">
+      <span>Upload files</span> →
+      <span>Detect file type</span> →
+      <span>If <code>.html</code> → Scan</span> →
+      <span>If clean → Publish</span> →
+      <span>If restricted → Gate</span> →
+      <span>If malicious → Block</span>
+    </div>
+    <p>No manual triggers. No “run scan” button. No bypass.</p>
+  </section>
+
+  <section>
+    <h2>Phase 11 — HTML content scrubber</h2>
+    <p class="section-label">Trigger condition</p>
+    <ul>
+      <li><strong>File extension:</strong> <code>.html</code> or <code>.htm</code></li>
+      <li><strong>Scope:</strong> Only scans finalized uploads, not drafts</li>
+      <li><strong>Intent:</strong> Preserve speed while enforcing accountability</li>
+    </ul>
+
+    <h3>What the scrubber checks for</h3>
+
+    <h4>1. Malicious / dangerous content (hard block)</h4>
+    <p>These are never allowed — no subscription, no override.</p>
+    <ul>
+      <li>Obfuscated JavaScript payloads</li>
+      <li>Known malware signatures</li>
+      <li>Phishing forms (credential harvesting)</li>
+      <li>Drive‐by download scripts</li>
+      <li>Crypto‐mining scripts without disclosure</li>
+      <li>External script injection from flagged domains</li>
+    </ul>
+    <p class="result">✅ Result: Publish denied</p>
+    <p><strong>Message:</strong> “This content cannot be hosted.”</p>
+    <p>This protects users, visitors, and the platform itself.</p>
+
+    <h4>2. Age‐restricted / sensitive content (gated, not erased)</h4>
+    <p>This is where the model becomes distinctive.</p>
+    <ul>
+      <li>Adult‐only themes</li>
+      <li>Explicit imagery references</li>
+      <li>Sexualized content</li>
+      <li>Graphic violence</li>
+      <li>Explicit substance depiction</li>
+    </ul>
+    <p class="result">✅ Result: Content classified as restricted</p>
+    <p>Cannot be published publicly by default. No shadow publishing. No “I’ll just rename it” trick.</p>
+  </section>
+
+  <section>
+    <h2>Phase 12 — Ethical publishing gate</h2>
+    <p>If content is age‐restricted but not malicious, the platform enforces:</p>
+    <p class="section-label">Required actions (all must be true)</p>
+    <ul>
+      <li><strong>Publisher acknowledgement:</strong> “This content is not intended for minors.”</li>
+      <li><strong>Subscription tier required:</strong> Monitoring, review, and compliance cost money.</li>
+      <li><strong>Mandatory access controls:</strong>
+        <ul>
+          <li>Age gate</li>
+          <li>Restricted indexing</li>
+          <li>Monitoring enabled</li>
+        </ul>
+      </li>
+    </ul>
+    <p>If any condition is missing → publish blocked.</p>
+    <p>This avoids moral panic, silent hosting, and pretending content doesn’t exist. Instead, it enforces accountability.</p>
+  </section>
+
+  <section>
+    <h2>Why subscription is justified</h2>
+    <p>The subscription is not for the content. It’s for:</p>
+    <ul>
+      <li>Continuous monitoring</li>
+      <li>Compliance logging</li>
+      <li>Abuse reporting infrastructure</li>
+      <li>Legal risk mitigation</li>
+      <li>Human review escalation when flagged</li>
+    </ul>
+    <p>That makes it ethical, sustainable, and transparent — and it prevents “free platform, zero responsibility” abuse.</p>
+  </section>
+
+  <section>
+    <h2>Phase 13 — Monitoring &amp; enforcement</h2>
+    <p class="section-label">Once gated content is published</p>
+    <ul>
+      <li>Re‐scan on updates</li>
+      <li>Periodic integrity checks</li>
+      <li>Visitor reports</li>
+      <li>Automated pattern drift detection</li>
+    </ul>
+
+    <p class="section-label">Enforcement ladder</p>
+    <ul>
+      <li>Warning</li>
+      <li>Temporary unpublish</li>
+      <li>Account restriction</li>
+      <li>Removal (for violations)</li>
+    </ul>
+    <p>No public shaming. No silent tolerance.</p>
+  </section>
+
+  <section>
+    <h2>What users cannot do (by design)</h2>
+    <ul class="no-list">
+      <li>Rename file extensions to bypass</li>
+      <li>Embed content remotely to evade scanning</li>
+      <li>Obfuscate HTML to avoid classification</li>
+      <li>Claim ignorance after classification</li>
+      <li>Publish restricted content “accidentally”</li>
+    </ul>
+    <p>This is enforced structurally, not by trust.</p>
+  </section>
+
+  <section>
+    <h2>What stays minimalist</h2>
+    <ul>
+      <li>Upload still feels instant</li>
+      <li>No dashboards added</li>
+      <li>No approval queues for clean content</li>
+      <li>No creator friction for ethical sites</li>
+      <li>No surprise rules mid‐workflow</li>
+    </ul>
+    <p>Most users will never even notice this system exists. That’s good design.</p>
+  </section>
+
+  <section>
+    <h2>Updated mantra</h2>
+    <div class="callout">
+      <p>Files first.<br>
+      Paths are truth.<br>
+      Publishing is implicit.<br>
+      Safety is invisible.<br>
+      Ethics are enforced at the boundary.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Why this fits the minimalist instinct</h2>
+    <p>You’re not trying to police creativity, moralize users, or add bureaucracy.</p>
+    <p>You’re doing something subtler and smarter: removing the ability to be irresponsible by accident or convenience.</p>
+    <p>That’s not censorship. That’s platform design with a spine.</p>
+  </section>
+
+  <section>
+    <h2>Final grounding thought</h2>
+    <p>Most platforms either ignore responsibility until forced, or overcorrect with heavy‐handed moderation.</p>
+    <p>You’re sketching a third path:</p>
+    <ul>
+      <li>Minimal surface</li>
+      <li>Hard boundaries</li>
+      <li>No loopholes</li>
+    </ul>
+    <p>That’s rare — and worth building carefully.</p>
+  </section>
+
+  <footer>
+    <h3>Next directions</h3>
+    <p>From here, you can:</p>
+    <ul>
+      <li>Define exact classification boundaries (without being explicit)</li>
+      <li>Sketch the technical architecture of the scrubber (static analysis + signatures + ML)</li>
+      <li>Pressure‐test this against abuse scenarios (obfuscation, false positives, edge cases)</li>
+    </ul>
+  </footer>
+
+</main>
+</body>
+</html>
