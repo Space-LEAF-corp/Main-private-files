@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SpaceLEAFCorp.global – Nano Capsule Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #050816, #020308);
+      color: #e5f7ff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+    .shell {
+      background: rgba(3, 10, 24, 0.9);
+      border: 1px solid rgba(120, 220, 255, 0.3);
+      border-radius: 16px;
+      padding: 24px 28px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 0 40px rgba(0, 255, 200, 0.15);
+    }
+    h1 {
+      font-size: 1.4rem;
+      margin-top: 0;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.9;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(120, 220, 255, 0.4);
+      background: rgba(0, 0, 0, 0.4);
+      color: #e5f7ff;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+    input[type="file"] {
+      margin: 0.5rem 0 1rem;
+      color: #e5f7ff;
+      font-size: 0.8rem;
+    }
+    button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(135deg, #00ffc3, #00a2ff);
+      color: #020308;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .status {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      opacity: 0.9;
+      min-height: 1.2em;
+      white-space: pre-line;
+    }
+    .footer {
+      margin-top: 1.5rem;
+      font-size: 0.7rem;
+      opacity: 0.6;
+      text-align: center;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(120, 220, 255, 0.4);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <h1>SpaceLEAFCorp.global</h1>
+    <div class="subtitle">
+      Turbo Stack Satellite Capsule<br />
+      <span class="tag">Nano Code Matrix</span>
+      <span class="tag">Dual QR Required</span>
+    </div>
+
+    <!-- QR payloads (in practice, filled by QR scanner) -->
+    <label for="qr1">QR Key A Payload</label>
+    <input id="qr1" type="text" placeholder="Scan or paste QR A payload..." />
+
+    <label for="qr2">QR Key B Payload</label>
+    <input id="qr2" type="text" placeholder="Scan or paste QR B payload..." />
+
+    <!-- Local capsule file (encrypted + zipped) -->
+    <label for="capsule">Nano Capsule File</label>
+    <input id="capsule" type="file" accept=".leafcapsule,.bin,.dat" />
+
+    <button id="unlockBtn" disabled>Unlock Nano Capsule</button>
+
+    <div class="status" id="status"></div>
+
+    <div class="footer">
+      Open-source login shell for the Space Car release stack.<br />
+      No data leaves this device. Capsule is decrypted locally.
+    </div>
+  </div>
+
+  <script>
+    const qr1Input = document.getElementById('qr1');
+    const qr2Input = document.getElementById('qr2');
+    const capsuleInput = document.getElementById('capsule');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const statusEl = document.getElementById('status');
+
+    function updateButtonState() {
+      const ready =
+        qr1Input.value.trim().length > 0 &&
+        qr2Input.value.trim().length > 0 &&
+        capsuleInput.files.length === 1;
+      unlockBtn.disabled = !ready;
+    }
+
+    qr1Input.addEventListener('input', updateButtonState);
+    qr2Input.addEventListener('input', updateButtonState);
+    capsuleInput.addEventListener('change', updateButtonState);
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    // Placeholder: derive key from two QR payloads
+    async function deriveKeyFromQR(qrA, qrB) {
+      // In a real implementation:
+      // 1. Concatenate qrA + qrB
+      // 2. Use subtle.crypto.importKey + deriveKey (PBKDF2 or HKDF)
+      // 3. Return CryptoKey for AES-GCM
+      const combined = qrA + '::' + qrB;
+      // Fake key: hash to hex just for demo
+      const enc = new TextEncoder().encode(combined);
+      const digest = await crypto.subtle.digest('SHA-256', enc);
+      const hashArray = Array.from(new Uint8Array(digest));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex; // placeholder
+    }
+
+    // Placeholder: decrypt + unzip capsule
+    async function decryptAndLoadCapsule(fakeKeyHex, file) {
+      // Real flow:
+      // 1. Read file as ArrayBuffer
+      // 2. Use AES-GCM with key to decrypt
+      // 3. Use JSZip (or similar) to unzip
+      // 4. Read matrix.json, boot nano code matrix
+      const arrayBuffer = await file.arrayBuffer();
+      // For demo, we just pretend and parse as text
+      const text = new TextDecoder().decode(arrayBuffer);
+      // Expecting something like JSON in dev mode
+      let capsule;
+      try {
+        capsule = JSON.parse(text);
+      } catch (e) {
+        throw new Error('Capsule is not valid JSON (dev mode).');
+      }
+      // Expect a nano matrix index
+      if (!capsule.nanoMatrix || !capsule.nanoMatrix.ants) {
+        throw new Error('Nano code matrix index missing in capsule.');
+      }
+      return capsule;
+    }
+
+    unlockBtn.addEventListener('click', async () => {
+      setStatus('Deriving key from dual QR payloads...');
+      unlockBtn.disabled = true;
+
+      const qrA = qr1Input.value.trim();
+      const qrB = qr2Input.value.trim();
+      const file = capsuleInput.files[0];
+
+      try {
+        const keyHex = await deriveKeyFromQR(qrA, qrB);
+        setStatus('Key derived. Decrypting nano capsule...');
+
+        const capsule = await decryptAndLoadCapsule(keyHex, file);
+
+        // At this point, you would:
+        // - Read capsule.nanoMatrix (turbo stack, swarm, nano ants)
+        // - Dynamically load modules / hydrate UI
+        console.log('Nano Capsule Loaded:', capsule);
+
+        setStatus(
+          'Nano capsule unlocked.\n' +
+          'Turbo stack + satellite swarm index loaded.\n' +
+          'Booting Space Car release environment...'
+        );
+
+        // Example: show a simple confirmation UI or redirect
+        // window.location.href = '/space-car/release-console';
+      } catch (err) {
+        console.error(err);
+        setStatus('Unlock failed: ' + err.message);
+      } finally {
+        updateButtonState();
+      }
+    });
+  </script>
+</body>
+</html>
