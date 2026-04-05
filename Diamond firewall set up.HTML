@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Diamond Firewall Setup — Space LEAF Corp</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #0b0b0b;
+        color: #e0e0e0;
+        font-family: Arial, sans-serif;
+    }
+    .top-bar {
+        width: 100%;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        background: rgba(0,0,0,0.6);
+    }
+    .logo { font-size: 24px; font-weight: bold; letter-spacing: 2px; }
+    .menu { display: flex; gap: 20px; }
+    .menu a { color: #7fffd4; text-decoration: none; font-weight: bold; }
+
+    .container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+    .section {
+        background: #1a1a1a;
+        border-radius: 10px;
+        border: 1px solid #333;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    h2 { color: #7fffd4; margin-top: 0; }
+    label { display: block; margin-top: 8px; }
+    select, input[type="checkbox"] {
+        margin-top: 5px;
+    }
+    .layer-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+    button {
+        padding: 12px 20px;
+        background-color: #7fffd4;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 20px;
+        width: 100%;
+    }
+    .bead-info {
+        font-size: 14px;
+        color: #b0b0b0;
+        margin-top: 5px;
+    }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="logo">SPACE LEAF CORP</div>
+    <div class="menu">
+        <a href="#">Dashboard</a>
+        <a href="#">Beads</a>
+        <a href="#">Firewall</a>
+        <a href="#">Settings</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="section">
+        <h2>Diamond Firewall Mode</h2>
+        <label>Choose how your firewall behaves:</label>
+        <select>
+            <option>Silent Mode — present, but quiet</option>
+            <option>Guardian Mode — gentle guidance</option>
+            <option>Ceremony Mode — for rituals and setup</option>
+            <option>Master Mode — MDF + recovery phrase only</option>
+        </select>
+        <p class="bead-info">
+            Master Mode is only meaningful when your MDF bead is present and your recovery phrase is known.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Layer Permissions</h2>
+        <p>Choose which layers are available at your current bead tier.</p>
+        <div class="layer-grid">
+            <label><input type="checkbox" checked> PDSL — Personal Device Services</label>
+            <label><input type="checkbox" checked> SSWL — Spatial Systems Work</label>
+            <label><input type="checkbox" checked> ESAL — Earth Services Access</label>
+            <label><input type="checkbox"> PBSL — Planetary Body Systems</label>
+            <label><input type="checkbox" checked> UMSL — Universal Media Systems</label>
+        </div>
+        <p class="bead-info">
+            Some layers may be limited or unavailable depending on your bead tier.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Privacy & Safety</h2>
+        <label><input type="checkbox" checked> Local‐Only Mode (recommended)</label>
+        <label><input type="checkbox"> Kid‐Safe Mode (Guardian Mode + extra limits)</label>
+        <label><input type="checkbox" checked> Dimensional gestures allowed</label>
+        <label><input type="checkbox"> Require Ceremony Mode for major changes</label>
+    </div>
+
+    <div class="section">
+        <h2>Bead & Master Settings</h2>
+        <p>Current bead tier: <strong>8 Beads — Advanced User</strong></p>
+        <p>MDF bead detected: <strong>Yes</strong></p>
+        <label><input type="checkbox"> Allow Master Mode to change layer permissions</label>
+        <label><input type="checkbox"> Require 12‐word recovery phrase for overrides</label>
+        <p class="bead-info">
+            Your beads define your authority. The Diamond Firewall simply honors what your beads represent.
+        </p>
+    </div>
+
+    <button>Save Firewall Settings (Local Only)</button>
+
+</div>
+
+</body>
+</html>
