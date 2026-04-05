@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Space LEAF Corp — Login</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: url('panther_background.jpg') no-repeat center center fixed;
+        background-size: cover;
+        font-family: Arial, sans-serif;
+        color: #e0e0e0;
+    }
+    .top-bar {
+        width: 100%;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        background: rgba(0,0,0,0.6);
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 2px;
+    }
+    .menu {
+        display: flex;
+        gap: 20px;
+    }
+    .menu a {
+        color: #7fffd4;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .login-box {
+        background: rgba(0,0,0,0.75);
+        width: 350px;
+        padding: 30px;
+        border-radius: 10px;
+        margin: 120px auto;
+        text-align: center;
+    }
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        background: #222;
+        border: 1px solid #444;
+        border-radius: 5px;
+        color: #e0e0e0;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background: #7fffd4;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="logo">SPACE LEAF CORP</div>
+    <div class="menu">
+        <a href="#">About</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Current Status</a>
+    </div>
+</div>
+
+<div class="login-box">
+    <h2>Login</h2>
+    <input type="text" placeholder="Username">
+    <input type="password" placeholder="Password">
+    <button>Login</button>
+    <button>Create Account</button>
+</div>
+
+</body>
+</html>
