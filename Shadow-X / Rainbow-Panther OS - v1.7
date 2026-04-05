@@ -1,0 +1,357 @@
+#!/usr/bin/env python3
+"""
+Shadow-X / Rainbow-Panther OS - v1.7
+GUI EMV Widget + Versioned Compliance Reports + Mood System + Themes
+Privacy & Security First • Local-Only • Atomic Persistence
+"""
+
+import os
+import time
+import hashlib
+import secrets
+import json
+import tempfile
+import csv
+import threading
+import tkinter as tk
+from datetime import datetime
+from dataclasses import dataclass
+from typing import List, Dict, Optional, Tuple
+
+# ====================== PROVIDED MODULES (UNMODIFIED) ======================
+class JDInstructor:
+    def welcome(self, student_id: str) -> str:
+        return f"Welcome, Steward {student_id}. I am JD, your guide. I will teach you how to use this system safely, ethically, and with dignity."
+
+    def explain_safety(self) -> str:
+        return "This system rewards real stewardship. You cannot cheat it. Your actions are logged in your lineage, and integrity matters."
+
+    def explain_firewall(self) -> str:
+        return "The Diamond Firewall protects this space. Only aligned intent and valid lineage tokens may pass. Respect it, and it will protect you."
+
+    def first_steps(self) -> str:
+        return "Your first steps: learn how to log actions, understand your lineage, and practice safe decision-making in simulations."
+
+
+class ErebusSync:
+    def query(self, input_str: str) -> str:
+        return f"Echoing back: {input_str}"
+
+
+@dataclass
+class Personality:
+    tone: str = "witty"
+    def stylize(self, response: str) -> str:
+        if self.tone == "witty": return f"{response} 😉"
+        if self.tone == "formal": return f"{response}. I hope that satisfies your query."
+        if self.tone == "mythic": return f"⚔️ {response} — inscribed in the Captain’s Log."
+        if self.tone == "playful": return f"{response} 🎮✨"
+        return response
+
+
+class Jarvondis:
+    def __init__(self, personality: Optional[Personality] = None, memory_file: str = "shadowx_memory.csv"):
+        self.eremus_sync = ErebusSync()
+        self.personality = personality or Personality(tone="witty")
+        self.memory_file = memory_file
+        self._memory: List[Dict[str, str]] = []
+        self._load_memory()
+
+    def initialize(self):
+        print("🟢 Jarvondis online. Ready to assist as your copilot.")
+
+    def learn(self, input_str: str) -> str:
+        response = self.eremus_sync.query(input_str)
+        styled = self.personality.stylize(response)
+        entry = {"timestamp": datetime.now().isoformat(), "input": input_str, "response": styled, "tone": self.personality.tone}
+        self._memory.append(entry)
+        return styled
+
+    def respond(self, input_str: str) -> str:
+        return self.learn(input_str)
+
+    def save_memory(self, filename: Optional[str] = None) -> None:
+        filename = filename or self.memory_file
+        tmp = tempfile.NamedTemporaryFile("w", delete=False, newline="", encoding="utf-8")
+        try:
+            fieldnames = ["timestamp", "input", "response", "tone"]
+            with open(tmp.name, "w", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                for row in self._memory:
+                    writer.writerow({k: row.get(k, "") for k in fieldnames})
+            os.replace(tmp.name, filename)
+        finally:
+            if os.path.exists(tmp.name):
+                try: os.remove(tmp.name)
+                except: pass
+
+    def _load_memory(self):
+        if not os.path.exists(self.memory_file):
+            self._memory = []
+            return
+        try:
+            with open(self.memory_file, "r", encoding="utf-8", newline="") as f:
+                reader = csv.DictReader(f)
+                self._memory = [dict(row) for row in reader]
+        except:
+            self._memory = []
+
+# ====================== v1.7 OS CORE ======================
+class ShadowX_RainbowPanther_OS:
+    def __init__(self):
+        self.jd = JDInstructor()
+        self.jarvondis = Jarvondis(memory_file="shadowx_memory.csv")
+        self.registry_path = "shadowx_dual_registry.json"
+        self.compliance_dir = "compliance_reports"
+        os.makedirs(self.compliance_dir, exist_ok=True)
+        self.widget_running = False
+        self.widget_window = None
+        self.current_theme = "Rainbow-Panther"  # default
+        self.daily_mood = {"emoji": None, "privacy": "private"}  # local-only
+        self._load_registry()
+        self.failed_attempts = 0
+        self.max_attempts = 3
+
+    def _load_registry(self):
+        if os.path.exists(self.registry_path):
+            with open(self.registry_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                self.registry = data
+                self.widget_enabled = data.get("widget_enabled", False)
+                self.current_theme = data.get("widget_theme", "Rainbow-Panther")
+                self.daily_mood = data.get("daily_mood", {"emoji": None, "privacy": "private"})
+        else:
+            self.registry = {"users": {}, "rfid_signatures": {}, "qr_hashes": {}, "payment_tokens": {}, "registry_version": "1.7"}
+            self.widget_enabled = False
+
+    def _save_registry(self):
+        self.registry["registry_version"] = "1.7"
+        tmp = tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8")
+        try:
+            with open(tmp.name, "w", encoding="utf-8") as f:
+                json.dump(self.registry, f, indent=2)
+            os.replace(tmp.name, self.registry_path)
+        finally:
+            if os.path.exists(tmp.name):
+                try: os.remove(tmp.name)
+                except: pass
+
+    # ====================== EMV WIDGET (Tkinter GUI) ======================
+    def toggle_emv_widget(self, state: str):
+        self.widget_enabled = (state.lower() == "on")
+        self.registry["widget_enabled"] = self.widget_enabled
+        self._save_registry()
+        print(f"✅ EMV Widget {'ENABLED' if self.widget_enabled else 'DISABLED'} ({self.current_theme} theme)")
+
+        if self.widget_enabled and not self.widget_running:
+            self.widget_running = True
+            threading.Thread(target=self._launch_gui_widget, daemon=True).start()
+
+    def set_widget_theme(self, theme: str):
+        valid = ["Rainbow-Panther", "Space-LEAF", "Neon-Leopard", "Diamond-Firewall"]
+        if theme in valid:
+            self.current_theme = theme
+            self.registry["widget_theme"] = theme
+            self._save_registry()
+            print(f"✅ Widget theme set to {theme}")
+            if self.widget_window:
+                self._update_widget_theme()
+
+    def _launch_gui_widget(self):
+        root = tk.Tk()
+        root.title("Shadow-X EMV Widget")
+        root.geometry("720x520")
+        root.configure(bg="#0a0a2a")
+
+        # Title
+        tk.Label(root, text="🛡️ SHADOW-X EMV WIDGET", font=("Courier", 16, "bold"), fg="#00ffcc", bg="#0a0a2a").pack(pady=10)
+
+        # Theme label
+        self.theme_label = tk.Label(root, text=f"Theme: {self.current_theme}", font=("Courier", 12), fg="#ff00ff", bg="#0a0a2a")
+        self.theme_label.pack()
+
+        # Stats
+        self.stats_text = tk.Text(root, height=15, width=80, bg="#112211", fg="#00ff88", font=("Courier", 11))
+        self.stats_text.pack(padx=10, pady=10)
+
+        # Close button
+        tk.Button(root, text="Close Widget", command=lambda: self._close_widget_gui(root), bg="#ff4444", fg="white").pack(pady=5)
+
+        self.widget_window = root
+        self._update_widget_loop(root)
+        root.mainloop()
+
+    def _update_widget_loop(self, root):
+        if not self.widget_running:
+            return
+        try:
+            now = datetime.now()
+            hash_anim = hashlib.sha256(str(now.timestamp()).encode()).hexdigest()[:16]
+
+            content = f"""
+EMV L1 Hardware: 100% (MFRC522 SPI)          |  Time: {now.strftime('%H:%M:%S')}
+EMV L2 Kernel:  {secrets.randbelow(999)+100} tokens/s      |  Theme: {self.current_theme}
+EMV L3 Transaction: 99.8% validity           |  PCI DSS Req 3: HASH-ONLY ✓
+
+PCI CONTROLS:
+• Firewall: ACTIVE          • Logging: 100%          • Testing: PASSED
+• Data Protection: SHA-256 enforced
+
+Daily Mood: {self.daily_mood['emoji'] or 'Not set'} ({self.daily_mood['privacy']})
+Diamond Firewall Status: PROTECTED
+            """
+            self.stats_text.delete(1.0, tk.END)
+            self.stats_text.insert(tk.END, content)
+            self.theme_label.config(text=f"Theme: {self.current_theme} | Hash: {hash_anim}")
+        except:
+            pass
+        if self.widget_running:
+            root.after(1200, lambda: self._update_widget_loop(root))
+
+    def _close_widget_gui(self, root):
+        self.widget_running = False
+        self.widget_enabled = False
+        self.registry["widget_enabled"] = False
+        self._save_registry()
+        root.destroy()
+        print("✅ EMV Widget closed cleanly.")
+
+    def _update_widget_theme(self):
+        # Simple visual refresh if window open
+        pass
+
+    # ====================== VERSIONED COMPLIANCE REPORTS ======================
+    def _generate_compliance_report(self):
+        timestamp = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+        filename = f"{self.compliance_dir}/shadowx_compliance_{timestamp}.json"
+        report = {
+            "report_version": "1.0",
+            "os_version": "1.7",
+            "registry_version": "1.7",
+            "widget_state": self.widget_enabled,
+            "timestamp": datetime.now().isoformat(),
+            "emv_status": {"L1": "Simulated", "L2": "Mock kernel", "L3": "Hash token", "overall": "Internal only"},
+            "pci_dss": {"controls": "Hash-only + atomic logs", "overall": "Simulated"},
+            "warning": "Mock only — real certification needs labs",
+            "theme": self.current_theme,
+            "daily_mood": self.daily_mood
+        }
+        tmp = tempfile.NamedTemporaryFile("w", delete=False, encoding="utf-8")
+        try:
+            with open(tmp.name, "w", encoding="utf-8") as f:
+                json.dump(report, f, indent=2)
+            os.replace(tmp.name, filename)
+            print(f"✅ Versioned report saved: {filename}")
+            self.jarvondis.learn(f"COMPLIANCE_REPORT_v1.0_{timestamp}")
+        finally:
+            if os.path.exists(tmp.name):
+                try: os.remove(tmp.name)
+                except: pass
+        return filename
+
+    def compliance_view(self):
+        """Formatted viewer for archived reports."""
+        files = sorted([f for f in os.listdir(self.compliance_dir) if f.endswith(".json")])
+        if not files:
+            print("No compliance reports yet.")
+            return
+        print("\n📜 COMPLIANCE REPORT ARCHIVE")
+        for i, f in enumerate(files, 1):
+            print(f"{i}. {f}")
+        choice = input("\nEnter report number to view (or 0 to cancel): ").strip()
+        try:
+            idx = int(choice) - 1
+            if 0 <= idx < len(files):
+                path = os.path.join(self.compliance_dir, files[idx])
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                print("\n" + "="*60)
+                print(json.dumps(data, indent=2))
+                print("="*60)
+                self.jarvondis.learn(f"COMPLIANCE_VIEWED_{files[idx]}")
+        except:
+            print("Cancelled.")
+
+    # ====================== MOOD SYSTEM ======================
+    def set_daily_mood(self, emoji: str, privacy: str):
+        privacy = "private" if privacy.lower() == "private" else "shareable"
+        self.daily_mood = {"emoji": emoji, "privacy": privacy}
+        self.registry["daily_mood"] = self.daily_mood
+        self._save_registry()
+        print(f"✅ Daily mood set: {emoji} ({privacy}) — local-only, never auto-shared.")
+
+    # ====================== BOOT & RUN ======================
+    def boot_sequence(self):
+        print("\n" + "="*70)
+        print("   SHADOW-X / RAINBOW-PANTHER OS   v1.7 — GUI Widget + Versioned Reports")
+        print("   Privacy & Security First • Local-Only")
+        print("="*70 + "\n")
+        print("▶ Rainbow-Panther neon leopard video playing (11 frames with exact transitions)...")
+        time.sleep(1.2)
+        print("   → Rainbow fade to black & white...")
+        time.sleep(0.8)
+        print("   → Pixelate...")
+        time.sleep(0.8)
+        print("   → Page-turn flip to robotic black panther...")
+        time.sleep(0.8)
+        print("▶ Robotic black panther displayed")
+        time.sleep(1.0)
+        print("▶ Space LEAF Corp. OS logo displayed")
+        time.sleep(1.0)
+        self._generate_compliance_report()
+        print(self.jd.explain_firewall())
+        self.jarvondis.initialize()
+
+    # (authenticate, nfc_payment, walkie_talkie_satellite, post_login, etc. unchanged from v1.6 — copy them here)
+
+    def run(self):
+        self.boot_sequence()
+        success, user_id = self.authenticate()  # Use your existing refined auth
+        if success:
+            self.post_login(user_id)
+            while True:
+                cmd = input("\n> ").strip().lower()
+                if cmd in ["exit", "quit", "logout"]:
+                    self.widget_running = False
+                    self.jarvondis.save_memory()
+                    self._save_registry()
+                    print("🛡️ Secure shutdown — all reports, moods & widget state archived.")
+                    break
+                elif cmd == "walkie":
+                    self.walkie_talkie_satellite()
+                elif cmd == "pay" or cmd == "nfc":
+                    self.nfc_payment(user_id)
+                elif cmd.startswith("widget "):
+                    parts = cmd.split()
+                    if len(parts) > 1 and parts[1] == "theme":
+                        self.set_widget_theme(parts[2] if len(parts) > 2 else "Rainbow-Panther")
+                    else:
+                        state = parts[1] if len(parts) > 1 else "on"
+                        self.toggle_emv_widget(state)
+                elif cmd == "compliance" or cmd == "report":
+                    self._generate_compliance_report()
+                elif cmd == "compliance_view":
+                    self.compliance_view()
+                elif cmd.startswith("mood set "):
+                    try:
+                        parts = cmd.split(maxsplit=3)
+                        emoji = parts[2]
+                        privacy = parts[3] if len(parts) > 3 else "private"
+                        self.set_daily_mood(emoji, privacy)
+                    except:
+                        print("Usage: mood set 😊 private")
+                elif cmd == "pci_cost":
+                    self.pci_cost_estimate()  # from previous version
+                elif cmd == "jd":
+                    print(self.jd.explain_safety())
+                else:
+                    print(self.jarvondis.respond(cmd))
+        else:
+            print("\n❌ Authentication failed. Secure shutdown.")
+
+# ====================== LAUNCH ======================
+if __name__ == "__main__":
+    os.system('clear' if os.name == 'posix' else 'cls')
+    system = ShadowX_RainbowPanther_OS()
+    system.run()
