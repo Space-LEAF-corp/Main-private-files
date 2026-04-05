@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space Olympics EVA Suit Prototype Builder</title>
+  <style>
+    :root {
+      --bg: #050814;
+      --panel: #0b1020;
+      --accent: #4af2c5;
+      --accent-soft: #2b8a7f;
+      --text: #f5f7ff;
+      --muted: #9aa0c2;
+      --danger: #ff4b6b;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #151b3a 0, #050814 55%);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #1b223b;
+      background: linear-gradient(90deg, #050814, #0b1020);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    header span {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(320px, 380px) minmax(0, 1fr) 360px;
+      gap: 16px;
+      padding: 16px;
+      flex: 1;
+    }
+
+    section {
+      background: radial-gradient(circle at top left, #151b3a 0, #050814 60%);
+      border-radius: 12px;
+      border: 1px solid #1b223b;
+      padding: 14px 16px;
+      overflow: hidden;
+    }
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+
+    h3 {
+      margin: 12px 0 4px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    p, li {
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .small {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .spec-block {
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #252b45;
+    }
+
+    .spec-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .spec-value {
+      font-size: 0.9rem;
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 10px;
+      margin-top: 6px;
+    }
+
+    .telemetry-item {
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #0b1020;
+      border: 1px solid #1b223b;
+    }
+
+    .telemetry-name {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .telemetry-value {
+      font-size: 0.9rem;
+    }
+
+    .telemetry-status-ok {
+      color: var(--accent);
+    }
+
+    .telemetry-status-warn {
+      color: #ffc857;
+    }
+
+    .telemetry-status-danger {
+      color: var(--danger);
+    }
+
+    .builder-section {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #252b45;
+    }
+
+    .builder-group {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      background: #0b1020;
+      border: 1px solid #1b223b;
+    }
+
+    .builder-group h4 {
+      margin: 0 0 6px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .builder-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .builder-row label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    .builder-row input[type="color"] {
+      width: 40px;
+      height: 22px;
+      padding: 0;
+      border-radius: 4px;
+      border: 1px solid #1b223b;
+      background: transparent;
+    }
+
+    .builder-row select {
+      flex: 1;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #1b223b;
+      background: #050814;
+      color: var(--text);
+      font-size: 0.8rem;
+    }
+
+    .builder-row span.value {
+      font-size: 0.8rem;
+      color: var(--muted);
+      min-width: 60px;
+      text-align: right;
+    }
+
+    .render-panel {
+      position: relative;
+      height: 100%;
+      min-height: 420px;
+      background: radial-gradient(circle at top, #1b223b 0, #050814 60%);
+      border-radius: 10px;
+      border: 1px solid #1b223b;
+      overflow: hidden;
+    }
+
+    .render-header {
+      position: absolute;
+      top: 8px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+      z-index: 2;
+    }
+
+    .render-canvas {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .suit-figure {
+      position: relative;
+      width: 180px;
+      height: 320px;
+      transform: translateY(10px);
+    }
+
+    .suit-core {
+      position: absolute;
+      inset: 20px 60px 40px;
+      border-radius: 40px;
+      background: linear-gradient(180deg, #222b5a, #101426);
+      border: 2px solid #3b4a9a;
+      box-shadow: 0 0 18px rgba(74, 242, 197, 0.2);
+    }
+
+    .suit-helmet {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 80px;
+      height: 70px;
+      transform: translateX(-50%);
+      border-radius: 50px 50px 40px 40px;
+      background: #151b3a;
+      border: 2px solid #3b4a9a;
+      box-shadow: 0 0 12px rgba(74, 242, 197, 0.25);
+    }
+
+    .suit-visor {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      width: 54px;
+      height: 26px;
+      transform: translateX(-50%);
+      border-radius: 20px;
+      background: radial-gradient(circle at top, #4af2c5, #0b1020);
+    }
+
+    .suit-belt {
+      position: absolute;
+      left: 50%;
+      bottom: 60px;
+      width: 110px;
+      height: 18px;
+      transform: translateX(-50%);
+      border-radius: 12px;
+      background: #151b3a;
+      border: 2px solid #3b4a9a;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+    }
+
+    .belt-node {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4af2c5;
+      box-shadow: 0 0 8px rgba(74, 242, 197, 0.7);
+    }
+
+    .suit-leg {
+      position: absolute;
+      bottom: 0;
+      width: 40px;
+      height: 70px;
+      border-radius: 20px;
+      background: #151b3a;
+      border: 2px solid #3b4a9a;
+    }
+
+    .suit-leg.left {
+      left: 50%;
+      transform: translateX(-52px);
+    }
+
+    .suit-leg.right {
+      right: 50%;
+      transform: translateX(52px);
+    }
+
+    .wing {
+      position: absolute;
+      top: 60px;
+      width: 120px;
+      height: 180px;
+      border-radius: 80% 10% 80% 10%;
+      background: linear-gradient(135deg, #1b223b, #050814);
+      border: 2px solid #3b4a9a;
+      box-shadow: 0 0 18px rgba(74, 242, 197, 0.25);
+      opacity: 0.9;
+    }
+
+    .wing.left {
+      right: 50%;
+      transform-origin: right center;
+      transform: translateX(-20px) rotateY(20deg);
+    }
+
+    .wing.right {
+      left: 50%;
+      transform-origin: left center;
+      transform: translateX(20px) rotateY(-20deg);
+    }
+
+    .wing-inner {
+      position: absolute;
+      inset: 10px 16px;
+      border-radius: inherit;
+      background: radial-gradient(circle at center, #4af2c5, #151b3a);
+      opacity: 0.9;
+    }
+
+    .render-footer {
+      position: absolute;
+      bottom: 8px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+      z-index: 2;
+    }
+
+    footer {
+      padding: 6px 16px 10px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid #1b223b;
+      background: #050814;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    code {
+      font-size: 0.75rem;
+      background: #0b1020;
+      padding: 2px 4px;
+      border-radius: 4px;
+      border: 1px solid #1b223b;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Space Olympics EVA Suit Prototype</h1>
+    <span>Modular Nano‐Tech Solar Wing System · Demo Builder</span>
+  </div>
+  <span>Spec: ST‐EVA‐OLY‐α</span>
+</header>
+
+<main>
+  <!-- LEFT: OFFICIAL SPEC SHEET -->
+  <section>
+    <h2>Official Spec Sheet</h2>
+
+    <div class="spec-block">
+      <div class="spec-label">Suit Class</div>
+      <div class="spec-value">Bio‐Responsive, Solar‐Powered, Radiation‐Adaptive EVA Exosuit</div>
+    </div>
+
+    <div class="spec-block">
+      <div class="spec-label">Wing Modules</div>
+      <ul>
+        <li><strong>Station Class (SC‐W1):</strong> Compact, precision EVA, training & obstacle events.</li>
+        <li><strong>Deep Space (DS‐W2):</strong> Extended span, solar glide, Sailboard Mode capable.</li>
+        <li><strong>Storm Class (ST‐W3):</strong> Heavy shielding, plasma & flare survival, cocoon mode.</li>
+      </ul>
+    </div>
+
+    <div class="spec-block">
+      <div class="spec-label">Transformation Modes</div>
+      <ul>
+        <li><strong>Wing Mode:</strong> Fine maneuvering, solar harvesting, analog control.</li>
+        <li><strong>Shield Mode:</strong> Wrap‐around cocoon, radiation & plasma protection.</li>
+        <li><strong>Sailboard Mode (SB‐V1):</strong> Detached solar wind surfboard with magnetic tether.</li>
+      </ul>
+    </div>
+
+    <div class="spec-block">
+      <div class="spec-label">Guardian Auto‐Recovery Protocol (GARP)</div>
+      <p class="small">
+        Continuous monitoring of drift, vitals, and control. On uncontrolled drift or suspected unconsciousness:
+        wings/board reattach, stabilize attitude, deploy shield/Station geometry, and broadcast distress telemetry.
+      </p>
+    </div>
+
+    <div class="spec-block">
+      <div class="spec-label">Core Safety Features</div>
+      <ul>
+        <li>Full‐body radiation management with modular shielding tiles.</li>
+        <li>Plasma‐reflective outer skin on Storm Class wings.</li>
+        <li>Emergency oxygen buffer & micro‐leak sealing in cocoon mode.</li>
+        <li>Memory‐metal spine for reliable deployment & lock‐in.</li>
+      </ul>
+    </div>
+
+    <div class="spec-block">
+      <div class="spec-label">Olympic Event Integration</div>
+      <ul class="small">
+        <li>Precision EVA Trials (SC‐W1)</li>
+        <li>Solar Glide Races (DS‐W2)</li>
+        <li>Storm Endurance Challenges (ST‐W3)</li>
+        <li>Solar Surfboard Grand Prix (SB‐V1)</li>
+        <li>Transformation Sequence Scoring</li>
+        <li>Team Formation Flight Events</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CENTER: RENDER PANEL -->
+  <section>
+    <h2>3D Render Panel (Concept)</h2>
+    <p class="small">
+      This is a visual placeholder. You can wire this panel into a real 3D engine (WebGL/Three.js/etc.) and feed it
+      the color + configuration values from the builder on the right.
+    </p>
+    <div class="render-panel">
+      <div class="render-header">
+        <span id="render-wing-mode-label">Wing Set: Station Class (SC‐W1)</span>
+        <span id="render-status-label">GARP: Standby · Telemetry Nominal</span>
+      </div>
+        <canvas id="suitCanvas"></canvas>
+        <!-- Stylized 2.5D figure driven by JS color values -->
+        <div class="suit-figure">
+          <div class="suit-helmet" id="helmet"></div>
+          <div class="suit-visor" id="visor"></div>
+          <div class="suit-core" id="core"></div>
+          <div class="suit-belt" id="belt">
+            <div class="belt-node"></div>
+            <div class="belt-node"></div>
+            <div class="belt-node"></div>
+          </div>
+          <div class="suit-leg left" id="leg-left"></div>
+          <div class="suit-leg right" id="leg-right"></div>
+
+          <div class="wing left" id="wing-left">
+            <div class="wing-inner" id="wing-inner-left"></div>
+          </div>
+          <div class="wing right" id="wing-right">
+            <div class="wing-inner" id="wing-inner-right"></div>
+          </div>
+        </div>
+      </div>
+      <div class="render-footer">
+        <span id="render-mode-footer">Mode: Wing · EVA Control Active</span>
+        <span id="render-telemetry-footer">Drift: 0.02 m/s · Heart: 72 bpm</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: BUILDER + TELEMETRY -->
+  <section>
+    <h2>Suit & Wing Builder</h2>
+
+    <div class="builder-section">
+      <h3>Main Suit Colors</h3>
+      <div class="builder-group">
+        <h4>Core Body</h4>
+        <div class="builder-row">
+          <label for="coreColor">Chest / Torso Armor</label>
+          <input type="color" id="coreColor" value="#222b5a" />
+        </div>
+        <div class="builder-row">
+          <label for="helmetColor">Helmet Shell</label>
+          <input type="color" id="helmetColor" value="#151b3a" />
+        </div>
+        <div class="builder-row">
+          <label for="visorColor">Visor Glow</label>
+          <input type="color" id="visorColor" value="#4af2c5" />
+        </div>
+        <div class="builder-row">
+          <label for="beltColor">Belt & Nodes Housing</label>
+          <input type="color" id="beltColor" value="#151b3a" />
+        </div>
+        <div class="builder-row">
+          <label for="legColor">Leg Armor</label>
+          <input type="color" id="legColor" value="#151b3a" />
+        </div>
+      </div>
+    </div>
+
+    <div class="builder-section">
+      <h3>Wing Sets & Inner Color</h3>
+      <div class="builder-group">
+        <h4>Wing Configuration</h4>
+        <div class="builder-row">
+          <label for="wingSet">Wing Set</label>
+          <select id="wingSet">
+            <option value="station">Station Class (SC‐W1)</option>
+            <option value="deep">Deep Space (DS‐W2)</option>
+            <option value="storm">Storm Class (ST‐W3)</option>
+          </select>
+        </div>
+        <div class="builder-row">
+          <label for="wingInnerColor">Inner Wing Color (Visible Side)</label>
+          <input type="color" id="wingInnerColor" value="#4af2c5" />
+        </div>
+        <p class="small">
+          Outer wing surfaces are reserved for solar panel & shielding materials. This control affects the
+          <strong>inner visible side</strong> only.
+        </p>
+      </div>
+    </div>
+
+    <div class="builder-section">
+      <h3>Mode & GARP Simulation</h3>
+      <div class="builder-group">
+        <h4>Operational Mode</h4>
+        <div class="builder-row">
+          <label for="modeSelect">Suit Mode</label>
+          <select id="modeSelect">
+            <option value="wing">Wing Mode (EVA)</option>
+            <option value="shield">Shield Mode (Cocoon)</option>
+            <option value="sailboard">Sailboard Mode (SB‐V1)</option>
+          </select>
+        </div>
+        <div class="builder-row">
+          <label for="garpState">GARP State</label>
+          <select id="garpState">
+            <option value="standby">Standby</option>
+            <option value="active">Active (Auto‐Recovery)</option>
+            <option value="recovering">Recovering (Reattach & Stabilize)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="builder-section">
+      <h3>Telemetry Signals</h3>
+      <p class="small">
+        These represent the live data channels the suit would broadcast to mission control / Olympic judges.
+      </p>
+      <div class="telemetry-grid" id="telemetryGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>Hook this UI into your 3D engine by reading values from <code>window.suitConfig</code>.</span>
+  <span>Prototype logic: color mapping, wing set, mode, and GARP state are already wired.</span>
+</footer>
+
+<script>
+  // Core configuration object you can read from a 3D engine
+  const suitConfig = {
+    colors: {
+      core: "#222b5a",
+      helmet: "#151b3a",
+      visor: "#4af2c5",
+      belt: "#151b3a",
+      leg: "#151b3a",
+      wingInner: "#4af2c5",
+    },
+    wingSet: "station", // station | deep | storm
+    mode: "wing", // wing | shield | sailboard
+    garpState: "standby", // standby | active | recovering
+    telemetry: {
+      position: "Low‐Earth EVA",
+      velocity: "0.02 m/s drift",
+      orientation: "Stable · +Z nadir",
+      heartRate: 72,
+      oxygenLevel: 98,
+      suitPressure: "1.0 atm",
+      radiation: "Low",
+      wingMode: "Wing",
+      garpStatus: "Standby",
+      tetherStatus: "Secure",
+      boardAttached: false,
+    },
+  };
+
+  const telemetryDefinitions = [
+    { key: "position", label: "Position" },
+    { key: "velocity", label: "Velocity" },
+    { key: "orientation", label: "Orientation" },
+    { key: "heartRate", label: "Heart Rate" },
+    { key: "oxygenLevel", label: "O2 Level" },
+    { key: "suitPressure", label: "Suit Pressure" },
+    { key: "radiation", label: "Radiation" },
+    { key: "wingMode", label: "Wing Mode" },
+    { key: "garpStatus", label: "GARP Status" },
+    { key: "tetherStatus", label: "Tether" },
+    { key: "boardAttached", label: "Sailboard Attached" },
+  ];
+
+  // DOM references
+  const coreEl = document.getElementById("core");
+  const helmetEl = document.getElementById("helmet");
+  const visorEl = document.getElementById("visor");
+  const beltEl = document.getElementById("belt");
+  const legLeftEl = document.getElementById("leg-left");
+  const legRightEl = document.getElementById("leg-right");
+  const wingInnerLeftEl = document.getElementById("wing-inner-left");
+  const wingInnerRightEl = document.getElementById("wing-inner-right");
+  const wingLeftEl = document.getElementById("wing-left");
+  const wingRightEl = document.getElementById("wing-right");
+
+  const coreColorInput = document.getElementById("coreColor");
+  const helmetColorInput = document.getElementById("helmetColor");
+  const visorColorInput = document.getElementById("visorColor");
+  const beltColorInput = document.getElementById("beltColor");
+  const legColorInput = document.getElementById("legColor");
+  const wingInnerColorInput = document.getElementById("wingInnerColor");
+
+  const wingSetSelect = document.getElementById("wingSet");
+  const modeSelect = document.getElementById("modeSelect");
+  const garpSelect = document.getElementById("garpState");
+
+  const telemetryGrid = document.getElementById("telemetryGrid");
+  const renderWingModeLabel = document.getElementById("render-wing-mode-label");
+  const renderStatusLabel = document.getElementById("render-status-label");
+  const renderModeFooter = document.getElementById("render-mode-footer");
+  const renderTelemetryFooter = document.getElementById("render-telemetry-footer");
+
+  // Initialize telemetry UI
+  function renderTelemetry() {
+    telemetryGrid.innerHTML = "";
+    telemetryDefinitions.forEach((def) => {
+      const value = suitConfig.telemetry[def.key];
+      const item = document.createElement("div");
+      item.className = "telemetry-item";
+
+      const nameEl = document.createElement("div");
+      nameEl.className = "telemetry-name";
+      nameEl.textContent = def.label;
+
+      const valueEl = document.createElement("div");
+      valueEl.className = "telemetry-value";
+
+      let displayValue = value;
+      let statusClass = "";
+
+      if (def.key === "heartRate") {
+        displayValue = value + " bpm";
+        statusClass =
+          value < 45 || value > 160
+            ? "telemetry-status-danger"
+            : value < 55 || value > 120
+            ? "telemetry-status-warn"
+            : "telemetry-status-ok";
+      } else if (def.key === "oxygenLevel") {
+        displayValue = value + " %";
+        statusClass =
+          value < 85
+            ? "telemetry-status-danger"
+            : value < 94
+            ? "telemetry-status-warn"
+            : "telemetry-status-ok";
+      } else if (def.key === "radiation") {
+        statusClass =
+          value === "High"
+            ? "telemetry-status-danger"
+            : value === "Moderate"
+            ? "telemetry-status-warn"
+            : "telemetry-status-ok";
+      } else if (def.key === "garpStatus") {
+        statusClass =
+          value === "Active" || value === "Recovering"
+            ? "telemetry-status-warn"
+            : "telemetry-status-ok";
+      } else if (def.key === "boardAttached") {
+        displayValue = value ? "Yes" : "No";
+        statusClass = value ? "telemetry-status-ok" : "";
+      }
+
+      if (statusClass) valueEl.classList.add(statusClass);
+      valueEl.textContent = displayValue;
+
+      item.appendChild(nameEl);
+      item.appendChild(valueEl);
+      telemetryGrid.appendChild(item);
+    });
+
+    renderTelemetryFooter.textContent =
+      "Drift: " +
+      suitConfig.telemetry.velocity +
+      " · Heart: " +
+      suitConfig.telemetry.heartRate +
+      " bpm";
+  }
+
+  // Apply colors to the stylized figure
+  function applyColors() {
+    coreEl.style.background = suitConfig.colors.core;
+    coreEl.style.borderColor = suitConfig.colors.core;
+
+    helmetEl.style.background = suitConfig.colors.helmet;
+    helmetEl.style.borderColor = suitConfig.colors.core;
+
+    visorEl.style.background = suitConfig.colors.visor;
+
+    beltEl.style.background = suitConfig.colors.belt;
+    beltEl.style.borderColor = suitConfig.colors.core;
+
+    legLeftEl.style.background = suitConfig.colors.leg;
+    legLeftEl.style.borderColor = suitConfig.colors.core;
+    legRightEl.style.background = suitConfig.colors.leg;
+    legRightEl.style.borderColor = suitConfig.colors.core;
+
+    wingInnerLeftEl.style.background = suitConfig.colors.wingInner;
+    wingInnerRightEl.style.background = suitConfig.colors.wingInner;
+  }
+
+  // Update wing set labels & implied behavior
+  function applyWingSet() {
+    let label = "";
+    let modeLabel = suitConfig.mode;
+    switch (suitConfig.wingSet) {
+      case "station":
+        label = "Wing Set: Station Class (SC‐W1)";
+        break;
+      case "deep":
+        label = "Wing Set: Deep Space (DS‐W2)";
+        break;
+      case "storm":
+        label = "Wing Set: Storm Class (ST‐W3)";
+        break;
+    }
+    renderWingModeLabel.textContent = label;
+
+    // Telemetry wing mode
+    if (suitConfig.mode === "wing") {
+      suitConfig.telemetry.wingMode = "Wing";
+    } else if (suitConfig.mode === "shield") {
+      suitConfig.telemetry.wingMode = "Shield";
+    } else if (suitConfig.mode === "sailboard") {
+      suitConfig.telemetry.wingMode = "Sailboard";
+    }
+
+    // Visual tweaks per wing set (simple for now)
+    if (suitConfig.wingSet === "storm") {
+      wingLeftEl.style.boxShadow = "0 0 22px rgba(255, 75, 107, 0.5)";
+      wingRightEl.style.boxShadow = "0 0 22px rgba(255, 75, 107, 0.5)";
+    } else if (suitConfig.wingSet === "deep") {
+      wingLeftEl.style.boxShadow = "0 0 22px rgba(74, 242, 197, 0.6)";
+      wingRightEl.style.boxShadow = "0 0 22px rgba(74, 242, 197, 0.6)";
+    } else {
+      wingLeftEl.style.boxShadow = "0 0 18px rgba(74, 242, 197, 0.25)";
+      wingRightEl.style.boxShadow = "0 0 18px rgba(74, 242, 197, 0.25)";
+    }
+
+    renderTelemetry();
+  }
+
+  // Apply mode & GARP state to labels and simple visuals
+  function applyModeAndGarp() {
+    let modeText = "";
+    if (suitConfig.mode === "wing") {
+      modeText = "Mode: Wing · EVA Control Active";
+      wingLeftEl.style.opacity = "0.9";
+      wingRightEl.style.opacity = "0.9";
+      wingLeftEl.style.transform = "translateX(-20px) rotateY(20deg)";
+      wingRightEl.style.transform = "translateX(20px) rotateY(-20deg)";
+      suitConfig.telemetry.boardAttached = false;
+    } else if (suitConfig.mode === "shield") {
+      modeText = "Mode: Shield · Cocoon Formation";
+      wingLeftEl.style.opacity = "1";
+      wingRightEl.style.opacity = "1";
+      wingLeftEl.style.transform = "translateX(-10px) rotateY(60deg)";
+      wingRightEl.style.transform = "translateX(10px) rotateY(-60deg)";
+      suitConfig.telemetry.boardAttached = false;
+    } else if (suitConfig.mode === "sailboard") {
+      modeText = "Mode: Sailboard · Solar Surf";
+      // Represented by wings pulling slightly back
+      wingLeftEl.style.opacity = "0.6";
+      wingRightEl.style.opacity = "0.6";
+      wingLeftEl.style.transform = "translateX(-30px) rotateY(10deg)";
+      wingRightEl.style.transform = "translateX(30px) rotateY(-10deg)";
+      suitConfig.telemetry.boardAttached = true;
+    }
+    renderModeFooter.textContent = modeText;
+
+    // GARP state
+    let garpLabel = "";
+    if (suitConfig.garpState === "standby") {
+      garpLabel = "GARP: Standby · Telemetry Nominal";
+      suitConfig.telemetry.garpStatus = "Standby";
+    } else if (suitConfig.garpState === "active") {
+      garpLabel = "GARP: Active · Monitoring Drift & Vitals";
+      suitConfig.telemetry.garpStatus = "Active";
+    } else if (suitConfig.garpState === "recovering") {
+      garpLabel = "GARP: Recovering · Reattach & Stabilize";
+      suitConfig.telemetry.garpStatus = "Recovering";
+      suitConfig.telemetry.velocity = "Auto‐correcting";
+    }
+    renderStatusLabel.textContent = garpLabel;
+
+    renderTelemetry();
+  }
+
+  // Wire inputs
+  coreColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.core = e.target.value;
+    applyColors();
+  });
+  helmetColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.helmet = e.target.value;
+    applyColors();
+  });
+  visorColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.visor = e.target.value;
+    applyColors();
+  });
+  beltColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.belt = e.target.value;
+    applyColors();
+  });
+  legColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.leg = e.target.value;
+    applyColors();
+  });
+  wingInnerColorInput.addEventListener("input", (e) => {
+    suitConfig.colors.wingInner = e.target.value;
+    applyColors();
+  });
+
+  wingSetSelect.addEventListener("change", (e) => {
+    suitConfig.wingSet = e.target.value;
+    applyWingSet();
+  });
+
+  modeSelect.addEventListener("change", (e) => {
+    suitConfig.mode = e.target.value;
+    applyModeAndGarp();
+  });
+
+  garpSelect.addEventListener("change", (e) => {
+    suitConfig.garpState = e.target.value;
+    applyModeAndGarp();
+  });
+
+  // Initial render
+  applyColors();
+  applyWingSet();
+  applyModeAndGarp();
+
+  // Expose config globally for external engines
+  window.suitConfig = suitConfig;
+</script>
+</body>
+</html>
