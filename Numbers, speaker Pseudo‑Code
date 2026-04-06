@@ -1,0 +1,88 @@
+DEFINE LIST SMALL_NUMS = [
+    "zero", "one", "two", ..., "nineteen"
+]
+
+DEFINE LIST TENS = [
+    "", "", "twenty", "thirty", ..., "ninety"
+]
+
+DEFINE LIST SCALES = [
+    "", "thousand", "million", "billion", "trillion",
+    "quadrillion", "quintillion", "sextillion", ...
+    // Extend as far as needed
+]
+
+
+FUNCTION three_digit_to_words(n):
+    IF n == 0:
+        RETURN empty string
+
+    SET words = empty list
+
+    SET hundreds = n DIV 100
+    SET remainder = n MOD 100
+
+    IF hundreds > 0:
+        APPEND SMALL_NUMS[hundreds] TO words
+        APPEND "hundred" TO words
+
+    IF remainder > 0:
+        IF remainder < 20:
+            APPEND SMALL_NUMS[remainder] TO words
+        ELSE:
+            SET tens_value = remainder DIV 10
+            SET ones_value = remainder MOD 10
+
+            APPEND TENS[tens_value] TO words
+
+            IF ones_value > 0:
+                APPEND SMALL_NUMS[ones_value] TO words
+
+    RETURN JOIN(words, " ")
+
+
+
+FUNCTION number_to_words(input_number):
+    CONVERT input_number TO STRING num_str
+
+    IF num_str STARTS WITH "-":
+        SET sign = "negative "
+        REMOVE leading "-" FROM num_str
+    ELSE:
+        SET sign = ""
+
+    REMOVE leading zeros FROM num_str
+
+    IF num_str IS EMPTY:
+        RETURN "zero"
+
+    // Split into 3‑digit groups from right
+    INITIALIZE empty LIST groups
+    WHILE num_str NOT EMPTY:
+        TAKE last 3 characters AS group
+        APPEND group TO groups
+        REMOVE last 3 characters FROM num_str
+
+    INITIALIZE empty LIST result_parts
+
+    FOR each group_index i FROM 0 TO groups.length - 1:
+        SET group_value = INTEGER(groups[i])
+
+        IF group_value == 0:
+            CONTINUE
+
+        SET chunk_words = three_digit_to_words(group_value)
+
+        IF i < LENGTH(SCALES):
+            SET scale_word = SCALES[i]
+        ELSE:
+            SET scale_word = "10^" + (i * 3)
+
+        IF scale_word IS NOT EMPTY:
+            APPEND (chunk_words + " " + scale_word) TO result_parts
+        ELSE:
+            APPEND chunk_words TO result_parts
+
+    REVERSE result_parts
+
+    RETURN sign + JOIN(result_parts, " ")
