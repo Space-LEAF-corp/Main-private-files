@@ -1,0 +1,71 @@
+                          +-----------------------------+
+                          |   Unified Login Portal     |
+                          |        (ULP-1.0)          |
+                          |  - OAuth / OIDC shell     |
+                          |  - No data storage        |
+                          +-------------+-------------+
+                                        |
+             +--------------------------+--------------------------+
+             |                          |                          |
+   "Log in with DMV-O"        "Log in with FAAO"         "Log in with Space-O"
+             |                          |                          |
+   +---------v---------+      +---------v---------+      +---------v---------+
+   |  DMV-O Identity   |      |   FAAO Identity   |      |   Space-O Identity|
+   |  Provider (IdP)   |      |   Provider (IdP)  |      |   Provider (IdP)  |
+   +---------+---------+      +---------+---------+      +---------+---------+
+             \                    /          \                    /
+              \                  /            \                  /
+               \                /              \                /
+                \              /                \              /
+                 v            v                  v            v
+              +---------------------------------------------------+
+              |           Identity Envelope (IE-1.0)              |
+              |  - Legal name (from DMV-O)                        |
+              |  - State ID token (DMV-O)                         |
+              |  - Pilot cert token (FAAO)                        |
+              |  - Space operator token (Space-O)                 |
+              |  - Safety profile (gravity, access needs, pledge) |
+              |  - Mission context                                |
+              +----------------------+----------------------------+
+                                     |
+                                     v
+                      +-------------------------------+
+                      |   Space DMV Core Platform     |
+                      |         (SDCP-1.0)            |
+                      +-------------------------------+
+                      |  Modules:                     |
+                      |  - Operator Console           |
+                      |  - DVV Registry               |
+                      |  - Safety Protocol Engine     |
+                      |  - Training & Sim Layer       |
+                      |  - API Gateway                |
+                      +-----------------+-------------+
+                                        |
+          +-----------------------------+-----------------------------+
+          |                                                           |
+          v                                                           v
++------------------------+                               +------------------------+
+|   DVV Registry         |                               | Safety Protocol Engine |
+|  (Digital Vessel IDs)  |                               |       (SPC-1.0)        |
++------------------------+                               +------------------------+
+| - Vessel identity      |                               | - Non-violent pledge   |
+| - Hybrid capabilities  |                               | - Emergency calm       |
+| - Maintenance logs     |                               | - Gravity matching     |
+| - Mission history      |                               | - Access needs logic   |
++-----------+------------+                               +-----------+------------+
+            |                                                           
+            | DVV lookup / verify (read-only)                           
+            |                                                           
+   +--------+----------+                                   +------------+--------+
+   |   DMV Systems     |                                   |   FAA Systems      |
+   | (State-level)     |                                   | (Federal-level)    |
+   +-------------------+                                   +--------------------+
+   | - Ground licenses |                                   | - Pilot certs      |
+   | - Vehicle titles  |                                   | - Aircraft reg     |
+   +-------------------+                                   +--------------------+
+
+Legend:
+- DMV-O: DMV Operator Identity Provider
+- FAAO: FAA Operator Identity Provider
+- Space-O: Space DMV Operator Identity Provider
+- DVV: Digital Vessel Verification
