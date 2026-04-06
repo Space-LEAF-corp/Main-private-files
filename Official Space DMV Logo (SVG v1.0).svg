@@ -1,0 +1,34 @@
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#5cf2ff"/>
+      <stop offset="100%" stop-color="#050816"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="90" cy="90" r="80" fill="none" stroke="#5cf2ff" stroke-width="3" opacity="0.8"/>
+
+  <!-- Inner glow sphere -->
+  <circle cx="90" cy="90" r="55" fill="url(#glow)" opacity="0.9"/>
+
+  <!-- Orbit arcs -->
+  <path d="M30 90a60 28 0 1 0 120 0a60 28 0 1 0 -120 0" 
+        fill="none" stroke="#9ef7ff" stroke-width="2" opacity="0.5"/>
+
+  <path d="M45 90a45 20 0 1 0 90 0a45 20 0 1 0 -90 0" 
+        fill="none" stroke="#5cf2ff" stroke-width="2" opacity="0.7"/>
+
+  <!-- Central leaf/star hybrid (Space LEAF nod) -->
+  <path d="M90 55
+           C105 75, 105 105, 90 125
+           C75 105, 75 75, 90 55Z"
+        fill="#050816" stroke="#5cf2ff" stroke-width="2"/>
+
+  <!-- Text -->
+  <text x="90" y="165" font-family="Segoe UI, sans-serif" font-size="14" 
+        fill="#9ef7ff" text-anchor="middle" letter-spacing="3">
+    SPACE DMV
+  </text>
+</svg>
