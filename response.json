@@ -1,0 +1,12 @@
+{
+  "words": "nine quintillion eight hundred seventy six quadrillion five hundred forty three trillion two hundred ten billion one hundred twenty three million four hundred fifty six thousand seven hundred eighty nine",
+  "chunks": [
+    { "value": 9, "scale": "quintillion" },
+    { "value": 876, "scale": "quadrillion" },
+    { "value": 543, "scale": "trillion" },
+    { "value": 210, "scale": "billion" },
+    { "value": 123, "scale": "million" },
+    { "value": 456, "scale": "thousand" },
+    { "value": 789, "scale": "" }
+  ]
+}
