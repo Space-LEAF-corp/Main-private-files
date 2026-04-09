@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SmartGlass Learning Mode</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #05060a;
+      color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .app {
+      margin-top: 32px;
+      width: 420px;
+      max-width: 100%;
+      background: #10121a;
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+      padding: 20px 20px 24px;
+      box-sizing: border-box;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #1f2937;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .status-card {
+      background: linear-gradient(135deg, #111827, #020617);
+      border-radius: 14px;
+      padding: 14px 14px 16px;
+      margin-bottom: 16px;
+      border: 1px solid #1f2937;
+    }
+    .status-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 4px;
+    }
+    .status-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .status-main span {
+      font-size: 0.95rem;
+    }
+    .calibration {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #38bdf8;
+    }
+    .eta {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 6px;
+    }
+    .section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin: 18px 0 6px;
+    }
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 10px 12px 12px;
+      border: 1px solid #1f2937;
+      margin-bottom: 8px;
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin: 3px 0;
+      color: #e5e7eb;
+    }
+    .metric-label {
+      color: #9ca3af;
+    }
+    .buttons-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: #1d4ed8;
+      color: #f9fafb;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    button.secondary {
+      background: #111827;
+      color: #e5e7eb;
+      border: 1px solid #1f2937;
+    }
+    button.danger {
+      background: #7f1d1d;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      margin: 4px 0;
+    }
+    .toggle-label {
+      color: #e5e7eb;
+    }
+    .toggle-sub {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+    .toggle {
+      width: 40px;
+      height: 22px;
+      border-radius: 999px;
+      background: #111827;
+      border: 1px solid #374151;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle-knob {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: #9ca3af;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: all 0.18s ease;
+    }
+    .toggle.on {
+      background: #16a34a;
+      border-color: #16a34a;
+    }
+    .toggle.on .toggle-knob {
+      left: 20px;
+      background: #f9fafb;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    .log {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 10px;
+      max-height: 80px;
+      overflow-y: auto;
+      border-top: 1px solid #1f2937;
+      padding-top: 6px;
+    }
+    .log-entry {
+      margin-bottom: 3px;
+    }
+    .command-input {
+      margin-top: 14px;
+    }
+    .command-input label {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .command-input input {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.8rem;
+      box-sizing: border-box;
+    }
+    .pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #1f2937;
+      color: #9ca3af;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="title">SmartGlass Learning Mode</div>
+      <div class="badge">Touch‑Pattern Active</div>
+    </div>
+
+    <div class="status-card">
+      <div class="status-label">Status</div>
+      <div class="status-main">
+        <span>Learning Mode: <strong id="learning-status">ON</strong></span>
+        <span class="calibration" id="calibration-value">12%</span>
+      </div>
+      <div class="eta" id="eta-text">Estimated completion: ~9 months of normal use</div>
+    </div>
+
+    <div class="section-title">Touch data overview</div>
+    <div class="card" id="touch-card">
+      <div class="metric-row">
+        <span class="metric-label">Pressure profile</span>
+        <span id="metric-pressure">Balanced</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Swipe rhythm</span>
+        <span id="metric-swipe">Moderate</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Tap timing</span>
+        <span id="metric-tap">Consistent</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Edge touches</span>
+        <span id="metric-edge">Low</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Multi‑touch patterns</span>
+        <span id="metric-multi">Standard</span>
+      </div>
+      <div class="note">
+        No fingerprints or biological data are collected. Only interaction patterns are analyzed.
+      </div>
+    </div>
+
+    <div class="section-title">Upgrade path</div>
+    <div class="card">
+      <div class="metric-row">
+        <span class="metric-label">SmartGlass+ eligibility</span>
+        <span id="eligibility-label">Not yet eligible</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-label">Trade‑in credit</span>
+        <span id="tradein-label">$0 (intact glass required)</span>
+      </div>
+      <div class="buttons-row">
+        <button id="btn-upgrade" disabled>Upgrade to SmartGlass+ ($20)</button>
+        <button id="btn-tradein" class="secondary" disabled>Trade in Learning Edition</button>
+      </div>
+      <div class="note">
+        Upgrade unlocks optional fingerprint micro‑layer. You choose if and when to enable it.
+      </div>
+    </div>
+
+    <div class="section-title">Privacy controls</div>
+    <div class="card">
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Learning Mode</div>
+          <div class="toggle-sub">Allow touch‑pattern adaptation on this device.</div>
+        </div>
+        <div class="toggle on" id="toggle-learning">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Anonymized R&D data</div>
+          <div class="toggle-sub">Share non‑biometric interaction stats to improve future hardware.</div>
+        </div>
+        <div class="toggle on" id="toggle-rnd">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Local profile</div>
+          <div class="toggle-sub">Store your touch profile only on this device.</div>
+        </div>
+        <div class="toggle on" id="toggle-local">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+
+      <div class="buttons-row">
+        <button id="btn-reset" class="danger secondary">Factory reset SmartGlass</button>
+      </div>
+    </div>
+
+    <div class="command-input">
+      <label for="command">
+        Wake‑up command
+        <span class="pill">say: "privacy features on and status"</span>
+      </label>
+      <input id="command" type="text" placeholder='Type command and press Enter' />
+    </div>
+
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    // --- State ---
+    let calibration = 12; // starting %
+    let learningOn = true;
+    let rndOn = true;
+    let localOn = true;
+
+    const calibrationEl = document.getElementById("calibration-value");
+    const etaEl = document.getElementById("eta-text");
+    const eligibilityEl = document.getElementById("eligibility-label");
+    const tradeinEl = document.getElementById("tradein-label");
+    const btnUpgrade = document.getElementById("btn-upgrade");
+    const btnTradein = document.getElementById("btn-tradein");
+    const learningStatusEl = document.getElementById("learning-status");
+    const logEl = document.getElementById("log");
+
+    const toggleLearning = document.getElementById("toggle-learning");
+    const toggleRnd = document.getElementById("toggle-rnd");
+    const toggleLocal = document.getElementById("toggle-local");
+    const btnReset = document.getElementById("btn-reset");
+    const commandInput = document.getElementById("command");
+
+    function log(msg) {
+      const div = document.createElement("div");
+      div.className = "log-entry";
+      const ts = new Date().toLocaleTimeString();
+      div.textContent = `[${ts}] ${msg}`;
+      logEl.prepend(div);
+    }
+
+    function updateCalibrationUI() {
+      calibrationEl.textContent = calibration + "%";
+
+      if (calibration < 30) {
+        etaEl.textContent = "Estimated completion: ~9 months of normal use";
+        eligibilityEl.textContent = "Not yet eligible";
+        tradeinEl.textContent = "$0 (intact glass required)";
+        btnUpgrade.disabled = true;
+        btnTradein.disabled = true;
+      } else if (calibration < 70) {
+        etaEl.textContent = "Estimated completion: ~6 months of normal use";
+        eligibilityEl.textContent = "Early‑stage eligible (SmartGlass+ will improve over time)";
+        tradeinEl.textContent = "$0 (intact glass required)";
+        btnUpgrade.disabled = false;
+        btnTradein.disabled = true;
+      } else if (calibration < 100) {
+        etaEl.textContent = "Estimated completion: ~3 months of normal use";
+        eligibilityEl.textContent = "Nearly fully calibrated — ideal for SmartGlass+";
+        tradeinEl.textContent = "$5 credit (intact glass)";
+        btnUpgrade.disabled = false;
+        btnTradein.disabled = false;
+      } else {
+        etaEl.textContent = "Calibration complete. SmartGlass+ will perform at maximum accuracy.";
+        eligibilityEl.textContent = "Fully calibrated — SmartGlass+ ready";
+        tradeinEl.textContent = "$5 credit (intact glass)";
+        btnUpgrade.disabled = false;
+        btnTradein.disabled = false;
+      }
+    }
+
+    function setToggle(el, on) {
+      if (on) el.classList.add("on");
+      else el.classList.remove("on");
+    }
+
+    function recalcFromPrivacy() {
+      // Simple simulation: if learning is off, calibration stalls.
+      if (!learningOn) {
+        log("Learning Mode disabled — calibration paused.");
+      } else {
+        log("Learning Mode enabled — calibration progressing.");
+      }
+    }
+
+    // Initialize
+    updateCalibrationUI();
+    setToggle(toggleLearning, learningOn);
+    setToggle(toggleRnd, rndOn);
+    setToggle(toggleLocal, localOn);
+
+    // Toggle handlers
+    toggleLearning.addEventListener("click", () => {
+      learningOn = !learningOn;
+      setToggle(toggleLearning, learningOn);
+      learningStatusEl.textContent = learningOn ? "ON" : "OFF";
+      recalcFromPrivacy();
+    });
+
+    toggleRnd.addEventListener("click", () => {
+      rndOn = !rndOn;
+      setToggle(toggleRnd, rndOn);
+      log("Anonymized R&D data " + (rndOn ? "enabled." : "disabled."));
+    });
+
+    toggleLocal.addEventListener("click", () => {
+      localOn = !localOn;
+      setToggle(toggleLocal, localOn);
+      log("Local profile storage " + (localOn ? "enabled." : "disabled."));
+    });
+
+    btnReset.addEventListener("click", () => {
+      if (!confirm("Factory reset SmartGlass learning profile?")) return;
+      calibration = 0;
+      updateCalibrationUI();
+      log("SmartGlass factory reset. Calibration restarted.");
+    });
+
+    btnUpgrade.addEventListener("click", () => {
+      log("Upgrade flow triggered: SmartGlass+ purchase screen would open here.");
+      alert("Upgrade to SmartGlass+ ($20) — placeholder flow.\n\nIn production, this would open a secure purchase screen.");
+    });
+
+    btnTradein.addEventListener("click", () => {
+      log("Trade‑in flow triggered: instructions + shipping label would appear here.");
+      alert("Trade‑in Learning Edition for $5 credit — placeholder flow.\n\nIn production, this would generate a return label.");
+    });
+
+    // Wake‑up command handler
+    commandInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const value = commandInput.value.trim().toLowerCase();
+        if (value === "privacy features on and status") {
+          // Wake‑up behavior: ensure privacy toggles ON and show status log
+          learningOn = true;
+          rndOn = true;
+          localOn = true;
+          setToggle(toggleLearning, true);
+          setToggle(toggleRnd, true);
+          setToggle(toggleLocal, true);
+          learningStatusEl.textContent = "ON";
+          log('Wake‑up command received: "privacy features on and status". All privacy features ON. Status displayed.');
+          alert(
+            "Privacy features ON.\n\n" +
+            "Learning Mode: ON\n" +
+            "Anonymized R&D data: ON\n" +
+            "Local profile: ON\n" +
+            "Calibration: " + calibration + "%\n"
+          );
+        } else {
+          log('Unrecognized command: "' + value + '"');
+        }
+        commandInput.value = "";
+      }
+    });
+
+    // Optional: simulate calibration slowly increasing over time
+    setInterval(() => {
+      if (!learningOn) return;
+      if (calibration < 100) {
+        calibration += 1;
+        updateCalibrationUI();
+      }
+    }, 15000); // every 15 seconds in this demo
+  </script>
+</body>
+</html>
