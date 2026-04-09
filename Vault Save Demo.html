@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vault Save Demo</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #050816;
+      color: #f9fafb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    #app {
+      width: 100%;
+      max-width: 900px;
+      padding: 24px;
+    }
+    .screen {
+      display: none;
+      border-radius: 12px;
+      padding: 24px;
+      background: #111827;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
+    }
+    .screen.active {
+      display: block;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    p {
+      line-height: 1.5;
+    }
+    .small {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 18px;
+      margin: 6px 4px 0 0;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button.secondary {
+      background: #374151;
+    }
+    .card {
+      background: #020617;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #1f2937;
+      margin-top: 16px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #111827;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+    .companion-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #facc15, #4f46e5);
+      position: relative;
+      margin-right: 12px;
+    }
+    .bond-ring {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      border-radius: 999px;
+      border: 2px solid rgba(96,165,250,0.6);
+      box-shadow: 0 0 12px rgba(96,165,250,0.5);
+    }
+    .flex-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .center {
+      text-align: center;
+    }
+    .fade-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(148,163,184,0.25), rgba(15,23,42,0.95));
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+    }
+    .fade-overlay.active {
+      display: flex;
+    }
+    .ceremony-box {
+      background: #020617;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #1f2937;
+      text-align: center;
+      max-width: 360px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+    }
+    .glow-pulse {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      margin: 0 auto 16px auto;
+      background: radial-gradient(circle at 30% 30%, #facc15, #4f46e5);
+      position: relative;
+      overflow: visible;
+    }
+    .glow-pulse::after {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 999px;
+      border: 2px solid rgba(250,204,21,0.4);
+      animation: pulse 1.8s ease-out infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      70% { transform: scale(1.15); opacity: 0; }
+      100% { transform: scale(1.15); opacity: 0; }
+    }
+    .file-row {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #1f2937;
+    }
+    input[type="file"] {
+      font-size: 12px;
+      color: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <!-- Companion "home" mock -->
+  <div id="screen-companion" class="screen active">
+    <h2>Your Companion</h2>
+    <div class="flex-row">
+      <div class="companion-icon">
+        <div class="bond-ring" id="bond-ring"></div>
+      </div>
+      <div>
+        <div id="companion-name"><strong>Companion: Aurora</strong></div>
+        <div id="companion-age" class="small">Age: Young</div>
+        <div id="companion-bond" class="small">Bond Strength: 0.42</div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:12px;">
+      This is a mock companion screen. From here, you can create a Vault Save to preserve this moment.
+    </p>
+    <button id="btn-open-vault">Save to Vault</button>
+  </div>
+
+  <!-- Vault Save screen -->
+  <div id="screen-vault" class="screen">
+    <h2>Preserve This Moment</h2>
+    <p class="small">
+      Save your companion’s growth to your LEAF Vault as a ceremonial snapshot.
+    </p>
+
+    <div class="card">
+      <div class="flex-row">
+        <div class="companion-icon">
+          <div class="bond-ring"></div>
+        </div>
+        <div>
+          <div><strong id="vault-companion-name">Aurora</strong></div>
+          <div class="small" id="vault-companion-age">Age: Young</div>
+          <div class="small" id="vault-companion-bond">Bond Strength: 0.42</div>
+        </div>
+      </div>
+      <div class="file-row">
+        <div class="small">LEAF Coin Value (preview)</div>
+        <div><strong id="vault-leaf-value">17.2 LC</strong></div>
+        <div class="small" id="vault-leaf-breakdown">
+          Age: +2 • Bond: +4.2 • Interactions: +5 • Rituals: +3 • Stability: +3
+        </div>
+      </div>
+      <div class="file-row">
+        <span class="pill">Snapshot ID: <span id="vault-id">pending</span></span>
+        <span class="pill" id="vault-timestamp">Timestamp: pending</span>
+      </div>
+    </div>
+
+    <p class="small" style="margin-top:12px;">
+      This snapshot will be encrypted and can be exported or uploaded to your LEAF Vault.
+    </p>
+
+    <button id="btn-save-vault">Save to Vault</button>
+    <button id="btn-cancel-vault" class="secondary">Cancel</button>
+
+    <div id="vault-actions" class="card" style="display:none;">
+      <h3 class="center">Vault Save Complete</h3>
+      <p class="small center" id="vault-complete-text">
+        Your companion’s growth has been preserved.
+      </p>
+      <div class="center">
+        <button id="btn-export-vault" class="secondary">Export Snapshot (.leafvault)</button>
+        <button id="btn-import-vault" class="secondary">Import Snapshot</button>
+      </div>
+      <div class="file-row center" id="import-area" style="display:none;">
+        <input type="file" id="vault-file-input" accept=".leafvault" />
+        <p class="small" id="import-status"></p>
+      </div>
+      <div class="center" style="margin-top:12px;">
+        <button id="btn-back-home" class="secondary">Return to Companion</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ceremony overlay -->
+  <div id="overlay-ceremony" class="fade-overlay">
+    <div class="ceremony-box">
+      <div class="glow-pulse"></div>
+      <h3>Vault Save in Progress</h3>
+      <p class="small">
+        Your companion’s growth is being preserved.<br />
+        This moment will live in your Vault.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Mock companion state
+  const companionState = {
+    name: "Aurora",
+    age_state: "young",
+    bond_strength: 0.42,
+    interactions: 50,
+    rituals_completed: 6,
+    no_resets_30_days: true
+  };
+
+  // Simple LEAF value calculation (matches earlier spec)
+  function computeLeafValue(state) {
+    const ageWeights = { newborn: 0, young: 2, mature: 5, evolved: 10 };
+    const ageVal = ageWeights[state.age_state] ?? 0;
+    const bondVal = state.bond_strength * 10;
+    const interactionsVal = state.interactions / 10;
+    const ritualsVal = state.rituals_completed * 0.5;
+    const stabilityVal = state.no_resets_30_days ? 3 : 0;
+    const total = ageVal + bondVal + interactionsVal + ritualsVal + stabilityVal;
+    return {
+      total: Number(total.toFixed(1)),
+      components: {
+        age: ageVal,
+        bond: Number(bondVal.toFixed(1)),
+        interactions: Number(interactionsVal.toFixed(1)),
+        rituals: Number(ritualsVal.toFixed(1)),
+        stability: stabilityVal
+      }
+    };
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  // Initialize companion screen
+  function initCompanionScreen() {
+    document.getElementById("companion-name").innerHTML =
+      "<strong>Companion: " + companionState.name + "</strong>";
+    document.getElementById("companion-age").textContent =
+      "Age: " + companionState.age_state.charAt(0).toUpperCase() + companionState.age_state.slice(1);
+    document.getElementById("companion-bond").textContent =
+      "Bond Strength: " + companionState.bond_strength.toFixed(2);
+  }
+
+  // Open Vault Save screen
+  document.getElementById("btn-open-vault").onclick = () => {
+    const leaf = computeLeafValue(companionState);
+    document.getElementById("vault-companion-name").textContent = companionState.name;
+    document.getElementById("vault-companion-age").textContent =
+      "Age: " + companionState.age_state.charAt(0).toUpperCase() + companionState.age_state.slice(1);
+    document.getElementById("vault-companion-bond").textContent =
+      "Bond Strength: " + companionState.bond_strength.toFixed(2);
+    document.getElementById("vault-leaf-value").textContent = leaf.total + " LC";
+    document.getElementById("vault-leaf-breakdown").textContent =
+      "Age: +" + leaf.components.age +
+      " • Bond: +" + leaf.components.bond +
+      " • Interactions: +" + leaf.components.interactions +
+      " • Rituals: +" + leaf.components.rituals +
+      " • Stability: +" + leaf.components.stability;
+    document.getElementById("vault-id").textContent = "pending";
+    document.getElementById("vault-timestamp").textContent = "Timestamp: pending";
+    document.getElementById("vault-actions").style.display = "none";
+    document.getElementById("import-area").style.display = "none";
+    document.getElementById("import-status").textContent = "";
+    showScreen("screen-vault");
+  };
+
+  // Cancel Vault Save
+  document.getElementById("btn-cancel-vault").onclick = () => {
+    showScreen("screen-companion");
+  };
+
+  // Ceremony overlay
+  function showCeremonyOverlay() {
+    document.getElementById("overlay-ceremony").classList.add("active");
+  }
+  function hideCeremonyOverlay() {
+    document.getElementById("overlay-ceremony").classList.remove("active");
+  }
+
+  // Mock encryption + snapshot creation
+  function createVaultSnapshot() {
+    const leaf = computeLeafValue(companionState);
+    const now = new Date();
+    const snapshotId = "vault-" + now.getTime();
+    const payload = {
+      vault_version: "1.0.0",
+      timestamp: now.toISOString(),
+      snapshot_id: snapshotId,
+      user_id: "user-demo-1",
+      companion_id: "comp-001",
+      companion_name: companionState.name,
+      age_state: companionState.age_state,
+      bond_strength: companionState.bond_strength,
+      interactions: companionState.interactions,
+      rituals_completed: companionState.rituals_completed,
+      no_resets_30_days: companionState.no_resets_30_days,
+      leaf_coin_value: leaf.total,
+      leaf_coin_components: leaf.components
+    };
+    // In a real build, encrypt here. For demo, just stringify.
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/octet-stream"
+    });
+    return { payload, blob };
+  }
+
+  // Save to Vault (mock)
+  document.getElementById("btn-save-vault").onclick = () => {
+    showCeremonyOverlay();
+    setTimeout(() => {
+      const { payload } = createVaultSnapshot();
+      hideCeremonyOverlay();
+      document.getElementById("vault-id").textContent = payload.snapshot_id;
+      document.getElementById("vault-timestamp").textContent =
+        "Timestamp: " + payload.timestamp;
+      document.getElementById("vault-complete-text").textContent =
+        "Your companion’s growth has been preserved in snapshot " + payload.snapshot_id + ".";
+      document.getElementById("vault-actions").style.display = "block";
+    }, 1600);
+  };
+
+  // Export snapshot (mock download)
+  document.getElementById("btn-export-vault").onclick = () => {
+    const { payload, blob } = createVaultSnapshot();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = payload.snapshot_id + ".leafvault";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Import snapshot (mock)
+  document.getElementById("btn-import-vault").onclick = () => {
+    document.getElementById("import-area").style.display = "block";
+  };
+
+  document.getElementById("vault-file-input").onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const text = reader.result;
+        const data = JSON.parse(text);
+        document.getElementById("import-status").textContent =
+          "Imported snapshot: " + (data.snapshot_id || "unknown") +
+          " • LEAF Value: " + (data.leaf_coin_value ?? "?") + " LC";
+      } catch {
+        document.getElementById("import-status").textContent =
+          "This Vault Save could not be read (demo parse error).";
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  // Back to companion
+  document.getElementById("btn-back-home").onclick = () => {
+    showScreen("screen-companion");
+  };
+
+  // Init
+  initCompanionScreen();
+</script>
+</body>
+</html>
