@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Digital Astrolabe – Realm Navigator</title>
+  <style>
+    body {
+      background: #050711;
+      color: #eee;
+      font-family: system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+    }
+    h2 {
+      margin: 0;
+    }
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    canvas {
+      background: radial-gradient(circle at center, #111 0%, #020308 70%);
+      border-radius: 12px;
+    }
+    .row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .info {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      text-align: center;
+    }
+    .info span {
+      font-weight: 600;
+      color: #ffe08a;
+    }
+  </style>
+</head>
+<body>
+  <h2>Virtual Engine Core + Digital Astrolabe</h2>
+  <p>Use ← / → to change realm • Astrolabe auto-rotates over time</p>
+
+  <div class="row">
+    <canvas id="engine" width="320" height="320"></canvas>
+    <canvas id="astrolabe" width="320" height="320"></canvas>
+  </div>
+
+  <div class="info">
+    Active Realm: <span id="realmName">—</span> • Bearing: <span id="realmBearing">0°</span>
+  </div>
+
+  <script>
+    // ---------- VIRTUAL ENGINE CORE (unchanged) ----------
+    const engineCanvas = document.getElementById('engine');
+    const ectx = engineCanvas.getContext('2d');
+    const eCenter = { x: engineCanvas.width / 2, y: engineCanvas.height / 2 };
+
+    function drawEngineCore(t) {
+      const time = t * 0.001;
+      ectx.clearRect(0, 0, engineCanvas.width, engineCanvas.height);
+
+      // Outer glow
+      const gradient = ectx.createRadialGradient(
+        eCenter.x, eCenter.y, 10,
+        eCenter.x, eCenter.y, 140
+      );
+      gradient.addColorStop(0, 'rgba(255, 200, 80, 1)');
+      gradient.addColorStop(0.3, 'rgba(255, 120, 40, 0.9)');
+      gradient.addColorStop(0.6, 'rgba(40, 160, 255, 0.5)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ectx.fillStyle = gradient;
+      ectx.beginPath();
+      ectx.arc(eCenter.x, eCenter.y, 140, 0, Math.PI * 2);
+      ectx.fill();
+
+      // Rotating inner rings
+      for (let i = 0; i < 3; i++) {
+        const radius = 40 + i * 20;
+        const angle = time * (0.6 + i * 0.4) * (i % 2 === 0 ? 1 : -1);
+        ectx.save();
+        ectx.translate(eCenter.x, eCenter.y);
+        ectx.rotate(angle);
+        ectx.strokeStyle = i === 0 ? '#ffe08a' : i === 1 ? '#ff7b4a' : '#4fd5ff';
+        ectx.lineWidth = 3;
+        ectx.setLineDash([10, 8]);
+        ectx.beginPath();
+        ectx.arc(0, 0, radius, 0, Math.PI * 2);
+        ectx.stroke();
+        ectx.restore();
+      }
+
+      // Pulsing core
+      const pulse = 10 + Math.sin(time * 4) * 4;
+      ectx.fillStyle = '#fff5c4';
+      ectx.beginPath();
+      ectx.arc(eCenter.x, eCenter.y, pulse, 0, Math.PI * 2);
+      ectx.fill();
+
+      // Vertical energy beam
+      ectx.save();
+      ectx.translate(eCenter.x, eCenter.y);
+      const beamWidth = 18 + Math.sin(time * 6) * 4;
+      const beamGrad = ectx.createLinearGradient(0, -140, 0, 140);
+      beamGrad.addColorStop(0, 'rgba(255, 230, 160, 0)');
+      beamGrad.addColorStop(0.3, 'rgba(255, 210, 120, 0.8)');
+      beamGrad.addColorStop(0.7, 'rgba(255, 140, 60, 0.9)');
+      beamGrad.addColorStop(1, 'rgba(255, 80, 40, 0)');
+      ectx.fillStyle = beamGrad;
+      ectx.beginPath();
+      ectx.rect(-beamWidth / 2, -140, beamWidth, 280);
+      ectx.fill();
+      ectx.restore();
+    }
+
+    // ---------- DIGITAL ASTROLABE / REALM NAVIGATOR ----------
+    const astroCanvas = document.getElementById('astrolabe');
+    const actx = astroCanvas.getContext('2d');
+    const aCenter = { x: astroCanvas.width / 2, y: astroCanvas.height / 2 };
+
+    const realmNameEl = document.getElementById('realmName');
+    const realmBearingEl = document.getElementById('realmBearing');
+
+    // Realms: name + base angle (radians, 0 = "north" / up)
+    const realms = [
+      { name: 'Sky Realm', angle: 0 },
+      { name: 'Tide Realm', angle: Math.PI / 3 },
+      { name: 'Ember Realm', angle: (2 * Math.PI) / 3 },
+      { name: 'Stone Realm', angle: Math.PI },
+      { name: 'Veil Realm', angle: (4 * Math.PI) / 3 },
+      { name: 'Echo Realm', angle: (5 * Math.PI) / 3 }
+    ];
+    let activeRealmIndex = 0;
+
+    // Global rotation speed (like celestial drift)
+    const astroRotationSpeed = 0.12; // radians per second
+
+    function drawAstrolabe(t) {
+      const time = t * 0.001;
+      actx.clearRect(0, 0, astroCanvas.width, astroCanvas.height);
+
+      const baseRadius = 130;
+      const innerRadius = 40;
+
+      // Background glow
+      const bgGrad = actx.createRadialGradient(
+        aCenter.x, aCenter.y, 10,
+        aCenter.x, aCenter.y, baseRadius
+      );
+      bgGrad.addColorStop(0, 'rgba(245, 250, 255, 0.15)');
+      bgGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      actx.fillStyle = bgGrad;
+      actx.beginPath();
+      actx.arc(aCenter.x, aCenter.y, baseRadius, 0, Math.PI * 2);
+      actx.fill();
+
+      // Outer ring
+      actx.strokeStyle = 'rgba(210, 220, 245, 0.7)';
+      actx.lineWidth = 2;
+      actx.beginPath();
+      actx.arc(aCenter.x, aCenter.y, baseRadius, 0, Math.PI * 2);
+      actx.stroke();
+
+      // Inner ring
+      actx.strokeStyle = 'rgba(160, 180, 220, 0.6)';
+      actx.lineWidth = 1.5;
+      actx.beginPath();
+      actx.arc(aCenter.x, aCenter.y, innerRadius, 0, Math.PI * 2);
+      actx.stroke();
+
+      // Degree ticks (every 10°, major every 30°)
+      const globalRotation = time * astroRotationSpeed;
+      for (let deg = 0; deg < 360; deg += 10) {
+        const rad = (deg * Math.PI) / 180;
+        const angle = rad + globalRotation;
+
+        const isMajor = deg % 30 === 0;
+        const rOuter = baseRadius;
+        const rInner = baseRadius - (isMajor ? 10 : 5);
+
+        const x1 = aCenter.x + Math.sin(angle) * rInner;
+        const y1 = aCenter.y - Math.cos(angle) * rInner;
+        const x2 = aCenter.x + Math.sin(angle) * rOuter;
+        const y2 = aCenter.y - Math.cos(angle) * rOuter;
+
+        actx.strokeStyle = isMajor
+          ? 'rgba(240, 245, 255, 0.9)'
+          : 'rgba(200, 210, 235, 0.5)';
+        actx.lineWidth = isMajor ? 1.5 : 1;
+        actx.beginPath();
+        actx.moveTo(x1, y1);
+        actx.lineTo(x2, y2);
+        actx.stroke();
+      }
+
+      // Cardinal directions (N/E/S/W)
+      const cardinals = [
+        { label: 'N', angle: 0 },
+        { label: 'E', angle: Math.PI / 2 },
+        { label: 'S', angle: Math.PI },
+        { label: 'W', angle: (3 * Math.PI) / 2 }
+      ];
+      actx.fillStyle = '#f5f7ff';
+      actx.font = '12px system-ui';
+      actx.textAlign = 'center';
+      actx.textBaseline = 'middle';
+
+      cardinals.forEach(c => {
+        const angle = c.angle + globalRotation;
+        const r = baseRadius - 22;
+        const x = aCenter.x + Math.sin(angle) * r;
+        const y = aCenter.y - Math.cos(angle) * r;
+        actx.fillText(c.label, x, y);
+      });
+
+      // Realm markers on a mid ring
+      const realmRadius = (baseRadius + innerRadius) / 2;
+      realms.forEach((realm, index) => {
+        const angle = realm.angle + globalRotation;
+        const x = aCenter.x + Math.sin(angle) * realmRadius;
+        const y = aCenter.y - Math.cos(angle) * realmRadius;
+
+        const isActive = index === activeRealmIndex;
+        const r = isActive ? 6 : 3;
+
+        actx.beginPath();
+        actx.fillStyle = isActive
+          ? 'rgba(255, 220, 120, 0.95)'
+          : 'rgba(220, 230, 255, 0.7)';
+        actx.arc(x, y, r, 0, Math.PI * 2);
+        actx.fill();
+      });
+
+      // Active realm pointer (like an alidade)
+      const activeRealm = realms[activeRealmIndex];
+      const activeAngle = activeRealm.angle + globalRotation;
+
+      const pointerInner = innerRadius + 8;
+      const pointerOuter = baseRadius - 18;
+
+      const px1 = aCenter.x + Math.sin(activeAngle) * pointerInner;
+      const py1 = aCenter.y - Math.cos(activeAngle) * pointerInner;
+      const px2 = aCenter.x + Math.sin(activeAngle) * pointerOuter;
+      const py2 = aCenter.y - Math.cos(activeAngle) * pointerOuter;
+
+      actx.strokeStyle = 'rgba(255, 230, 160, 0.95)';
+      actx.lineWidth = 2;
+      actx.beginPath();
+      actx.moveTo(px1, py1);
+      actx.lineTo(px2, py2);
+      actx.stroke();
+
+      // Center disc
+      const centerGrad = actx.createRadialGradient(
+        aCenter.x - 10, aCenter.y - 10, 5,
+        aCenter.x, aCenter.y, 30
+      );
+      centerGrad.addColorStop(0, '#ffffff');
+      centerGrad.addColorStop(0.4, '#e5f0ff');
+      centerGrad.addColorStop(1, '#1a2340');
+      actx.fillStyle = centerGrad;
+      actx.beginPath();
+      actx.arc(aCenter.x, aCenter.y, 30, 0, Math.PI * 2);
+      actx.fill();
+
+      // Active realm label inside the disc
+      actx.fillStyle = '#050711';
+      actx.font = '10px system-ui';
+      actx.textAlign = 'center';
+      actx.textBaseline = 'middle';
+      actx.fillText(activeRealm.name, aCenter.x, aCenter.y);
+
+      // Update DOM info (bearing in degrees, 0 = north)
+      let bearingDeg = (activeAngle * 180) / Math.PI;
+      bearingDeg = (bearingDeg + 360) % 360;
+      realmNameEl.textContent = activeRealm.name;
+      realmBearingEl.textContent = bearingDeg.toFixed(1) + '°';
+    }
+
+    // ---------- INPUT: REALM CYCLING ----------
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') {
+        activeRealmIndex = (activeRealmIndex + 1) % realms.length;
+      } else if (e.key === 'ArrowLeft') {
+        activeRealmIndex =
+          (activeRealmIndex - 1 + realms.length) % realms.length;
+      }
+    });
+
+    // ---------- ANIMATION LOOP ----------
+    function loop(t) {
+      drawEngineCore(t);
+      drawAstrolabe(t);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
