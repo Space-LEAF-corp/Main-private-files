@@ -1,0 +1,35 @@
+{
+  "leaf_coin_value": {
+    "version": "1.0.0",
+    "components": {
+      "age_state": {
+        "value": 2,
+        "weights": {
+          "newborn": 0,
+          "young": 2,
+          "mature": 5,
+          "evolved": 10
+        }
+      },
+      "bond_strength": {
+        "value": 4.2,
+        "formula": "bond_strength * 10"
+      },
+      "interaction_count": {
+        "value": 5,
+        "formula": "interactions / 10"
+      },
+      "rituals_completed": {
+        "value": 3,
+        "formula": "rituals * 0.5"
+      },
+      "stability_bonus": {
+        "value": 3,
+        "conditions": {
+          "no_resets_30_days": 3
+        }
+      }
+    },
+    "total": 17.2
+  }
+}
