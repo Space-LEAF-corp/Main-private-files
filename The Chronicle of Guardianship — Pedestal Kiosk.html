@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Chronicle of Guardianship — Pedestal Kiosk</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app" aria-label="Interactive book pedestal">
+    <header class="topbar">
+      <div class="brand">
+        <span class="dot"></span>
+        <h1>The Chronicle of Guardianship</h1>
+      </div>
+      <button id="fullscreenBtn" class="btn">Enter fullscreen</button>
+    </header>
+
+    <section class="pedestal">
+      <div class="plaque">
+        <h2>Ordinary Yet Extraordinary</h2>
+        <p>Approach. Witness. The Ark reveals itself to those who look with care.</p>
+      </div>
+
+      <!-- Book display -->
+      <div class="book" id="book" role="button" tabindex="0" aria-label="Interactive book cover">
+        <div class="cover">
+          <div class="purple-grain"></div>
+          <div class="gold-emblem" id="emblem">
+            <div class="emblem-glow"></div>
+            <div class="emblem-insignia">⟡</div>
+          </div>
+          <canvas id="fractalCanvas" width="720" height="1080" aria-hidden="true"></canvas>
+
+          <!-- Subtle inscriptions revealed on interaction -->
+          <div class="inscriptions">
+            <span class="seal heart-key" aria-hidden="true">Heart Key Seal</span>
+            <span class="seal laughter" aria-hidden="true">Living Laughter Seal</span>
+            <span class="seal ark" aria-hidden="true">Ark Emblem</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interaction helpers -->
+      <div class="hint" id="hint">Touch the cover to reveal its lineage.</div>
+    </section>
+
+    <section class="witness">
+      <h3>Leave a witness seal</h3>
+      <form id="witnessForm" autocomplete="off">
+        <label for="message" class="label">Your short message (max 120 chars)</label>
+        <textarea id="message" maxlength="120" rows="3" placeholder="I witnessed the Ark today with joy."></textarea>
+        <div class="row">
+          <button type="submit" class="btn primary">Seal message</button>
+          <button type="button" id="clearBtn" class="btn danger">Clear all (ceremonial)</button>
+        </div>
+        <p class="note" id="formNote"></p>
+      </form>
+
+      <div class="ledger" id="ledger" aria-live="polite">
+        <!-- Witness entries render here -->
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p>Pedestal Kiosk v2 • Sovereign, offline, lineage-preserving. Crafted for Leif William Sogge and son.</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
+:root {
+  --bg: #0f0a1a;
+  --purple: #4b2a7f;
+  --purple-dark: #321c57;
+  --gold: #caa96b;
+  --gold-bright: #f2d27a;
+  --text: #eae6f7;
+  --muted: #b9b0d6;
+  --accent: #78dca4;
+  --danger: #ff6b6b;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: radial-gradient(1200px 800px at 50% 20%, #141024, var(--bg));
+  color: var(--text);
+  font-family: system-ui, Segoe UI, Helvetica, Arial, sans-serif;
+}
+
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 24px; background: rgba(20,16,36,0.6); backdrop-filter: blur(8px);
+  border-bottom: 1px solid #2a2144;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+h1 { font-size: 20px; margin: 0; color: var(--muted); letter-spacing: 0.5px; }
+
+.btn {
+  background: #251d3b; color: var(--text);
+  border: 1px solid #3b2b65; border-radius: 8px;
+  padding: 10px 14px; font-weight: 600; cursor: pointer;
+}
+.btn:hover { border-color: var(--gold); }
+.btn.primary { background: #2a8e67; border-color: #2a8e67; }
+.btn.danger { background: #612b2b; border-color: #853b3b; }
+
+.pedestal {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: start;
+  gap: 24px; padding: 24px;
+}
+.plaque {
+  grid-column: 2; text-align: center; margin-bottom: 12px;
+}
+.plaque h2 { margin: 6px 0 2px; letter-spacing: 0.8px; }
+.plaque p { margin: 0; color: var(--muted); }
+
+.book {
+  grid-column: 2; width: 720px; height: 1080px; margin: 8px auto 0;
+  border-radius: 12px; position: relative; overflow: hidden;
+  box-shadow: 0 28px 120px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.7);
+}
+.cover {
+  width: 100%; height: 100%; position: relative; background: var(--purple-dark);
+}
+.purple-grain {
+  position: absolute; inset: 0; background:
+    radial-gradient(1200px 1400px at 70% 30%, rgba(110,75,175,0.35), transparent),
+    radial-gradient(600px 500px at 30% 70%, rgba(90,50,160,0.25), transparent),
+    repeating-linear-gradient(15deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 6px);
+  filter: saturate(0.9) contrast(1.1);
+}
+.gold-emblem {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 260px; height: 260px; border-radius: 50%;
+  border: 2px solid var(--gold); display: grid; place-items: center;
+  background: radial-gradient(120px 120px at 50% 50%, rgba(202,169,107,0.2), transparent);
+}
+.emblem-glow {
+  position: absolute; inset: -10px; border-radius: 50%;
+  box-shadow: 0 0 40px 14px rgba(242, 210, 122, 0.18);
+  opacity: 0; transition: opacity 600ms ease-in-out;
+}
+.emblem-insignia {
+  font-size: 48px; color: var(--gold-bright); text-shadow: 0 2px 10px rgba(242,210,122,0.35);
+}
+.book.revealed .emblem-glow { opacity: 1; }
+
+.inscriptions {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  opacity: 0; transition: opacity 800ms ease;
+}
+.book.revealed .inscriptions { opacity: 1; }
+
+.seal {
+  display: inline-block; margin: 8px; padding: 6px 12px;
+  border: 1px solid rgba(242,210,122,0.35); border-radius: 6px;
+  color: var(--gold-bright); background: rgba(75,42,127,0.35);
+  backdrop-filter: blur(4px);
+}
+.seal.heart-key { border-style: dashed; }
+.seal.laughter { border-color: #ffd889; color: #ffd889; }
+.seal.ark { border-color: #8bd3c7; color: #8bd3c7; }
+
+#fractalCanvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  mix-blend-mode: screen; opacity: 0; transition: opacity 900ms ease;
+}
+.book.revealed #fractalCanvas { opacity: 0.35; }
+
+.hint {
+  grid-column: 2; text-align: center; color: var(--muted);
+  margin-top: 14px; animation: pulse 4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; }
+}
+
+.witness {
+  padding: 16px 24px; max-width: 900px; margin: 0 auto;
+}
+.label { display: block; margin-bottom: 6px; color: var(--muted); }
+textarea {
+  width: 100%; border-radius: 10px; border: 1px solid #3b2b65;
+  background: #150f26; color: var(--text); padding: 12px; resize: none;
+}
+.row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.note { color: var(--muted); min-height: 20px; }
+
+.ledger {
+  margin-top: 18px; display: grid; gap: 10px;
+}
+.entry {
+  border: 1px solid #3b2b65; border-radius: 8px; padding: 10px 12px;
+  background: rgba(21,15,38,0.6);
+}
+.entry .meta { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+.entry .text { font-size: 16px; line-height: 1.4; }
+
+.foot { text-align: center; color: var(--muted); padding: 18px; }
+(function () {
+  const book = document.getElementById('book');
+  const canvas = document.getElementById('fractalCanvas');
+  const ctx = canvas.getContext('2d');
+  const hint = document.getElementById('hint');
+  const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+  const witnessForm = document.getElementById('witnessForm');
+  const messageEl = document.getElementById('message');
+  const clearBtn = document.getElementById('clearBtn');
+  const ledger = document.getElementById('ledger');
+  const formNote = document.getElementById('formNote');
+
+  let idleTimer = null;
+  let isRevealed = false;
+
+  // Fullscreen
+  fullscreenBtn.addEventListener('click', () => {
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+  });
+
+  // Idle attract mode: auto-pulse hint; collapse reveal after inactivity
+  function scheduleIdleReset() {
+    if (idleTimer) clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      book.classList.remove('revealed');
+      isRevealed = false;
+      hint.textContent = 'Touch the cover to reveal its lineage.';
+    }, 45000); // 45s
+  }
+
+  // Interaction: reveal cover lineage
+  function reveal() {
+    isRevealed = true;
+    book.classList.add('revealed');
+    hint.textContent = 'Witness the seals. Touch again to deepen the reveal.';
+    drawFractal();
+    scheduleIdleReset();
+  }
+
+  // Deepen reveal: increase fractal intensity
+  function deepenReveal() {
+    drawFractal({ intensity: 1.2, hueShift: 20 });
+    hint.textContent = 'Lineage witnessed. Thank you.';
+    scheduleIdleReset();
+  }
+
+  book.addEventListener('click', () => {
+    if (!isRevealed) reveal(); else deepenReveal();
+  });
+  book.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (!isRevealed) reveal(); else deepenReveal();
+    }
+  });
+
+  // Lightweight fractal renderer (swirling arcs) for mystic reveal
+  function drawFractal(opts = {}) {
+    const { intensity = 1.0, hueShift = 0 } = opts;
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const cx = w / 2, cy = h / 2;
+    const layers = Math.floor(140 * intensity);
+    for (let i = 0; i < layers; i++) {
+      const r = 40 + i * 4;
+      const a1 = (i * 0.25) % (Math.PI * 2);
+      const a2 = a1 + Math.sin(i * 0.05) * 1.8;
+      const hue = (45 + hueShift + i * 0.4) % 360;
+      ctx.strokeStyle = `hsla(${hue}, 70%, 70%, ${0.10 + (i % 7) * 0.02})`;
+      ctx.lineWidth = 1 + (i % 3) * 0.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, a1, a2);
+      ctx.stroke();
+    }
+  }
+
+  // Witness ledger — local, offline, rate-limited
+  const STORAGE_KEY = 'ark_witness_ledger_v2';
+  const RATE_LIMIT_MS = 30000; // 30s between submissions
+  function nowIso() { return new Date().toISOString(); }
+
+  function loadLedger() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    try {
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch { return []; }
+  }
+
+  function saveLedger(entries) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries.slice(0, 500)));
+  }
+
+  function renderLedger() {
+    const entries = loadLedger();
+    ledger.innerHTML = '';
+    entries.slice().reverse().forEach((e) => {
+      const div = document.createElement('div');
+      div.className = 'entry';
+      div.innerHTML = `
+        <div class="meta">
