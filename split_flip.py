@@ -1,0 +1,124 @@
+#!/usr/bin/env python3
+"""
+split_flip.py
+
+CLI helper to "flip" a source file by splitting its top-level items and swapping halves.
+Two modes:
+ - simple: split by lines (safe for pure text transformations; may break code semantics)
+ - python_ast: safely reorder top-level function/class definitions for Python files while
+               keeping imports, module docstring, and top-level executable statements in place.
+
+Usage:
+    python3 split_flip.py <input-file> [--mode simple|python_ast] [--out <out-file>] [--backup]
+"""
+from __future__ import annotations
+import ast
+import argparse
+import shutil
+from pathlib import Path
+from typing import List, Tuple
+
+def read_text(path: Path) -> List[str]:
+    return path.read_text(encoding="utf-8").splitlines(keepends=True)
+
+def write_text(path: Path, lines: List[str]):
+    path.write_text("".join(lines), encoding="utf-8")
+
+def split_by_lines(lines: List[str]) -> Tuple[List[str], List[str]]:
+    mid = len(lines) // 2
+    return lines[:mid], lines[mid:]
+
+def simple_flip(lines: List[str]) -> List[str]:
+    a, b = split_by_lines(lines)
+    return b + a
+
+def get_node_segment(lines: List[str], node: ast.AST) -> List[str]:
+    # requires Python AST nodes to have lineno and end_lineno attributes
+    start = getattr(node, "lineno", None)
+    end = getattr(node, "end_lineno", None)
+    if start is None or end is None:
+        # fallback to empty
+        return []
+    return lines[start - 1 : end]
+
+def python_ast_flip(lines: List[str]) -> List[str]:
+    src = "".join(lines)
+    module = ast.parse(src)
+    # collect docstring if present
+    body = list(module.body)
+    docstring = []
+    header_imports = []
+    defs = []        # FunctionDef, AsyncFunctionDef, ClassDef
+    others = []      # top-level executable statements (Assign, Expr, If, etc)
+
+    # detect module docstring
+    if body and isinstance(body[0], ast.Expr) and isinstance(body[0].value, ast.Constant) and isinstance(body[0].value.value, str):
+        doc_node = body.pop(0)
+        docstring = get_node_segment(lines, doc_node)
+
+    # partition remaining nodes
+    for node in body:
+        if isinstance(node, (ast.Import, ast.ImportFrom)):
+            header_imports.extend(get_node_segment(lines, node))
+        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            defs.append((node, get_node_segment(lines, node)))
+        else:
+            others.extend(get_node_segment(lines, node))
+
+    # If there are no defs to reorder, return original content
+    if not defs:
+        return lines
+
+    # split defs into two halves by count
+    half = len(defs) // 2
+    first = defs[:half]
+    second = defs[half:]
+
+    # swap halves: second then first
+    reordered_defs: List[str] = []
+    for _, seg in second + first:
+        reordered_defs.extend(seg)
+
+    # Build output: docstring + imports + reordered defs + others
+    out = []
+    out.extend(docstring)
+    out.extend(header_imports)
+    out.extend(reordered_defs)
+    out.extend(others)
+    return out
+
+def main():
+    parser = argparse.ArgumentParser(description="Split and flip source files while trying to preserve functionality.")
+    parser.add_argument("input", type=Path, help="input source file")
+    parser.add_argument("--mode", choices=("simple", "python_ast"), default="python_ast", help="flip mode")
+    parser.add_argument("--out", type=Path, help="output file (defaults to <input>.flipped)")
+    parser.add_argument("--backup", action="store_true", help="make a .bak copy of the input before writing")
+    parser.add_argument("--dry", action="store_true", help="do a dry-run; print summary but don't write")
+    args = parser.parse_args()
+
+    inp = args.input.resolve()
+    if not inp.exists():
+        print("ERROR: input file not found:", inp)
+        raise SystemExit(1)
+
+    lines = read_text(inp)
+    if args.mode == "simple":
+        out_lines = simple_flip(lines)
+    else:
+        out_lines = python_ast_flip(lines)
+
+    out_path = args.out.resolve() if args.out else inp.with_name(inp.name + ".flipped")
+    if args.backup:
+        bak_path = inp.with_suffix(inp.suffix + ".bak")
+        shutil.copy2(inp, bak_path)
+        print("backup:", bak_path)
+
+    if args.dry:
+        print(f"Dry-run complete. input={len(lines)} lines, output={len(out_lines)} lines, mode={args.mode}")
+        return
+
+    write_text(out_path, out_lines)
+    print(f"Wrote: {out_path}  (mode={args.mode})")
+
+if __name__ == "__main__":
+    main()
