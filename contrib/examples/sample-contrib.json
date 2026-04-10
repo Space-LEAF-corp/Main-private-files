@@ -1,0 +1,15 @@
+[
+  {
+    "id": "diwali-2025",
+    "name": "Diwali",
+    "aliases": ["Deepavali"],
+    "tradition": "Hindu",
+    "date": { "type": "fixed", "value": "2025-10-20", "timezone": "Asia/Kolkata" },
+    "observance": { "beginsAtSunset": false },
+    "scope": "global",
+    "regions": ["IN", "SG", "MY", "FJ", "MU", "TT"],
+    "description": "Festival of lights celebrating the triumph of light over darkness.",
+    "links": ["https://example.org/context/diwali"],
+    "year": 2025
+  }
+]
