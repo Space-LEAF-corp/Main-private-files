@@ -1,0 +1,91 @@
+{
+  "artifact": {
+    "name": "PowerRanger_GameMode",
+    "version": "1.0.0",
+    "authorship": {
+      "steward": "LEIF",
+      "inscription": "Captain’s Log",
+      "lineage": ["ICU Guardian Spec", "Triangular Lens Display", "Transition Lens Stack"]
+    },
+    "trigger": {
+      "phrase": "game on my friend",
+      "activation": "voice_command",
+      "confidenceThreshold": 0.85
+    },
+    "gameMode": {
+      "status": "inactive",
+      "overlay": {
+        "color": "gold",
+        "pattern": "lightning_flash",
+        "durationMs": 5000
+      },
+      "effects": [
+        {"id": "duel_ready", "text": "Duel initiated!", "style": "bold"},
+        {"id": "energy_aura", "text": "Power aura active", "style": "glow"}
+      ]
+    },
+    "logging": {
+      "mode": "ceremonial",
+      "fields": ["timestamp", "trigger_phrase", "gameMode_status"],
+      "storage": "on_device_encrypted",
+      "retentionDays": 7
+    }
+  }
+}
+// Power Ranger Game Mode Controller
+
+type Mode = "inactive" | "active";
+
+class GameModeController {
+  mode: Mode = "inactive";
+
+  constructor(private triggerPhrase = "game on my friend") {}
+
+  // Called when speech recognition detects a phrase
+  onVoiceCommand(phrase: string, confidence: number) {
+    if (phrase.toLowerCase().trim() === this.triggerPhrase && confidence >= 0.85) {
+      this.activateGameMode();
+    }
+  }
+
+  activateGameMode() {
+    this.mode = "active";
+    this.showOverlay({ color: "gold", pattern: "lightning_flash", durationMs: 5000 });
+    this.displayEffect("Duel initiated!", "bold");
+    this.displayEffect("Power aura active", "glow");
+    this.logEvent("activated");
+    // Auto-reset after 5 seconds
+    setTimeout(() => this.deactivateGameMode(), 5000);
+  }
+
+  deactivateGameMode() {
+    this.mode = "inactive";
+    this.clearOverlay();
+    this.logEvent("deactivated");
+  }
+
+  showOverlay(opts: { color: string; pattern: string; durationMs: number }) {
+    renderOverlay(opts);
+  }
+
+  displayEffect(text: string, style: string) {
+    renderTextEffect({ text, style });
+  }
+
+  clearOverlay() {
+    renderOverlay({ color: "transparent", pattern: "none", durationMs: 0 });
+  }
+
+  logEvent(status: string) {
+    ceremonialLog({
+      timestamp: Date.now(),
+      trigger_phrase: this.triggerPhrase,
+      gameMode_status: status
+    });
+  }
+}
+
+// Placeholder rendering/logging functions
+function renderOverlay(opts: { color: string; pattern: string; durationMs: number }) { /* UI */ }
+function renderTextEffect(opts: { text: string; style: string }) { /* UI */ }
+function ceremonialLog(entry: Record<string, unknown>) { /* encrypted on-device log */ }
