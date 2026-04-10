@@ -1,0 +1,195 @@
+{
+  "artifact": {
+    "name": "Transition_Lens_Stack",
+    "version": "1.0.1",
+    "authorship": {
+      "steward": "LEIF",
+      "inscription": "Captain’s Log",
+      "lineage": ["ICU Guardian Spec", "Triangular Lens Display", "UV Transition Correction"]
+    },
+    "stack": [
+      {
+        "layer": "outer_hardcoat",
+        "function": "scratch_resistance",
+        "thickness_um": 5
+      },
+      {
+        "layer": "uv_absorber_polymer",
+        "function": "baseline_uv_block",
+        "target_OD_UVA_320_400nm": 1.2,
+        "target_OD_UVB_280_320nm": 1.2,
+        "chemistry": "benzotriazole/triazine"
+      },
+      {
+        "layer": "photochromic_layer",
+        "function": "uv_activated_darkening",
+        "target_OD_UV_active": 0.8,
+        "visible_transmittance_idle": 0.6,
+        "visible_transmittance_active": 0.2,
+        "activation_profile": {
+          "rise_time_s": 3,
+          "fade_time_s": 60,
+          "wavelength_peak_nm": 350
+        }
+      },
+      {
+        "layer": "electrochromic_assist",
+        "function": "fast_glare_control",
+        "target_OD_visible_active": 0.4,
+        "response_time_ms": 300,
+        "thickness_um": 1.5,
+        "notes": "optional; can be omitted if photochromic-only design preferred"
+      },
+      {
+        "layer": "ITO_electrodes",
+        "function": "drive_voltage_for_ec",
+        "sheet_resistance_ohm_sq": 30
+      },
+      {
+        "layer": "inner_protective_coat",
+        "function": "moisture_barrier",
+        "thickness_um": 3
+      }
+    ],
+    "sensing_control": {
+      "uv_sensor": {
+        "wavelengths_nm": [295, 315, 365],
+        "sampling_hz": 10,
+        "threshold_mW_cm2": 0.5
+      },
+      "ambient_light_sensor": {
+        "sampling_hz": 10,
+        "glare_threshold_lux": 20000
+      }
+    },
+    "triangular_overlay": {
+      "grid": "equilateral",
+      "rows": 12,
+      "columns": 20,
+      "triangle_size_mm": 2.5,
+      "modes": [
+        {"mode": "uv_detected", "color": "blue", "pattern": "solid"},
+        {"mode": "glare_high", "color": "green", "pattern": "soft_wave"},
+        {"mode": "max_protection", "color": "purple", "pattern": "ripple"}
+      ]
+    },
+    "targets": {
+      "OD_UV_total": 2.0,
+      "T_visible_idle": 0.6,
+      "T_visible_active": 0.2
+    },
+    "privacy": {
+      "on_device_control": true,
+      "no_identification_minors": true
+    }
+  }
+}
+// Transition Lens Controller — Photochromic primary, EC assist (TypeScript-like pseudocode)
+
+type Mode = "idle" | "uv_detected" | "glare_high" | "max_protection";
+
+interface UVReading {
+  uva_mW_cm2: number;  // 320–400 nm
+  uvb_mW_cm2: number;  // 280–320 nm
+}
+
+class TransitionLensController {
+  mode: Mode = "idle";
+  photochromicState = 0;   // 0..100% activation (model of dye darkening)
+  ecDriveLevel = 0;        // 0..100% electrochromic assist
+  lastUpdate = 0;
+
+  constructor(
+    private uvThreshold = 0.5,       // mW/cm2 combined UVA+UVB
+    private glareLuxThreshold = 20000 // ambient lux
+  ) {}
+
+  // Called every 100–200 ms with sensor updates
+  updateSensors(uv: UVReading, ambientLux: number, dt_ms: number) {
+    const uvLevel = uv.uva_mW_cm2 + uv.uvb_mW_cm2;
+    const uvHigh = uvLevel >= this.uvThreshold;
+    const glareHigh = ambientLux >= this.glareLuxThreshold;
+
+    if (uvHigh && glareHigh) {
+      this.mode = "max_protection";
+      this.photochromicState = this.approxPhotochromicRise(this.photochromicState, dt_ms);
+      this.activateEC(80); // boost visible OD quickly
+      this.showTriangles("max_protection");
+    } else if (uvHigh) {
+      this.mode = "uv_detected";
+      this.photochromicState = this.approxPhotochromicRise(this.photochromicState, dt_ms);
+      this.activateEC(20); // small assist to bridge rise time
+      this.showTriangles("uv_detected");
+    } else if (glareHigh) {
+      this.mode = "glare_high";
+      this.photochromicState = this.approxPhotochromicFade(this.photochromicState, dt_ms);
+      this.activateEC(40); // fast glare control without UV
+      this.showTriangles("glare_high");
+    } else {
+      this.mode = "idle";
+      this.photochromicState = this.approxPhotochromicFade(this.photochromicState, dt_ms);
+      this.activateEC(0);
+      this.clearTriangles();
+    }
+
+    this.logEvent(uvLevel, ambientLux);
+    this.lastUpdate = Date.now();
+  }
+
+  // Approximate photochromic kinetics: first-order rise/fade with time constants
+  approxPhotochromicRise(statePercent: number, dt_ms: number): number {
+    const tauRise_ms = 3000; // ~3 s rise
+    const target = 100;
+    const alpha = 1 - Math.exp(-dt_ms / tauRise_ms);
+    return Math.min(100, statePercent + alpha * (target - statePercent));
+  }
+
+  approxPhotochromicFade(statePercent: number, dt_ms: number): number {
+    const tauFade_ms = 60000; // ~60 s fade
+    const target = 0;
+    const alpha = 1 - Math.exp(-dt_ms / tauFade_ms);
+    return Math.max(0, statePercent - alpha * (statePercent - target));
+  }
+
+  // Map EC level to hardware drive (voltage/current/PWM)
+  activateEC(levelPercent: number) {
+    this.ecDriveLevel = levelPercent;
+    // sendECDrive(levelPercent); // hardware-specific
+  }
+
+  // Visual triangular feedback (does not block UV)
+  showTriangles(mode: Mode) {
+    switch (mode) {
+      case "uv_detected":
+        renderOverlay({ color: "blue", pattern: "solid" });
+        break;
+      case "glare_high":
+        renderOverlay({ color: "green", pattern: "soft_wave" });
+        break;
+      case "max_protection":
+        renderOverlay({ color: "purple", pattern: "ripple" });
+        break;
+      default:
+        this.clearTriangles();
+    }
+  }
+
+  clearTriangles() {
+    renderOverlay({ color: "transparent", pattern: "none" });
+  }
+
+  logEvent(uvLevel: number, ambientLux: number) {
+    ceremonialLog({
+      timestamp: Date.now(),
+      mode: this.mode,
+      photochromicState: this.photochromicState,
+      ecDriveLevel: this.ecDriveLevel,
+      uvLevel_mW_cm2: uvLevel,
+      ambientLux
+    });
+  }
+}
+
+// Placeholder hardware/UI hooks
+function renderOverlay(opts: { color: string; pattern: string }) { /* device UI */ }
+function ceremonialLog(entry: Record<string, unknown>) { /* encrypted on-device log */ }
