@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Original Defenders — Honor Console (Final Secure)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0b1220; --fg: #e7f0ff; --accent: #79ffe1; --muted: #a9b2c0; --card: #121a2c;
+      --ok: #79ffe1; --warn: #ffd47d; --err: #ff7d7d;
+    }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system; background: var(--bg); color: var(--fg); }
+    header { padding: 16px 20px; border-bottom: 1px solid #1e2a44; display:flex; align-items:center; gap:12px; }
+    .logo { width: 28px; height: 28px; border-radius:50%; background: linear-gradient(135deg,#79ffe1,#8a7dff); }
+    h1 { font-size: 18px; margin:0; }
+    main { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap:16px; }
+    .card { background: var(--card); border: 1px solid #1e2a44; border-radius: 12px; padding: 16px; }
+    .card h2 { margin:0 0 8px 0; font-size: 16px; }
+    label { display:block; margin:8px 0 4px; color: var(--muted); font-size: 13px; }
+    input, select, textarea { width:100%; padding:10px; border-radius:8px; border:1px solid #263453; background:#0e1730; color: var(--fg); }
+    button { background: #263453; color: var(--fg); border: 1px solid #37507c; padding: 10px 14px; border-radius: 10px; cursor:pointer; }
+    button.primary { background: linear-gradient(135deg,#79ffe1,#8a7dff); color:#0b1220; border:none; }
+    .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .pill { display:inline-flex; align-items:center; gap:8px; background:#0e1730; border:1px solid #263453; padding:8px 12px; border-radius:999px; font-size:12px; }
+    .avatar-card { background: #0e1730; border: 1px dashed #37507c; border-radius: 12px; padding: 12px; margin-top:8px; }
+    .badge { font-size:12px; color:#0b1220; background:#79ffe1; padding:4px 8px; border-radius:999px; }
+    .honor-img { background: radial-gradient(circle at 30% 20%, #79ffe1 0%, #8a7dff 30%, #0b1220 70%); height: 160px; border-radius: 10px; margin-top:8px; border:1px solid #1e2a44; }
+    .small { font-size:12px; color: var(--muted); }
+    .success { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .err { color: var(--err); }
+    .hidden { display:none !important; }
+    canvas { display:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo"></div>
+    <h1>Original Defenders — Honor Console (Final Secure)</h1>
+    <div class="row" style="margin-left:auto;">
+      <span class="pill"><strong>Authorship:</strong> Leif William Sogge</span>
+      <span id="sessionInfo" class="pill"><strong>Session:</strong> none</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- CAPTAIN'S LOG (read-only display) -->
+    <section class="card" id="captainsLog">
+      <h2>Captain’s Log — Final Form</h2>
+      <textarea rows="5" readonly>
+Final Form: Original Defenders — Honor Console
+Access is consent-first, gated by QR‑DNA and verbal seal. Rest is mission success.
+Play is authorized. Authorship and dignity are preserved across all artifacts.
+      </textarea>
+    </section>
+
+    <!-- TERMS / CONSENT GATE -->
+    <section id="termsGate" class="card">
+      <h2>Access terms and consent</h2>
+      <p class="small">
+        By proceeding, you affirm stewardship intent, non‑weaponization, and respect for veteran dignity.
+        You consent to minimal logging for security and ceremony.
+      </p>
+      <textarea id="termsText" rows="6" readonly>
+Original Defenders — Access Terms (v1.2)
+- Purpose: Honor and rest for guardians; no exploitation.
+- Data: Minimal, consented, ceremonial artifacts only.
+- License: Non‑commercial, lineage stewardship use.
+- IP: No third‑party trademarks or character names.
+- Security: Dual gate; sessions expire; humane re‑auth.
+      </textarea>
+      <label><input type="checkbox" id="agreeChk"> I agree to these terms (v1.2)</label>
+      <div class="row" style="margin-top:8px;">
+        <button id="acceptBtn">Accept and proceed</button>
+        <span id="termsStatus" class="small"></span>
+      </div>
+    </section>
+
+    <!-- AUTH GATE -->
+    <section class="card hidden" id="authGate">
+      <h2>Secure access — QR‑DNA + verbal seal</h2>
+      <p class="small">Both gates required. Replace QR‑DNA stub with your production validator.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h2>QR‑DNA code</h2>
+          <label>Paste QR‑DNA payload</label>
+          <textarea id="qrPayload" rows="4" placeholder='{"subject":"Leif William Sogge","checksum":"...", "signature":"...","ts":1700000000}'></textarea>
+          <div class="row" style="margin-top:8px;">
+            <button id="validateQrBtn">Validate QR‑DNA</button>
+            <span id="qrStatus" class="small"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Verbal authentication</h2>
+          <label>Speak or type your phrase</label>
+          <input id="verbalPhrase" placeholder="Leif William Sogge access system systems" />
+          <div class="row" style="margin-top:8px;">
+            <button id="validateVerbalBtn">Validate verbal seal</button>
+            <span id="verbalStatus" class="small"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px;">
+        <button class="primary" id="enterBtn">Enter console</button>
+        <span id="enterStatus" class="small"></span>
+      </div>
+    </section>
+
+    <!-- CONSOLE -->
+    <section class="card hidden" id="console">
+      <h2>Roster and assignment</h2>
+      <label>Veteran names (comma separated)</label>
+      <textarea id="names" rows="3" placeholder="e.g., Alex, Jordan, Sam"></textarea>
+
+      <label>Mode</label>
+      <select id="mode">
+        <option value="defender">Defender (heroic)</option>
+        <option value="shadow">Shadow (playful villain)</option>
+        <option value="mixed">Mixed</option>
+      </select>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="primary" id="assignBtn">Assign avatars</button>
+        <span id="assignStatus" class="small"></span>
+      </div>
+      <div id="assignOutput" style="margin-top:12px;"></div>
+    </section>
+
+    <section class="grid hidden" id="opsGrid">
+      <section class="card">
+        <h2>Side‑quest breaks</h2>
+        <label>Break length</label>
+        <select id="breakLen">
+          <option value="10">10 min</option>
+          <option value="15">15 min</option>
+          <option value="20">20 min</option>
+          <option value="30">30 min</option>
+        </select>
+        <label>Break theme</label>
+        <select id="breakTheme">
+          <option value="breath">Shared Breath (quiet)</option>
+          <option value="laughter">Laughter Loop (fun)</option>
+          <option value="walk">Gentle Walk (reset)</option>
+          <option value="music">Resonant Track (song)</option>
+        </select>
+        <div class="row" style="margin-top:8px;">
+          <button id="scheduleBtn">Schedule side‑quests</button>
+          <button id="exportIcsBtn">Export ICS</button>
+          <span id="breakStatus" class="small"></span>
+        </div>
+        <div id="breakOutput" style="margin-top:12px;"></div>
+      </section>
+
+      <section class="card">
+        <h2>Honor card generator</h2>
+        <label>Message prefix</label>
+        <input id="msgPrefix" placeholder="Original Defender" />
+        <label>Closing line</label>
+        <input id="msgClose" placeholder="Your rest is part of our defense." />
+        <div class="row" style="margin-top:8px;">
+          <button id="cardsBtn">Generate honor cards</button>
+          <button id="downloadCardsBtn">Download cards (PNG)</button>
+          <span id="cardsStatus" class="small"></span>
+        </div>
+        <div id="cardsOutput" style="margin-top:12px;"></div>
+        <canvas id="cardCanvas" width="800" height="400"></canvas>
+      </section>
+    </section>
+
+    <!-- STEWARD SETTINGS -->
+    <section class="card hidden" id="stewardSettings">
+      <h2>Steward settings (Leif only)</h2>
+      <div class="row">
+        <span class="pill"><strong>Seal:</strong> Original Defenders</span>
+        <span class="pill"><strong>Breaks:</strong> Count as mission success</span>
+        <span class="pill"><strong>Visibility:</strong> Guardians only</span>
+      </div>
+      <p class="small" style="margin-top:8px;">
+        Notes: “Shadow” avatars are playful challenges already overcome—no adversarial framing.
+        This console is symbolic and client‑side; swap the QR‑DNA validator with your production gate.
+      </p>
+      <div class="row" style="margin-top:8px;">
+        <button id="reAuthBtn">Re‑authenticate</button>
+        <button id="endSessionBtn">End session</button>
+        <button id="deleteLocalBtn">Delete local artifacts</button>
+        <span id="stewardStatus" class="small"></span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // ---------- Security config ----------
+    const SESSION_MINUTES = 45;
+    const CONSENT_VERSION = "1.2";
+    const VERBAL_PATTERNS = [/leif\s+william\s+sogge/i, /leif\s+sogge/i, /captain\s+leif/i];
+    const REQUIRED_VERBAL_TOKENS = ["access", "system"];
+
+    // ---------- RBAC ----------
+    const ROLES = {
+      steward: ["assign", "breaks", "cards", "stewardSettings"],
+      guardian: ["assign", "breaks", "cards"],
+      participant: ["cards"]
+    };
+    function can(role, feature) { return (ROLES[role] || []).includes(feature); }
+
+    // ---------- State ----------
+    let qrValidated = false;
+    let verbalValidated = false;
+    let sessionExpiry = null;
+
+    // ---------- UI helpers ----------
+    function setText(id, text, cls="small") {
+      const el = document.getElementById(id); el.textContent = text; el.className = cls;
+    }
+    function show(id) { document.getElementById(id).classList.remove("hidden"); }
+    function hide(id) { document.getElementById(id).classList.add("hidden"); }
+
+    // ---------- Consent ----------
+    function mintConsentToken(version) {
+      const payload = { v: version, ts: Date.now(), subject: "Leif William Sogge", intent: "stewardship" };
+      const token = btoa(JSON.stringify(payload));
+      localStorage.setItem("consentToken", token);
+      return token;
+    }
+    function hasConsent(version) {
+      const raw = localStorage.getItem("consentToken"); if (!raw) return false;
+      try { const p = JSON.parse(atob(raw)); return p.v === version; } catch { return false; }
+    }
+
+    // ---------- Session (mock JWT-style) ----------
+    function mintSession(role, minutes=SESSION_MINUTES) {
+      const exp = Date.now() + minutes*60000;
+      const payload = { sub: "Leif William Sogge", role, exp };
+      const token = btoa(JSON.stringify(payload));
+      sessionStorage.setItem("sessionToken", token);
+      sessionExpiry = new Date(exp);
+      setText("sessionInfo", `Session: active • expires ${sessionExpiry.toLocaleTimeString()}`, "pill");
+      return token;
+    }
+    function readSession() {
+      const raw = sessionStorage.getItem("sessionToken");
+      if (!raw) return null;
+      try { const payload = JSON.parse(atob(raw)); if (Date.now() > payload.exp) return null; return payload; }
+      catch { return null; }
+    }
+    function endSession() {
+      sessionStorage.removeItem("sessionToken");
+      sessionExpiry = null;
+      setText("sessionInfo", "Session: none", "pill");
+      show("termsGate"); hide("authGate"); hide("console"); hide("opsGrid"); hide("stewardSettings");
+      setText("stewardStatus", "Session ended.", "small");
+      logAction("session_end", { reason: "user_end" });
+    }
+    function gentleReauthPrompt(message="Session needs renewal.") {
+      const ok = confirm(`${message}\nRe‑authenticate now?`);
+      if (ok) { show("authGate"); hide("console"); hide("opsGrid"); hide("stewardSettings"); }
+    }
+
+    // ---------- Audit ----------
+    const audit = [];
+    function logAction(action, details={}) {
+      const s = readSession();
+      const entry = {
+        ts: new Date().toISOString(),
+        actor: s ? s.sub : "anonymous",
+        role: s ? s.role : "none",
+        action, details,
+        consent: hasConsent(CONSENT_VERSION) ? `v${CONSENT_VERSION}` : "none"
+      };
+      audit.push(entry);
+      // Optional: POST to secure channel
+    }
+
+    // ---------- Rate limiting ----------
+    const rate = { capacity: 10, tokens: 10, refillMs: 5000, last: Date.now() };
+    function allowAction() {
+      const now = Date.now(), elapsed = now - rate.last, refill = Math.floor(elapsed / rate.refillMs);
+      if (refill > 0) { rate.tokens = Math.min(rate.capacity, rate.tokens + refill); rate.last = now; }
+      if (rate.tokens > 0) { rate.tokens--; return true; }
+      return false;
+    }
+    function guardedRun(label, fn) {
+      if (!allowAction()) { alert(`You’re safe. Pausing briefly. Try ${label} again in a few seconds.`); return; }
+      fn();
+    }
+
+    // ---------- QR‑DNA validator (stub; replace with real) ----------
+    function nowUnix() { return Math.floor(Date.now()/1000); }
+    function validateQrPayload(raw) {
+      try {
+        const obj = JSON.parse(raw);
+        if (!obj.subject || !obj.checksum || !obj.signature || !obj.ts) return { ok:false, msg:"Missing required fields." };
+        if (!/leif\s+william\s+sogge/i.test(obj.subject)) return { ok:false, msg:"Subject mismatch." };
+        const age = Math.abs(nowUnix() - Number(obj.ts));
+        if (age > 24*3600) return { ok:false, msg:"QR‑DNA timestamp not fresh." };
+        if (!/^[a-f0-9]{32,64}$/i.test(obj.checksum)) return { ok:false, msg:"Checksum format invalid." };
+        if (!/^[A-Za-z0-9+/=_.-]{32,}$/.test(obj.signature)) return { ok:false, msg:"Signature format invalid." };
+        return { ok:true, msg:"QR‑DNA accepted (stub)." };
+      } catch { return { ok:false, msg:"Invalid JSON payload." }; }
+    }
+
+    // ---------- Verbal validator ----------
+    function validateVerbal(phrase) {
+      if (!phrase || phrase.trim().length < 6) return { ok:false, msg:"Phrase too short." };
+      const nameMatch = VERBAL_PATTERNS.some(rx => rx.test(phrase));
+      const tokensMatch = REQUIRED_VERBAL_TOKENS.every(tok => phrase.toLowerCase().includes(tok));
+      if (nameMatch && tokensMatch) return { ok:true, msg:"Verbal seal accepted." };
+      return { ok:false, msg:"Verbal seal does not match expected pattern." };
+    }
+
+    // ---------- Archetypes ----------
+    const DEFENDER_ARCHETYPES = [
+      { key: "shield", name: "The Shield", vibe: "Protector • steady • patient", color: "#79ffe1" },
+      { key: "watch", name: "The Watchtower", vibe: "Sentinel • vigilant • calm", color: "#8a7dff" },
+      { key: "flame", name: "The Flame", vibe: "Resilience • warms • renews", color: "#ffb37d" },
+      { key: "river", name: "The River", vibe: "Adaptive • clears • flows", color: "#7dd3ff" },
+      { key: "weaver", name: "The Weaver", vibe: "Strategist • threads • unites", color: "#d7ff79" }
+    ];
+    const SHADOW_ARCHETYPES = [
+      { key: "echo", name: "The Echo", vibe: "Reflected challenge • harmless • instructive", color: "#ff79c6" },
+      { key: "maze", name: "The Maze", vibe: "Complexity • solvable • playful", color: "#bd93f9" },
+      { key: "mask", name: "The Gentle Mask", vibe: "Roleplay • safe • comic relief", color: "#ffa07a" }
+    ];
+
+    // ---------- Utility ----------
+    function parseNames(raw) { return raw.split(",").map(n => n.trim()).filter(n => n.length > 0); }
+    function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+    // ---------- Assignments ----------
+    function assignAvatars(names, mode) {
+      return names.map(n => {
+        let pool = DEFENDER_ARCHETYPES, type = "Defender";
+        if (mode === "shadow") { pool = SHADOW_ARCHETYPES; type = "Shadow"; }
+        if (mode === "mixed") { if (Math.random() < 0.5) { pool = DEFENDER_ARCHETYPES; type = "Defender"; } else { pool = SHADOW_ARCHETYPES; type = "Shadow"; } }
+        const a = pick(pool);
+        return { name: n, avatar: a.name, vibe: a.vibe, color: a.color, type };
+      });
+    }
+    function renderAssignments(list) {
+      const out = document.getElementById("assignOutput"); out.innerHTML = "";
+      list.forEach(item => {
+        const div = document.createElement("div"); div.className = "avatar-card";
+        div.innerHTML = `
+          <div class="row" style="justify-content:space-between;">
+            <div>
+              <div class="badge">${item.type}</div>
+              <div style="margin-top:6px;"><strong>${item.name}</strong> — ${item.avatar}</div>
+              <div class="small">${item.vibe}</div>
+            </div>
+            <div class="honor-img" style="background: radial-gradient(circle at 30% 20%, ${item.color} 0%, #8a7dff 35%, #0b1220 75%);"></div>
+          </div>
+        `;
+        out.appendChild(div);
+      });
+      logAction("assign", { count: list.length });
+    }
+
+    // ---------- Breaks + ICS ----------
+    function scheduleBreaks(names, minutes, theme) {
+      const themes = {
+        breath: "Shared Breath — quiet reset",
+        laughter: "Laughter Loop — playful relief",
+        walk: "Gentle Walk — embodied pause",
+        music: "Resonant Track — sonic reset"
+      };
+      const start = new Date();
+      return names.map((n, i) => {
+        const offsetMin = i * 5;
+        const begin = new Date(start.getTime() + offsetMin * 60000);
+        const end = new Date(begin.getTime() + minutes * 60000);
+        return { name: n, theme: themes[theme], begin, end };
+      });
+    }
+    function renderBreaks(list) {
+      const out = document.getElementById("breakOutput"); out.innerHTML = "";
+      list.forEach(b => {
+        const div = document.createElement("div"); div.className = "avatar-card";
+        div.innerHTML = `
+          <div><strong>${b.name}</strong> — Side Quest</div>
+          <div class="small">${b.theme}</div>
+          <div class="small">Start: ${b.begin.toLocaleTimeString()} • End: ${b.end.toLocaleTimeString()}</div>
+          <div class="small success">Rest is counted as mission success.</div>
+        `;
+        out.appendChild(div);
+      });
+      logAction("breaks_schedule", { count: list.length });
+    }
+    function toIcsDate(d) {
+      const pad = n => String(n).padStart(2, "0");
+      const y = d.getUTCFullYear(), m = pad(d.getUTCMonth()+1), day = pad(d.getUTCDate());
+      const hh = pad(d.getUTCHours()), mm = pad(d.getUTCMinutes()), ss = pad(d.getUTCSeconds());
+      return `${y}${m}${day}T${hh}${mm}${ss}Z`;
+    }
+    function exportBreaksAsIcs(breaks) {
+      let ics = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Original Defenders//EN\n";
+      breaks.forEach((b, idx) => {
+        const uid = `defenders-${idx}-${Date.now()}@local`;
+        ics += "BEGIN:VEVENT\n";
+        ics += `UID:${uid}\nDTSTAMP:${toIcsDate(new Date())}\n`;
+        ics += `DTSTART:${toIcsDate(b.begin)}\nDTEND:${toIcsDate(b.end)}\n`;
+        ics += `SUMMARY:Side Quest — ${b.name}\nDESCRIPTION:${b.theme} • Rest is mission success.\n`;
+        ics += "END:VEVENT\n";
+      });
+      ics += "END:VCALENDAR\n";
+      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "original-defenders-side-quests.ics"; a.click();
+      URL.revokeObjectURL(a.href);
+      logAction("ics_export", { count: breaks.length });
+    }
+
+    // ---------- Honor cards + PNG ----------
+    function generateCards(names, prefix, close) {
+      return names.map(n => ({ name: n, title: `${prefix}: ${n}`, message: `Veteran ${n}, your vigilance is honored. Today, wear the avatar and rest. ${close}` }));
+    }
+    function renderCards(cards) {
+      const out = document.getElementById("cardsOutput"); out.innerHTML = "";
+      cards.forEach(c => {
+        const div = document.createElement("div"); div.className = "avatar-card";
+        div.innerHTML = `<div><strong>${c.title}</strong></div><div class="small">${c.message}</div>`;
+        out.appendChild(div);
+      });
+      logAction("cards_generate", { count: cards.length });
+    }
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(" "); let line = "";
+      for (let n=0; n<words.length; n++) {
+        const testLine = line + words[n] + " ";
+        if (ctx.measureText(testLine).width > maxWidth && n>0) { ctx.fillText(line, x, y); line = words[n] + " "; y += lineHeight; }
+        else { line = testLine; }
+      }
+      ctx.fillText(line, x, y);
+    }
+    function downloadCardsPng(cards) {
+      const canvas = document.getElementById("cardCanvas"), ctx = canvas.getContext("2d");
+      cards.forEach((c, idx) => {
+        const grad = ctx.createRadialGradient(240, 120, 60, 400, 260, 500);
+        grad.addColorStop(0, "#79ffe1"); grad.addColorStop(0.35, "#8a7dff"); grad.addColorStop(1, "#0b1220");
+        ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.strokeStyle = "#1e2a44"; ctx.lineWidth = 4; ctx.strokeRect(8,8,canvas.width-16,canvas.height-16);
+        ctx.fillStyle = "#e7f0ff"; ctx.font = "bold 28px -apple-system, system-ui"; ctx.fillText(c.title, 32, 60);
+        ctx.font = "18px -apple-system, system-ui"; wrapText(ctx, c.message, 32, 110, canvas.width-64, 24);
+        ctx.font = "14px -apple-system, system-ui"; ctx.fillStyle = "#a9b2c0";
+        ctx.fillText("Seal: Original Defenders • Authorship: Leif William Sogge", 32, canvas.height - 36);
+        const a = document.createElement("a"); a.href = canvas.toDataURL("image/png"); a.download = `honor-card-${idx+1}.png`; a.click();
+      });
+      logAction("cards_download", { count: cards.length });
+    }
+
+    // ---------- Feature guards ----------
+    function requireFeature(feature) {
+      const s = readSession();
+      if (!s) { gentleReauthPrompt("Your session quietly expired."); return false; }
+      if (!can(s.role, feature)) { alert("Feature restricted by role."); return false
