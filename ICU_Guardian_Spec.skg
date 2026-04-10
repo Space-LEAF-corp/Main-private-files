@@ -1,0 +1,74 @@
+{
+  "artifact": {
+    "name": "ICU_Guardian_Spec",
+    "version": "1.0.0",
+    "authorship": {
+      "steward": "LEIF",
+      "inscription": "Captain’s Log",
+      "lineage": ["Calm Clause", "Vigilance Clause", "Child-Centered Guardianship"]
+    },
+    "purpose": "Non-clinical, ethical guardian for smart glasses in ICU-like contexts",
+    "principles": [
+      "Consent-first",
+      "Privacy by design",
+      "Human escalation",
+      "Child protection",
+      "Non-diagnostic support",
+      "Bias checks"
+    ],
+    "contexts": ["Hospital ICU", "Elder care ward", "School nurse office", "Waiting rooms"],
+    "features": {
+      "sceneAwareness": {
+        "signals": ["crowding", "blocked_exit", "trip_hazard", "agitation", "quiet_hours"],
+        "confidenceThreshold": 0.6,
+        "onDevice": true
+      },
+      "calmProtocol": {
+        "prompts": [
+          {"id": "soft_voice", "text": "Soft voice helps here.", "category": "de-escalation"},
+          {"id": "clear_path", "text": "Clear a safe path.", "category": "safety"},
+          {"id": "offer_water", "text": "Offer water if appropriate and permitted.", "category": "care"},
+          {"id": "call_nurse", "text": "Notify a nurse for assistance.", "category": "escalation"}
+        ],
+        "rateLimit": {"maxPer10Min": 3}
+      },
+      "consent": {
+        "states": ["unknown", "requested", "granted", "revoked"],
+        "visualOverlay": true,
+        "requiredFor": ["recording", "face_id", "data_share"]
+      },
+      "escalation": {
+        "contacts": [
+          {"role": "nurse_station", "method": "tap_to_call"},
+          {"role": "family_contact", "method": "tap_to_message"},
+          {"role": "ward_desk", "method": "tap_to_alert"}
+        ],
+        "logEveryEscalation": true
+      },
+      "childProtection": {
+        "minorFaceCapture": "forbidden_without_guardian_consent",
+        "languageTone": "gentle",
+        "privacyShield": true
+      },
+      "logging": {
+        "mode": "ceremonial",
+        "fields": ["timestamp", "context", "signal", "prompt", "consent_state", "escalation_action"],
+        "storage": "on_device_encrypted",
+        "retentionDays": 7
+      },
+      "safetyChecks": {
+        "bias": ["age", "disability", "race", "language"],
+        "overreach": ["medical_advice", "diagnosis", "treatment_suggestion"],
+        "autoBlock": true
+      }
+    },
+    "ui": {
+      "overlays": {
+        "consentBadge": {"shape": "circle", "colors": {"unknown": "gray", "granted": "green", "revoked": "red"}},
+        "calmCue": {"position": "lower_right", "durationMs": 4000},
+        "privacyShield": {"mode": "blur_faces_minors", "intensity": 0.7}
+      },
+      "inputs": ["tap", "voice", "glance"]
+    }
+  }
+}
