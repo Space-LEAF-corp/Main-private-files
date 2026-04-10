@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shadow OS – Web Mock</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: radial-gradient(circle at top, #1b1b24 0, #050509 55%, #000 100%);
+      --glass: rgba(18, 18, 28, 0.78);
+      --glass-strong: rgba(10, 10, 18, 0.92);
+      --accent: #5dd5ff;
+      --accent-soft: rgba(93, 213, 255, 0.35);
+      --text-main: #f5f5ff;
+      --text-soft: #a4a4c4;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.65);
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-pill: 999px;
+      --blur-strong: 26px;
+      --blur-soft: 18px;
+      --border-subtle: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      color: var(--text-main);
+      background: #000;
+    }
+
+    body {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      background: radial-gradient(circle at top, #1b1b24 0, #050509 55%, #000 100%);
+      color-scheme: dark;
+      overflow: hidden;
+    }
+
+    .desktop {
+      position: relative;
+      width: min(1200px, 100vw);
+      height: min(720px, 100vh);
+      margin: auto;
+      border-radius: 32px;
+      background: var(--bg);
+      box-shadow: 0 40px 80px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(40px);
+    }
+
+    /* Status bar */
+    .status-bar {
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.65),
+        rgba(0, 0, 0, 0.15)
+      );
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      z-index: 10;
+    }
+
+    .status-left,
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+    }
+
+    .status-signal {
+      display: inline-flex;
+      gap: 2px;
+    }
+
+    .status-signal span {
+      width: 3px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .status-signal span:nth-child(1) { height: 6px; }
+    .status-signal span:nth-child(2) { height: 9px; }
+    .status-signal span:nth-child(3) { height: 12px; }
+    .status-signal span:nth-child(4) {
+      height: 15px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-soft);
+    }
+
+    /* Main layout */
+    .main {
+      position: absolute;
+      inset: 40px 0 70px 0;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px;
+      padding: 18px 22px 22px;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      color: var(--text-soft);
+    }
+
+    .avatar-card {
+      padding: 14px 14px 12px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(
+        145deg,
+        rgba(15, 15, 30, 0.95),
+        rgba(10, 10, 20, 0.9)
+      );
+      border: var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(var(--blur-soft));
+    }
+
+    .avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #5dd5ff, #6366f1);
+      box-shadow: 0 0 18px rgba(99, 102, 241, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar-circle::after {
+      content: "";
+      position: absolute;
+      inset: 40% -40%;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.4), transparent);
+      opacity: 0.7;
+    }
+
+    .avatar-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .avatar-name {
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .avatar-role {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+    }
+
+    .avatar-pill-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .chip-accent {
+      border-color: rgba(93, 213, 255, 0.7);
+      background: radial-gradient(circle at top left, rgba(93, 213, 255, 0.25), rgba(15, 23, 42, 0.9));
+      color: var(--accent);
+      box-shadow: 0 0 14px rgba(93, 213, 255, 0.6);
+    }
+
+    .sidebar-section {
+      padding: 12px 12px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(10, 10, 20, 0.9);
+      border: var(--border-subtle);
+      backdrop-filter: blur(var(--blur-soft));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .sidebar-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+
+    .sidebar-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 7px;
+      border-radius: 10px;
+      cursor: default;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateY(-1px);
+    }
+
+    .sidebar-item span {
+      opacity: 0.9;
+    }
+
+    .sidebar-badge {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(93, 213, 255, 0.12);
+      color: var(--accent);
+      border: 1px solid rgba(93, 213, 255, 0.4);
+    }
+
+    /* Center area */
+    .center {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+    }
+
+    .hero {
+      position: relative;
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at top left, rgba(93, 213, 255, 0.18), rgba(15, 23, 42, 0.96));
+      border: var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(var(--blur-strong));
+      overflow: hidden;
+    }
+
+    .hero-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .hero-title {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
+
+    .hero-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-soft);
+    }
+
+    .hero-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent-soft);
+    }
+
+    .hero-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+    }
+
+    .hero-copy {
+      max-width: 60%;
+    }
+
+    .hero-heading {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .hero-sub {
+      font-size: 13px;
+      color: var(--text-soft);
+      max-width: 360px;
+    }
+
+    .hero-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-main);
+      transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at top left, #5dd5ff, #6366f1);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 14px 30px rgba(99, 102, 241, 0.7);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .hero-orb {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 20%, #e0faff, transparent 55%),
+        radial-gradient(circle at 70% 80%, #5dd5ff, #6366f1);
+      box-shadow:
+        0 0 40px rgba(93, 213, 255, 0.9),
+        0 0 80px rgba(99, 102, 241, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-orb::after {
+      content: "OS";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 0.3em;
+      text-indent: 0.3em;
+      color: rgba(5, 8, 22, 0.9);
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+    }
+
+    /* App grid */
+    .apps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .app-card {
+      padding: 10px 10px 9px;
+      border-radius: 18px;
+      background: rgba(10, 10, 20, 0.96);
+      border: var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(var(--blur-soft));
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .app-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 9px;
+      background: radial-gradient(circle at 30% 20%, #fef9c3, #f97316);
+      box-shadow: 0 0 16px rgba(248, 181, 0, 0.9);
+    }
+
+    .app-icon.blue {
+      background: radial-gradient(circle at 30% 20%, #e0f2fe, #3b82f6);
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.9);
+    }
+
+    .app-icon.pink {
+      background: radial-gradient(circle at 30% 20%, #fce7f3, #ec4899);
+      box-shadow: 0 0 16px rgba(236, 72, 153, 0.9);
+    }
+
+    .app-title {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .app-meta {
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .app-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .pill-soft {
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* Dock */
+    .dock {
+      position: absolute;
+      inset: auto 0 16px 0;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .dock-inner {
+      pointer-events: auto;
+      padding: 8px 14px;
+      border-radius: 24px;
+      background: rgba(10, 10, 20, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.9);
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .dock-icon-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      color: var(--text-soft);
+    }
+
+    .dock-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 30% 20%, #e0faff, #22c55e);
+      box-shadow: 0 0 18px rgba(34, 197, 94, 0.9);
+      cursor: default;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .dock-icon.purple {
+      background: radial-gradient(circle at 30% 20%, #ede9fe, #8b5cf6);
+      box-shadow: 0 0 18px rgba(139, 92, 246, 0.9);
+    }
+
+    .dock-icon.red {
+      background: radial-gradient(circle at 30% 20%, #fee2e2, #ef4444);
+      box-shadow: 0 0 18px rgba(239, 68, 68, 0.9);
+    }
+
+    .dock-icon.blue {
+      background: radial-gradient(circle at 30% 20%, #e0f2fe, #3b82f6);
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.9);
+    }
+
+    .dock-icon:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Small screen fallback */
+    @media (max-width: 900px) {
+      .desktop {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+      }
+      .main {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        display: none;
+      }
+      .apps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop">
+    <!-- Status bar -->
+    <header class="status-bar">
+      <div class="status-left">
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>Shadow OS</span>
+        </div>
+        <span>Workspace: Orchard</span>
+      </div>
+      <div class="status-right">
+        <div class="status-signal">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <span>100%</span>
+        <span>9:41</span>
+      </div>
+    </header>
+
+    <!-- Main layout -->
+    <main class="main">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <section class="avatar-card">
+          <div class="avatar-row">
+            <div class="avatar-circle"></div>
+            <div class="avatar-meta">
+              <div class="avatar-name">Primary Guardian</div>
+              <div class="avatar-role">Shadow profile</div>
+            </div>
+          </div>
+          <div class="avatar-pill-row">
+            <span class="chip chip-accent">Private mode</span>
+            <span class="chip">No tracking</span>
+          </div>
+        </section>
+
+        <section class="sidebar-section">
+          <div class="sidebar-title">Scenes</div>
+          <ul class="sidebar-list">
+            <li class="sidebar-item">
+              <span>Home orbit</span>
+              <span class="sidebar-badge">Active</span>
+            </li>
+            <li class="sidebar-item">
+              <span>Travel shell</span>
+              <span>Calm</span>
+            </li>
+            <li class="sidebar-item">
+              <span>Focus veil</span>
+              <span>Muted</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="sidebar-section">
+          <div class="sidebar-title">Safety layers</div>
+          <ul class="sidebar-list">
+            <li class="sidebar-item">
+              <span>Guardian channel</span>
+              <span>On</span>
+            </li>
+            <li class="sidebar-item">
+              <span>Artifact unlock</span>
+              <span>Ready</span>
+            </li>
+            <li class="sidebar-item">
+              <span>Guest surface</span>
+              <span>Isolated</span>
+            </li>
+          </ul>
+        </section>
+      </aside>
+
+      <!-- Center -->
+      <section class="center">
+        <!-- Hero -->
+        <section class="hero">
+          <div class="hero-header">
+            <div class="hero-title">Shadow shell · local only</div>
+            <div class="hero-pill">
+              <span class="hero-pill-dot"></span>
+              <span>Nothing leaves this device</span>
+            </div>
+          </div>
+          <div class="hero-main">
+            <div class="hero-copy">
+              <h1 class="hero-heading">A quiet layer over your world.</h1>
+              <p class="hero-sub">
+                This mock interface shows a “shadow” operating surface: soft, local, and ceremonial.
+                No accounts, no feeds—just a calm place to stage what you actually care about.
+              </p>
+              <div class="hero-actions">
+                <button class="btn btn-primary">Open private workspace</button>
+                <button class="btn">Preview guest view</button>
+              </div>
+            </div>
+            <div class="hero-orb" aria-hidden="true"></div>
+          </div>
+        </section>
+
+        <!-- Apps -->
+        <section class="apps" aria-label="Shadow OS tiles">
+          <article class="app-card">
+            <header class="app-header">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="app-icon blue"></div>
+                <div>
+                  <div class="app-title">Artifacts</div>
+                  <div class="app-meta">Keys · Tokens · Mementos</div>
+                </div>
+              </div>
+              <span class="pill-soft">Local</span>
+            </header>
+            <footer class="app-footer">
+              <span>12 bound items</span>
+              <span>Lineage intact</span>
+            </footer>
+          </article>
+
+          <article class="app-card">
+            <header class="app-header">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="app-icon pink"></div>
+                <div>
+                  <div class="app-title">Circles</div>
+                  <div class="app-meta">Family · Clan · Guests</div>
+                </div>
+              </div>
+              <span class="pill-soft">Guarded</span>
+            </header>
+            <footer class="app-footer">
+              <span>3 active circles</span>
+              <span>0 alerts</span>
+            </footer>
+          </article>
+
+          <article class="app-card">
+            <header class="app-header">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="app-icon"></div>
+                <div>
+                  <div class="app-title">Rituals</div>
+                  <div class="app-meta">Morning · Travel · Return</div>
+                </div>
+              </div>
+              <span class="pill-soft">Steady</span>
+            </header>
+            <footer class="app-footer">
+              <span>Next: Evening reset</span>
+              <span>+ 7 min</span>
+            </footer>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <!-- Dock -->
+    <nav class="dock" aria-label="Dock">
+      <div class="dock-inner">
+        <div class="dock-icon-wrap">
+          <div class="dock-icon blue"></div>
+          <span>Home</span>
+        </div>
+        <div class="dock-icon-wrap">
+          <div class="dock-icon purple"></div>
+          <span>Library</span>
+        </div>
+        <div class="dock-icon-wrap">
+          <div class="dock-icon"></div>
+          <span>Guardian</span>
+        </div>
+        <div class="dock-icon-wrap">
+          <div class="dock-icon red"></div>
+          <span>Emergency</span>
+        </div>
+      </div>
+    </nav>
+  </div>
+</body>
+</html>
