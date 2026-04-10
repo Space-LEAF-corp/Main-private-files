@@ -1,0 +1,260 @@
+{
+  "artifact": "PeaceLine Charter Seal",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "LEIF",
+      "role": "Ceremonial steward",
+      "lineage": "Captain’s Log — Jarvondis 3.0 continuity marker"
+    }
+  ],
+  "provenance": {
+    "created_at": "2025-11-13T18:41:00Z",
+    "location": "Ocala, Florida, United States",
+    "hash_algorithm": "SHA-256",
+    "content_hash": "<replace-with-sha256-of-this-file>"
+  },
+  "scope": {
+    "intent": "Discreet, invitation-only dialogue space for de-escalation and civilian care.",
+    "non_punitive": true,
+    "child_safety": true,
+    "data_retention": "no_plaintext_storage",
+    "visibility": "public_artifact, private_content"
+  },
+  "activation": {
+    "status": "Dormant until consent",
+    "conditions": [
+      "Mutual acknowledgment",
+      "Acceptance of ground rules",
+      "Registration of public keys"
+    ]
+  },
+  "ground_rules": [
+    "Dignity and non-violence in all communications",
+    "No doxxing, threats, or incitement",
+    "Encrypted-by-default; minimal metadata",
+    "Voluntary participation; revocable at any time"
+  ],
+  "contact_artifact": {
+    "url": "/",
+    "description": "Landing page hosts public legitimacy and private invitations."
+  }
+}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PeaceLine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A discreet, invitation-only space for dignified dialogue and de-escalation.">
+  <link href="https://unpkg.com/mvp.css" rel="stylesheet">
+  <style>
+    body { max-width: 800px; margin: 2rem auto; }
+    .seal { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: #f7f7f7; padding: 1rem; border-radius: 8px; }
+    .quiet { color: #555; }
+    footer { margin-top: 3rem; font-size: 0.9rem; color: #666; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PeaceLine</h1>
+    <p class="quiet">A vessel for consent-based dialogue. Public legitimacy, private content.</p>
+  </header>
+
+  <section>
+    <h2>Continuity and stewardship</h2>
+    <p>
+      This space remains dormant until mutual consent and acceptance of ground rules.
+      Invitations are cryptographic. No plaintext is stored.
+    </p>
+    <div class="seal">
+      <strong>Seal:</strong> PeaceLine Charter — Version 1.0.0<br>
+      <strong>Steward:</strong> LEIF<br>
+      <strong>Principles:</strong> Non-punitive, encrypted-by-default, civilian care, revocable consent.
+    </div>
+  </section>
+
+  <section>
+    <h2>Signal of readiness</h2>
+    <p>
+      If you have received an invitation token, you may acknowledge readiness with your public key.
+      Otherwise, please review the ground rules and contact through established channels.
+    </p>
+
+    <form id="ready-form">
+      <label for="pubkey">Public key (Base64):</label>
+      <input type="text" id="pubkey" name="pubkey" placeholder="Enter your public key" required>
+      <label for="token">Invitation token:</label>
+      <input type="text" id="token" name="token" placeholder="Paste invitation token" required>
+      <button type="submit">Acknowledge</button>
+    </form>
+
+    <p id="ack" class="quiet"></p>
+  </section>
+
+  <footer>
+    PeaceLine operates with dignity and minimal metadata. By design, we never store plaintext.
+  </footer>
+
+  <script>
+    // This only sends minimal data to the backend; there is no plaintext messaging here.
+    const form = document.getElementById('ready-form');
+    const ack = document.getElementById('ack');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        pubkey: form.pubkey.value.trim(),
+        token: form.token.value.trim()
+      };
+      ack.textContent = "Submitting (encrypted channel required)…";
+      try {
+        const res = await fetch('/api/acknowledge', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        ack.textContent = data.message || "Acknowledged.";
+      } catch (err) {
+        ack.textContent = "Submission failed. Please try again later.";
+      }
+    });
+  </script>
+</body>
+</html>
+// server.js
+// Minimal PeaceLine relay: invitation registration, public key registry, encrypted message relay.
+// Plaintext never touches disk. Use HTTPS and a reverse proxy. Audit before production.
+
+import express from 'express';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { randomBytes } from 'crypto';
+import { readFileSync } from 'fs';
+import sodium from 'libsodium-wrappers';
+
+const app = express();
+app.use(express.json({ limit: '32kb' }));
+app.use(helmet({
+  contentSecurityPolicy: false // serve static separately; tighten CSP in production
+}));
+app.use(rateLimit({ windowMs: 60_000, max: 60 }));
+
+// In-memory registries (replace with encrypted store if needed)
+const invitations = new Map(); // token -> { scope, expiresAt }
+const registry = new Map();     // keyId -> { pubkey (Uint8Array), createdAt }
+const mailbox = new Map();      // keyId -> [ { fromId, ciphertext, createdAt } ]
+
+// Load governance seal for reference (optional)
+let seal;
+try {
+  seal = JSON.parse(readFileSync('./governance_seal.json', 'utf8'));
+} catch (e) {
+  seal = { artifact: 'PeaceLine Charter Seal', version: '1.0.0' };
+}
+
+await sodium.ready;
+
+// Utility: base64 helpers
+const b64uToBytes = (s) => sodium.from_base64(s, sodium.base64_variants.ORIGINAL);
+const bytesToB64u = (b) => sodium.to_base64(b, sodium.base64_variants.ORIGINAL);
+
+// Create an invitation (admin-only; wire behind auth)
+app.post('/api/admin/invite', (req, res) => {
+  const { scope = 'dialogue', ttlMinutes = 1440 } = req.body || {};
+  const token = bytesToB64u(randomBytes(16));
+  const expiresAt = Date.now() + ttlMinutes * 60_000;
+  invitations.set(token, { scope, expiresAt });
+  res.json({ token, scope, expiresAt });
+});
+
+// Acknowledge readiness: register a public key using an invitation token
+app.post('/api/acknowledge', (req, res) => {
+  const { pubkey, token } = req.body || {};
+  if (!pubkey || !token) return res.status(400).json({ error: 'Missing pubkey or token' });
+
+  const invite = invitations.get(token);
+  if (!invite || invite.expiresAt < Date.now()) return res.status(403).json({ error: 'Invalid or expired token' });
+
+  const pub = b64uToBytes(pubkey);
+  if (pub.length !== sodium.crypto_box_PUBLICKEYBYTES) {
+    return res.status(400).json({ error: 'Invalid public key length' });
+  }
+  const keyId = bytesToB64u(sodium.crypto_generichash(16, pub));
+  registry.set(keyId, { pubkey: pub, createdAt: Date.now() });
+  invitations.delete(token); // one-time use
+
+  res.json({ message: 'Acknowledged. Key registered.', keyId });
+});
+
+// Send encrypted message: sealed box to recipient’s public key
+app.post('/api/send', (req, res) => {
+  const { fromId, toId, ciphertext } = req.body || {};
+  if (!fromId || !toId || !ciphertext) return res.status(400).json({ error: 'Missing fields' });
+
+  // We only accept sealed boxes. Server does not decrypt.
+  const recipient = registry.get(toId);
+  const sender = registry.get(fromId);
+  if (!recipient || !sender) return res.status(404).json({ error: 'Unknown participant' });
+
+  const bucket = mailbox.get(toId) || [];
+  bucket.push({ fromId, ciphertext, createdAt: Date.now() });
+  mailbox.set(toId, bucket);
+
+  res.json({ message: 'Delivered to mailbox.' });
+});
+
+// Fetch messages (recipient polls)
+app.post('/api/fetch', (req, res) => {
+  const { keyId } = req.body || {};
+  const participant = registry.get(keyId);
+  if (!participant) return res.status(404).json({ error: 'Unknown participant' });
+
+  const bucket = mailbox.get(keyId) || [];
+  // Ephemeral by default: delete after fetch
+  mailbox.set(keyId, []);
+  res.json({ messages: bucket });
+});
+
+// Health (exposes no sensitive data)
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', seal: { artifact: seal.artifact, version: seal.version } });
+});
+
+const PORT = process.env.PORT || 8787;
+app.listen(PORT, () => {
+  console.log(`PeaceLine relay listening on ${PORT}`);
+});
+npm init -y
+npm install express helmet express-rate-limit libsodium-wrappers
+node server.js
+<script type="module">
+  import sodium from 'https://cdn.skypack.dev/libsodium-wrappers';
+
+  await sodium.ready;
+
+  // Generate an X25519 key pair (crypto_box)
+  export async function generateKeyPair() {
+    const kp = sodium.crypto_box_keypair();
+    return {
+      publicKeyB64: sodium.to_base64(kp.publicKey, sodium.base64_variants.ORIGINAL),
+      secretKeyB64: sodium.to_base64(kp.privateKey, sodium.base64_variants.ORIGINAL)
+    };
+  }
+
+  // Create a sealed box for recipient public key (Base64 in, Base64 out)
+  export function encryptForRecipient(recipientPublicKeyB64, plaintextUtf8) {
+    const recipientPub = sodium.from_base64(recipientPublicKeyB64, sodium.base64_variants.ORIGINAL);
+    const cipher = sodium.crypto_box_seal(sodium.from_string(plaintextUtf8), recipientPub);
+    return sodium.to_base64(cipher, sodium.base64_variants.ORIGINAL);
+  }
+
+  // Open sealed box using recipient secret key and public key (both Base64)
+  export function decryptSealedBox(cipherB64, publicKeyB64, secretKeyB64) {
+    const cipher = sodium.from_base64(cipherB64, sodium.base64_variants.ORIGINAL);
+    const pub = sodium.from_base64(publicKeyB64, sodium.base64_variants.ORIGINAL);
+    const sec = sodium.from_base64(secretKeyB64, sodium.base64_variants.ORIGINAL);
+    const msg = sodium.crypto_box_seal_open(cipher, pub, sec);
+    return sodium.to_string(msg);
+  }
+</script>
