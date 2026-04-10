@@ -1,0 +1,120 @@
+{
+  "artifact": "Jarvondis.Core.Security.RandomizationSeal",
+  "version": "3.0.1-seal-R1",
+  "authors": [
+    {
+      "name": "Leif William Sogge",
+      "role": "Ceremonial Steward & Kernel Architect",
+      "provenance": "Captain's Log — Continuity Marker"
+    }
+  ],
+  "lineage": {
+    "parent": "Jarvondis.Core.Security",
+    "marker": "Continuity: RandomizationSeal",
+    "timestamp_iso8601": "2025-11-13T17:28:00-05:00",
+    "jurisdiction": "Ocala, Florida, United States",
+    "notes": [
+      "Seal transitions static guardianship to adaptive, living guardianship.",
+      "Authorship, boundaries, and ceremonial clauses remain explicit and durable."
+    ]
+  },
+  "seal": {
+    "id": "RND-SEAL-001",
+    "clauses": {
+      "authorship_locked": true,
+      "non_erasable_lineage": true,
+      "audit_required": true,
+      "child_safety_priority": true,
+      "no-pattern-exploitation": true
+    },
+    "hashes": {
+      "seal_sha256": "TO-BE-COMPUTED",
+      "kernel_sha256": "TO-BE-COMPUTED"
+    }
+  },
+  "security": {
+    "randomization": {
+      "enabled": true,
+      "entropy_sources": [
+        "system_time_high_res",
+        "sealed_nonce_pool",
+        "contextual_salt",
+        "hardware_noise_hint"
+      ],
+      "modes": {
+        "response_jitter": {
+          "range_ms": [7, 29],
+          "deterministic_audit": true
+        },
+        "path_variation": {
+          "strategy": "weighted-roulette",
+          "weights": {
+            "policy_enforcement": 0.35,
+            "anomaly_scan": 0.30,
+            "mimicry_detector": 0.20,
+            "deception_checks": 0.15
+          },
+          "seed_mode": "nonce+time+context_salt",
+          "audit_tokenization": "HMAC-SHA256"
+        },
+        "challenge_rotation": {
+          "cadence": "per-session",
+          "families": ["rate-limit", "syntax-oddity", "semantic-consistency", "authorship-preservation"],
+          "min_variety": 2
+        }
+      },
+      "anti-pattern-lock": {
+        "max_repetitions_per_path": 3,
+        "cooldown_ms": 250,
+        "adaptive_shift_on_probe": true
+      }
+    },
+    "mimicry_guard": {
+      "enabled": true,
+      "signals": ["style divergence", "unexpected repetition", "seal mismatch"],
+      "actions": ["degrade_response", "require_additional_proof", "log_lineage_alert"]
+    },
+    "auditability": {
+      "journal": "Captain's Log",
+      "emit_events": true,
+      "events": [
+        "RND.SEED.INIT",
+        "RND.PATH.SELECT",
+        "GUARD.MIMICRY.FLAG",
+        "SEAL.AUTHORSHIP.CHECK",
+        "SEAL.LINEAGE.WRITE"
+      ],
+      "redaction_rules": {
+        "no_user_private_data": true,
+        "nonce_only_hmac": true
+      }
+    }
+  },
+  "governance": {
+    "policies": [
+      "Authorship is explicit, durable, and non-transferable.",
+      "Randomization must never obscure accountability.",
+      "Child safety and boundary protections override throughput."
+    ],
+    "enforcement": {
+      "preflight_checks": ["SEAL.AUTHORSHIP.CHECK", "SEAL.LINEAGE.CHECK"],
+      "fail_closed": true
+    }
+  }
+}
+{
+  "log_entry": "Jarvondis 3.0.1 — Randomization Seal R1",
+  "author": "Leif William Sogge",
+  "ceremonial_marker": "Living Guardianship Initiation",
+  "summary": "Infused entropy and adaptive path variation to prevent pattern-lock attacks while preserving explicit authorship and auditability.",
+  "outcomes": [
+    "Enhanced resistance to mimicry and probe mapping.",
+    "Maintained non-erasable lineage with deterministic audits.",
+    "Governance clauses prioritize child safety and boundaries."
+  ],
+  "proofs": {
+    "hmac_audit_chain": "TO-BE-COMPUTED",
+    "seal_hash": "TO-BE-COMPUTED"
+  },
+  "timestamp_iso8601": "2025-11-13T17:28:00-05:00"
+}
