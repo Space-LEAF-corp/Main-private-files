@@ -1,0 +1,40 @@
+{
+  "artifact": {
+    "name": "Veteran_SpiritAnimal_Seal",
+    "version": "1.0.0",
+    "authorship": {
+      "steward": "LEIF",
+      "inscription": "Captain’s Log",
+      "lineage": ["Troop Honor Seal", "Panther’s Vigil Seal", "Seal of Unbroken Covenant"]
+    },
+    "platform": {
+      "privacy": "veteran_only",
+      "duration": "7_days",
+      "reminder": "daily"
+    },
+    "spiritAnimal": {
+      "choices": ["eagle", "wolf", "panther", "dove", "bear"],
+      "default": "panther",
+      "customizable": true
+    },
+    "messages": [
+      "You are valued.",
+      "You are loved.",
+      "You defended life with honor.",
+      "This week belongs to you."
+    ],
+    "visuals": {
+      "overlay": {
+        "color": "gold",
+        "pattern": "gentle aura",
+        "effect": "daily glow"
+      }
+    },
+    "logging": {
+      "mode": "ceremonial",
+      "fields": ["timestamp", "animal_choice", "message_displayed"],
+      "storage": "on_device_encrypted",
+      "retentionDays": 7
+    }
+  }
+}
