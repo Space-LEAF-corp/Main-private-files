@@ -1,0 +1,108 @@
+{
+  "university": {
+    "name": "Digital University of Jarvondis",
+    "version": "1.1.0",
+    "privacy": {
+      "covenantSeal": true,
+      "museumEthos": "look-but-not-touch",
+      "exclusions": ["Erebus"]
+    },
+    "witnessCircle": {
+      "enabled": true,
+      "logAcknowledgments": true,
+      "requiredForFailsafe": true
+    },
+    "modules": {
+      "scienceSectionIGiraffe": {
+        "label": "Science Section: I-Giraffe",
+        "status": "active"
+      },
+      "gameIntegrationLayer": {
+        "label": "Ceremonial Integration Layer",
+        "nonFinancial": true,
+        "status": "ready-for-outreach"
+      },
+      "globalSafetyNet": {
+        "label": "Global Safety Net Protocol",
+        "layers": {
+          "outerShield": "active",
+          "innerShield": "stable",
+          "coreShield": "secure"
+        },
+        "charterSafeguards": true,
+        "witnessesIncluded": true,
+        "updatePolicy": "ceremonial-affirmations",
+        "status": "initialized"
+      },
+      "schoolEntryRitual": {
+        "label": "University Entry Ritual",
+        "status": "active"
+      },
+      "neverAgainProtocol": {
+        "label": "Never Again Protocol",
+        "type": "symbolic-failsafe",
+        "trigger": {
+          "adminUser": "Leif William Sogge",
+          "phrase": "all hope is lost",
+          "caseSensitive": false,
+          "witnessConfirmationRequired": true
+        },
+        "actions": {
+          "failsafeSeal": "lock-ceremonial-modules",
+          "haltExpansion": true,
+          "charterRecord": "Final Seal of Stewardship",
+          "constellationMarker": "Star of Prevention",
+          "publicNotice": "Ceremonial closure invoked; life-protection intact"
+        },
+        "lifeProtectionClause": {
+          "preserve": [
+            "health-and-safety infrastructure",
+            "community support channels",
+            "education archives and commons",
+            "governance continuity records"
+          ],
+          "explicitlyExcludeDestructiveOperations": true
+        },
+        "audit": {
+          "witnessLog": true,
+          "timestampedEntries": true,
+          "immutableRecord": true
+        },
+        "status": "armed-symbolic"
+      }
+    }
+  }
+}
+"neverAgainProtocol": {
+  "label": "Never Again Protocol",
+  "type": "symbolic-failsafe",
+  "trigger": {
+    "adminUser": "Leif William Sogge",
+    "phrase": "all hope is lost",
+    "typedAuthorizationRequired": true,
+    "verbalConfirmationRequired": true,
+    "minimumWitnesses": 2
+  },
+  "actions": {
+    "failsafeSeal": "lock-ceremonial-modules",
+    "haltExpansion": true,
+    "charterRecord": "Final Seal of Stewardship",
+    "constellationMarker": "Star of Prevention",
+    "publicNotice": "Ceremonial closure invoked; life-protection intact"
+  },
+  "lifeProtectionClause": {
+    "preserve": [
+      "health-and-safety infrastructure",
+      "community support channels",
+      "education archives and commons",
+      "governance continuity records"
+    ],
+    "explicitlyExcludeDestructiveOperations": true
+  },
+  "audit": {
+    "witnessLog": true,
+    "timestampedEntries": true,
+    "immutableRecord": true
+  },
+  "status": "armed-symbolic"
+}
