@@ -1,0 +1,100 @@
+# Import dependencies
+import numpy as np
+import pandas as pd
+from datetime import datetime
+
+# Placeholder for ErebusSync (replace with your actual module)
+class ErebusSync:
+    def query(self, input_str):
+        # Simulated response for testing
+        return f"Echoing back: {input_str}"
+
+# Personality module
+class Personality:
+    def __init__(self, tone="neutral"):
+        self.tone = tone
+
+    def stylize(self, response):
+        if self.tone == "witty":
+            return f"{response} 😉"
+        elif self.tone == "formal":
+            return f"{response}. I hope that satisfies your query."
+        elif self.tone == "mythic":
+            return f"⚔️ {response} — inscribed in the Captain’s Log."
+        elif self.tone == "playful":
+            return f"{response} 🎮✨"
+        return response
+
+# Define Jarvondis class
+class Jarvondis:
+    def __init__(self):
+        self.eremus_sync = ErebusSync()
+        self.memory = pd.DataFrame(columns=['timestamp', 'input', 'response', 'tone'])
+        self.personality = Personality(tone="witty")
+
+    def initialize(self):
+        print("🟢 Jarvondis 2.0 online. Ready to assist.")
+        self.load_memory()
+
+    def learn(self, input_str):
+        try:
+            response = self.eremus_sync.query(input_str)
+            styled = self.personality.stylize(response)
+            self.memory.loc[len(self.memory)] = [
+                datetime.now().isoformat(), input_str, styled, self.personality.tone
+            ]
+            return styled
+        except Exception as e:
+            return f"⚠️ Error processing input: {e}"
+
+    def respond(self, input_str):
+        return self.learn(input_str)
+
+    def save_memory(self, filename="jarvondis_memory.csv"):
+        self.memory.to_csv(filename, index=False)
+
+    def load_memory(self, filename="jarvondis_memory.csv"):
+        try:
+            self.memory = pd.read_csv(filename)
+        except FileNotFoundError:
+            pass
+
+# Initialize and run Jarvondis
+if __name__ == "__main__":
+    jarvondis = None
+
+    # Wait until the user types 'run' to initialize Jarvondis
+    while True:
+        start_input = input('Type "run" to start Jarvondis 2.0 (or "exit" to quit): ')
+        if not start_input:
+            continue
+        cmd = start_input.strip().lower()
+        if cmd == "run":
+            jarvondis = Jarvondis()
+            jarvondis.initialize()
+            break
+        if cmd in ["exit", "quit"]:
+            print("Jarvondis: Exiting without starting. 💤")
+            exit(0)
+        print('Type "run" to start Jarvondis 2.0, or "exit" to quit.')
+
+    # Main interaction loop after initialization
+    while True:
+        try:
+            user_input = input("You: ")
+        except EOFError:
+            print("\nJarvondis: Input closed. Shutting down.")
+            if jarvondis:
+                jarvondis.save_memory()
+            break
+
+        if not user_input:
+            continue
+
+        if user_input.lower() in ["exit", "quit"]:
+            print("Jarvondis: Shutting down. 💤")
+            jarvondis.save_memory()
+            break
+
+        print("Jarvondis:", jarvondis.respond(user_input))
+        
