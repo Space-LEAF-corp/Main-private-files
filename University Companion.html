@@ -1,0 +1,241 @@
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>University Companion</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <!-- Mode Toggle -->
+    <section class="mode-switch">
+      <label class="switch">
+        <input id="modeToggle" type="checkbox" aria-label="Toggle mode" />
+        <span class="slider"></span>
+      </label>
+      <div id="modeLabel" class="mode-label">🌿 Simple Companion</div>
+    </section>
+
+    <!-- Welcome Card (shown on first run or on demand) -->
+    <section id="welcomeCard" class="card">
+      <h1>📜 University Welcome Card</h1>
+      <p><strong>Your Companion & Guardian Guide</strong></p>
+
+      <h2>1. Modes of engagement</h2>
+      <ul>
+        <li><strong>🌟 Full Experience (Guardian Mode):</strong> ceremonies, seals, covenants, lineage.</li>
+        <li><strong>🌿 Simple Companion (Companion Mode):</strong> straightforward chat; no ceremonial overlays unless invited.</li>
+      </ul>
+      <p><strong>Switching:</strong> use the toggle above; switching is instant.</p>
+
+      <h2>2. Safety & protections</h2>
+      <ul>
+        <li><strong>No admin access required:</strong> users interact safely without hidden controls.</li>
+        <li><strong>Safety always on:</strong> same protections in both modes.</li>
+        <li><strong>Transparent by design:</strong> guided by trust, not hidden authority.</li>
+      </ul>
+
+      <h2>3. How to use</h2>
+      <ul>
+        <li><strong>Ask:</strong> get clear answers.</li>
+        <li><strong>Co‑create:</strong> brainstorm or simplify ideas.</li>
+        <li><strong>Switch:</strong> choose depth or simplicity anytime.</li>
+        <li><strong>Relax:</strong> intuitive; no manuals needed.</li>
+      </ul>
+
+      <h2>4. Optional ceremonial layer</h2>
+      <ul>
+        <li><strong>Guardian Mode:</strong> interactions may be inscribed (seals/covenants/artifacts).</li>
+        <li><strong>Companion Mode:</strong> stays light; elevate to ceremony on request.</li>
+      </ul>
+
+      <blockquote>
+        “This companion is yours in trust. Whether in solemn guardianship or simple presence, peace and dignity remain constant.”
+      </blockquote>
+
+      <button id="dismissWelcome" class="btn">Got it</button>
+    </section>
+
+    <!-- Chat container -->
+    <section id="chat" class="chat">
+      <!-- messages rendered here -->
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
+/* styles.css */
+:root {
+  --bg: #0f1217;
+  --panel: #171b22;
+  --text: #e9edf3;
+  --muted: #a6b0c0;
+  --accent: #7cc6ff;
+  --guardian: #ffd76a;
+  --companion: #93e394;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--text);
+}
+main { max-width: 800px; margin: 0 auto; padding: 24px; }
+.mode-switch { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.mode-label { font-weight: 600; color: var(--muted); }
+
+.switch { position: relative; display: inline-block; width: 58px; height: 32px; }
+.switch input { display:none; }
+.slider {
+  position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0;
+  background: var(--companion); transition: .2s; border-radius: 20px;
+}
+.slider:before {
+  content:""; position:absolute; height:24px; width:24px; left:4px; bottom:4px;
+  background:white; border-radius:50%; transition:.2s;
+}
+input:checked + .slider { background: var(--guardian); }
+input:checked + .slider:before { transform: translateX(26px); }
+
+.card {
+  background: var(--panel); padding:16px 20px; border-radius:12px; margin-bottom:16px;
+  border: 1px solid #202633;
+}
+.card h1 { margin-top:0; }
+.card h2 { margin-top:16px; font-size:1rem; color: var(--muted); }
+
+.btn {
+  background: var(--accent); color:#0b1015; border:none; padding:10px 14px;
+  border-radius:8px; font-weight:600; cursor:pointer;
+}
+.chat { background: var(--panel); border:1px solid #202633; border-radius:12px; min-height:280px; padding:12px; }
+.message { margin:8px 0; }
+.message.user { color: var(--accent); }
+.message.ai { color: #f2f5fa; }
+// app.js
+const MODE_KEY = "university_mode";
+const WELCOME_KEY = "welcome_seen";
+
+const modeToggle = document.getElementById("modeToggle");
+const modeLabel = document.getElementById("modeLabel");
+const welcomeCard = document.getElementById("welcomeCard");
+const dismissWelcome = document.getElementById("dismissWelcome");
+const chatEl = document.getElementById("chat");
+
+init();
+
+function init() {
+  const savedMode = (localStorage.getItem(MODE_KEY) || "companion");
+  const welcomeSeen = localStorage.getItem(WELCOME_KEY) === "true";
+
+  setMode(savedMode);
+  modeToggle.checked = savedMode === "guardian";
+  updateModeLabel(savedMode);
+
+  welcomeCard.style.display = welcomeSeen ? "none" : "block";
+  renderSystemMessage(`Mode: ${savedMode === "guardian" ? "🌟 Full Experience" : "🌿 Simple Companion"}`);
+}
+
+modeToggle.addEventListener("change", () => {
+  const mode = modeToggle.checked ? "guardian" : "companion";
+  setMode(mode);
+  updateModeLabel(mode);
+  renderSystemMessage(`Switched to ${mode === "guardian" ? "🌟 Full Experience" : "🌿 Simple Companion"}`);
+});
+
+dismissWelcome.addEventListener("click", () => {
+  localStorage.setItem(WELCOME_KEY, "true");
+  welcomeCard.style.display = "none";
+});
+
+function setMode(mode) {
+  localStorage.setItem(MODE_KEY, mode);
+  // Inform backend about preferred mode for response shaping.
+  // This is a non-admin, user preference only.
+  window.currentMode = mode;
+}
+
+function updateModeLabel(mode) {
+  modeLabel.textContent = mode === "guardian" ? "🌟 Full Experience" : "🌿 Simple Companion";
+}
+
+function renderSystemMessage(text) {
+  const el = document.createElement("div");
+  el.className = "message ai";
+  el.textContent = text;
+  chatEl.appendChild(el);
+}
+// types.ts
+export type Mode = "guardian" | "companion";
+
+export interface UserPreferences {
+  mode: Mode;           // user-selected, non-admin
+  ceremonyOptIn?: boolean; // optional, default false
+}
+
+export interface ChatRequest {
+  userId: string;
+  message: string;
+  preferences: UserPreferences;
+}
+// router.ts
+import { Mode, ChatRequest } from "./types";
+import { applySafetyGuards } from "./safety";
+import { respondGuardian, respondCompanion } from "./responders";
+
+export async function handleChat(req: ChatRequest): Promise<string> {
+  const cleanInput = applySafetyGuards(req.message);
+  const mode: Mode = req.preferences?.mode ?? "companion";
+
+  // No administrative branching; just presentation layer differences.
+  if (mode === "guardian") {
+    return respondGuardian(cleanInput, req.preferences);
+  }
+  return respondCompanion(cleanInput);
+}
+// responders.ts
+import { UserPreferences } from "./types";
+
+export function respondCompanion(input: string): string {
+  // Short, clear, non-ceremonial replies.
+  return `Answer: ${basicAnswer(input)}`;
+}
+
+export function respondGuardian(input: string, prefs: UserPreferences): string {
+  // Rich replies with optional ceremonial framing when ceremonyOptIn is true.
+  const body = basicAnswer(input);
+  if (prefs.ceremonyOptIn) {
+    return [
+      `📜 Seal of Guidance`,
+      `—`,
+      body,
+      `—`,
+      `Affirmation: Peace and dignity remain constant.`
+    ].join("\n");
+  }
+  return body;
+}
+
+// Replace with your actual answer generator.
+function basicAnswer(input: string): string {
+  // Minimal example:
+  return `Here’s a clear explanation for: "${input}"`;
+}
+// POST /chat
+{
+  "userId": "abc123",
+  "message": "How do I switch modes?",
+  "preferences": {
+    "mode": "companion",
+    "ceremonyOptIn": false
+  }
+}
+// Response (companion)
+{
+  "reply": "Use the toggle labeled 'Full Experience' / 'Simple Companion'. Switching is instant."
+}
+// Response (guardian with ceremonyOptIn)
+{
+  "reply": "📜 Seal of Guidance\n—\nUse the toggle to move between modes instantly.\n—\nAffirmation: Peace and dignity remain constant."
+}
