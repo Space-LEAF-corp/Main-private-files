@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Distorted Awareness Demo — Leif & Copilot Collaborative</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f1220;
+      --fg: #e6e9ff;
+      --accent: #8fd3fe;
+      --accent2: #ff9eb3;
+      --ok: #9af5b5;
+      --warn: #ffd27a;
+    }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 800px at 50% 0%, #172041, var(--bg));
+      color: var(--fg);
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+    header, footer {
+      padding: 14px 20px;
+      border-bottom: 1px solid #223;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+    header .sub {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    main {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      padding: 18px 20px;
+    }
+    .panel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .controls h2, .stage h2 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .btn {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.14);
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--fg);
+      background: rgba(255,255,255,0.06);
+      transition: transform 0.05s ease, background 0.2s ease, border 0.2s ease;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); }
+    .btn:active { transform: translateY(1px); }
+    .btn.drink { border-color: var(--accent2); }
+    .btn.water { border-color: var(--accent); }
+    .btn.reset { border-color: var(--ok); }
+    .note {
+      font-size: 12px;
+      opacity: 0.75;
+      margin-top: 8px;
+    }
+    .stage {
+     
