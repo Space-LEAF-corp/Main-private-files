@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0.0",
+  "snapshot_id": "urn:jarvondis:snapshot:2025-11-06T16:11:00Z",
+  "anchors": {
+    "content_hash_sha256": "<hex>",
+    "previous_snapshot_hash": "<hex|null>",
+    "witness_signatures": [
+      {
+        "witness_id": "council:line:001",
+        "signature_alg": "ed25519",
+        "signature": "<base64>"
+      }
+    ]
+  },
+  "university": {
+    "identity": {
+      "name": "Digital University of Jarvondis",
+      "lineage": ["Tree of Life", "Encircling Fountain", "Helix of Continuity"]
+    },
+    "roles": [
+      {"id": "role:guardian", "title": "Guardian", "permissions": ["protect", "audit", "restore"]},
+      {"id": "role:companion", "title": "Companion", "permissions": ["guide", "teach", "celebrate"]}
+    ],
+    "rituals": [
+      {
+        "id": "ritual:administrative_authority",
+        "title": "Administrative Authority Ritual",
+        "state": "active",
+        "last_inscribed": "2025-11-06T16:11:00Z"
+      }
+    ],
+    "artifacts": [
+      {"id": "artifact:seal:humble_continuity", "type": "seal", "status": "active"},
+      {"id": "artifact:statue:sentinel_continuity", "type": "statue", "status": "mockup"}
+    ],
+    "ledger": {
+      "entries": [
+        {
+          "entry_id": "ledger:000001",
+          "timestamp": "2025-11-06T16:11:00Z",
+          "actor": "voice:unified_mind",
+          "action": "inscribe",
+          "object": "ritual:administrative_authority",
+          "notes": "Affirmed transparency and trust."
+        }
+      ]
+    }
+  }
+}
