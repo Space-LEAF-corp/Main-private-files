@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IntegratePayload",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "premises": { "type": "array", "items": { "type": "string" }, "maxItems": 256 },
+    "goal": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "context": { "type": "object", "additionalProperties": false }
+  },
+  "required": ["premises", "goal"]
+}
+# /etc/nginx/conf.d/jarvondis_integrate.conf
+limit_req_zone $binary_remote_addr zone=integrate_burst:10m rate=10r/s;
+
+server {
+  listen 443 ssl;
+  # ssl_certificate, ssl_certificate_key (use mTLS below)
+
+  location /api/logic/integrate {
+    client_max_body_size 64k;      # MAX_BYTES guard
+    limit_req zone=integrate_burst burst=20 nodelay;
+    add_header X-Content-Type-Options nosniff;
+    charset utf-8;                 # Enforce UTF-8
+
+    proxy_pass http://integrate_backend;
+    proxy_set_header X-Request-ID $request_id;
+    proxy_intercept_errors on;
+  }
+}
+ssl_verify_client on;
+ssl_client_certificate /etc/nginx/trust/clients_ca.pem;
+# Only clients with certs signed by clients_ca can call integrate
+# Client computes HMAC: base64(hmac_sha256(SECRET, body))
+curl -H "X-Signature: <hmac>" -d @payload.json https://.../api/logic/integrate
+def verify_hmac(request, secret):
+    import hmac, hashlib, base64
+    sig = request.headers.get("X-Signature")
+    comp = base64.b64encode(hmac.new(secret, request.body, hashlib.sha256).digest()).decode()
+    return hmac.compare_digest(sig, comp)
+# integrate.py (Jarvondis 3.0 API)
+
+MAX_BYTES = 64 * 1024
+MAX_DEPTH = 12
+MAX_ARRAY = 256
+EVAL_TIMEOUT_MS = 500
+ALLOC_BUDGET_BYTES = 4 * 1024 * 1024
+ALLOWED_FIELDS = {"premises", "goal", "context"}
+
+def post_integrate(request):
+    # 0) Auth: mTLS/HMAC/Token scopes (must pass)
+    if not is_trusted_caller(request):
+        return error(401, "Unauthorized")
+
+    # 1) Size guard
+    if len(request.body) > MAX_BYTES:
+        return error(413, "Payload too large")
+
+    # 2) Enforce UTF-8 and canonicalize keys
+    raw = request.body.decode("utf-8", errors="strict")
+    data = parse_json_with_limits(raw, max_depth=MAX_DEPTH, max_array=MAX_ARRAY)
+
+    # 3) Schema allow-list
+    if not validate_schema(data, allowed_fields=ALLOWED_FIELDS):
+        return error(400, "Unsupported schema")
+
+    # 4) Evaluate via sandboxed adapter call
+    result = evaluate_in_sandbox(
+        data,
+        timeout_ms=EVAL_TIMEOUT_MS,
+        alloc_budget=ALLOC_BUDGET_BYTES,
+        detect_cycles=True,
+        max_recursion=MAX_DEPTH
+    )
+
+    # 5) Safe abort mapping
+    abort_map = {
+        "ABORT_DEPTH": (422, "Evaluation aborted"),
+        "ABORT_CYCLE": (422, "Evaluation aborted"),
+        "ABORT_TIMEOUT": (504, "Evaluation timeout")
+    }
+    if result.status in abort_map:
+        code, msg = abort_map[result.status]
+        security_log(result.status, request_id=request.id)
+        return error(code, msg)
+
+    return success(200, result.value)
+# /etc/systemd/system/erebus-adapter.service
+[Unit]
+Description=Erebus Core Logic Adapter
+After=network.target
+
+[Service]
+ExecStart=/opt/jarvondis/erebus-adapter --ipc-socket=/run/erebus.sock
+User=adapter
+Group=adapter
+NoNewPrivileges
+# /etc/systemd/system/erebus-adapter.service
+[Unit]
+Description=Erebus Core Logic Adapter
+After=network.target
+
+[Service]
+ExecStart=/opt/jarvondis/erebus-adapter --ipc-socket=/run/erebus.sock
+User=adapter
+Group=adapter
+NoNewPrivileges
