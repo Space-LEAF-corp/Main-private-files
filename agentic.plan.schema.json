@@ -1,0 +1,455 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic.plan.schema.json",
+  "title": "Plan",
+  "type": "object",
+  "required": ["id", "title", "goal", "steps", "requiredScopes", "riskLevel", "state"],
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": "string" },
+    "goal": { "type": "string" },
+    "constraints": { "type": "object", "additionalProperties": true },
+    "steps": {
+      "type": "array",
+      "items": { "$ref": "agentic.step.schema.json" },
+      "minItems": 1
+    },
+    "requiredScopes": { "type": "array", "items": { "type": "string" } },
+    "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
+    "approvalsRequired": { "type": "integer", "minimum": 0 },
+    "state": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "PendingApproval",
+        "Approved",
+        "Executing",
+        "Paused",
+        "Completed",
+        "RolledBack",
+        "Aborted"
+      ]
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  }
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic.step.schema.json",
+  "title": "Step",
+  "type": "object",
+  "required": ["id", "description", "toolId", "params", "reversible"],
+  "properties": {
+    "id": { "type": "string" },
+    "description": { "type": "string" },
+    "toolId": { "type": "string" },
+    "scope": { "type": "string" },
+    "params": { "type": "object", "additionalProperties": true },
+    "previewDiff": { "type": "string" },
+    "reversible": { "type": "boolean" },
+    "dependencies": { "type": "array", "items": { "type": "string" } },
+    "status": { "type": "string", "enum": ["Planned", "Previewed", "Approved", "Executed", "Failed", "RolledBack"] }
+  }
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "agentic.audit.schema.json",
+  "title": "AuditEvent",
+  "type": "object",
+  "required": ["id", "timestamp", "actor", "action", "objectRef", "hash", "prevHash"],
+  "properties": {
+    "id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "actor": { "type": "string" },
+    "action": { "type": "string" },
+    "objectRef": { "type": "string" },
+    "diff": { "type": "string" },
+    "signature": { "type": "string" },
+    "hash": { "type": "string" },
+    "prevHash": { "type": "string" }
+  }
+}
+// Agentic subsystem interfaces
+
+export type PlanState =
+  | "Draft"
+  | "PendingApproval"
+  | "Approved"
+  | "Executing"
+  | "Paused"
+  | "Completed"
+  | "RolledBack"
+  | "Aborted";
+
+export type StepStatus =
+  | "Planned"
+  | "Previewed"
+  | "Approved"
+  | "Executed"
+  | "Failed"
+  | "RolledBack";
+
+export interface Step {
+  id: string;
+  description: string;
+  toolId: string;
+  scope?: string;
+  params: Record<string, unknown>;
+  previewDiff?: string;
+  reversible: boolean;
+  dependencies?: string[];
+  status?: StepStatus;
+}
+
+export interface Plan {
+  id: string;
+  title: string;
+  goal: string;
+  constraints?: Record<string, unknown>;
+  steps: Step[];
+  requiredScopes: string[];
+  riskLevel: "low" | "medium" | "high";
+  approvalsRequired: number;
+  state: PlanState;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ToolInvocation {
+  toolId: string;
+  scope: string;
+  params: Record<string, unknown>;
+  result?: unknown;
+  errors?: string[];
+  durationMs?: number;
+}
+
+export interface AuditEvent {
+  id: string;
+  timestamp: string;
+  actor: string; // e.g., "User:LEIF" | "Agent:System"
+  action: string; // e.g., "StepExecuted"
+  objectRef: string; // e.g., "Plan:123/Step:2"
+  diff?: string; // human-readable summary
+  signature?: string; // detached signature over (id,timestamp,action,objectRef,diff,prevHash)
+  hash: string;
+  prevHash: string;
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "resonance.memory.schema.json",
+  "title": "MemoryItem",
+  "type": "object",
+  "required": ["id", "content", "visibilityTier", "createdAt"],
+  "properties": {
+    "id": { "type": "string" },
+    "content": { "type": "string" },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "sensitivity": { "type": "string", "enum": ["low", "medium", "high"] },
+    "visibilityTier": { "type": "string", "enum": ["Personal", "Shared", "PublicArtifact"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "lastUsedAt": { "type": "string", "format": "date-time" }
+  }
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "resonance.profile.schema.json",
+  "title": "Profile",
+  "type": "object",
+  "required": ["id", "name", "style", "triggers"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "style": {
+      "type": "object",
+      "properties": {
+        "tone": { "type": "string", "enum": ["formal", "neutral", "warm", "playful"] },
+        "pacing": { "type": "string", "enum": ["fast", "steady", "deliberate"] },
+        "formality": { "type": "string", "enum": ["low", "medium", "high"] },
+        "symbolism": { "type": "string", "enum": ["low", "medium", "high"] }
+      },
+      "required": ["tone", "pacing", "formality", "symbolism"]
+    },
+    "triggers": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "active": { "type": "boolean" }
+  }
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "resonance.context.schema.json",
+  "title": "ContextSnapshot",
+  "type": "object",
+  "required": ["role", "timeOfDay", "deviceState"],
+  "properties": {
+    "role": { "type": "string" },
+    "taskType": { "type": "string" },
+    "channel": { "type": "string" },
+    "timeOfDay": { "type": "string", "enum": ["morning", "afternoon", "evening", "night"] },
+    "deviceState": { "type": "string", "enum": ["mobile", "desktop", "tablet", "wearable"] },
+    "privacyMode": { "type": "boolean" }
+  }
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "integrity.beacon.schema.json",
+  "title": "IntegrityBeacon",
+  "type": "object",
+  "required": ["deviceId", "time", "attestationToken"],
+  "properties": {
+    "deviceId": { "type": "string" },
+    "time": { "type": "string", "format": "date-time" },
+    "attestationToken": { "type": "string" },
+    "healthFlags": { "type": "array", "items": { "type": "string" } },
+    "locationHint": { "type": "string" },
+    "networkSig": { "type": "string" }
+  }
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "integrity.anomaly.schema.json",
+  "title": "Anomaly",
+  "type": "object",
+  "required": ["type", "severity", "signals", "firstSeen"],
+  "properties": {
+    "type": { "type": "string", "enum": ["sim_swap", "failed_unlock", "geofence_violation", "tamper"] },
+    "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+    "signals": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "firstSeen": { "type": "string", "format": "date-time" },
+    "lastSeen": { "type": "string", "format": "date-time" }
+  }
+}
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "integrity.case.schema.json",
+  "title": "EscalationCase",
+  "type": "object",
+  "required": ["caseId", "status", "ownerConfirmed"],
+  "properties": {
+    "caseId": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Healthy",
+        "AnomalyDetected",
+        "Monitoring",
+        "OwnerReview",
+        "ConfirmedStolen",
+        "ReportGenerated",
+        "Escalated",
+        "Resolved"
+      ]
+    },
+    "ownerConfirmed": { "type": "boolean" },
+    "reportArtifact": { "type": "string" },
+    "authoritySubmittedAt": { "type": "string", "format": "date-time" }
+  }
+}
+export interface IntegrityBeacon {
+  deviceId: string;
+  time: string;
+  attestationToken: string;
+  healthFlags?: string[];
+  locationHint?: string;
+  networkSig?: string;
+}
+
+export type AnomalyType = "sim_swap" | "failed_unlock" | "geofence_violation" | "tamper";
+
+export interface Anomaly {
+  type: AnomalyType;
+  severity: "low" | "medium" | "high";
+  signals: string[];
+  firstSeen: string;
+  lastSeen?: string;
+}
+
+export type CaseStatus =
+  | "Healthy"
+  | "AnomalyDetected"
+  | "Monitoring"
+  | "OwnerReview"
+  | "ConfirmedStolen"
+  | "ReportGenerated"
+  | "Escalated"
+  | "Resolved";
+
+export interface EscalationCase {
+  caseId: string;
+  status: CaseStatus;
+  ownerConfirmed: boolean;
+  reportArtifact?: string; // signed JSON string or URI
+  authoritySubmittedAt?: string;
+}
+import crypto from "crypto";
+
+export interface Hashable {
+  id: string;
+  timestamp: string;
+  payload: Record<string, unknown>;
+}
+
+export interface LedgerEntry {
+  id: string;
+  timestamp: string;
+  payload: Record<string, unknown>;
+  prevHash: string;
+  hash: string;
+  signature?: string;
+}
+
+export class AuditLedger {
+  private chain: LedgerEntry[] = [];
+
+  // Simple deterministic stringifier
+  private stableStringify(obj: unknown): string {
+    return JSON.stringify(obj, Object.keys(obj as object).sort());
+  }
+
+  private computeHash(entry: Omit<LedgerEntry, "hash">): string {
+    const data = `${entry.id}|${entry.timestamp}|${this.stableStringify(entry.payload)}|${entry.prevHash}`;
+    return crypto.createHash("sha256").update(data).digest("hex");
+  }
+
+  append(event: Hashable, sign?: (data: string) => string): LedgerEntry {
+    const prevHash = this.chain.length ? this.chain[this.chain.length - 1].hash : "GENESIS";
+    const partial: Omit<LedgerEntry, "hash"> = {
+      id: event.id,
+      timestamp: event.timestamp,
+      payload: event.payload,
+      prevHash
+    };
+    const hash = this.computeHash(partial);
+    const signature = sign ? sign(hash) : undefined;
+    const entry: LedgerEntry = { ...partial, hash, signature };
+    this.chain.push(entry);
+    return entry;
+  }
+
+  verify(): boolean {
+    let prev = "GENESIS";
+    for (const e of this.chain) {
+      const expected = this.computeHash({ id: e.id, timestamp: e.timestamp, payload: e.payload, prevHash: prev });
+      if (expected !== e.hash) return false;
+      prev = e.hash;
+    }
+    return true;
+  }
+
+  getChain(): LedgerEntry[] {
+    return [...this.chain];
+  }
+}
+// Agentic demo: "Plan my week"
+const ledger = new AuditLedger();
+
+const plan: Plan = {
+  id: "plan_001",
+  title: "Weekly planning",
+  goal: "Focus blocks + workouts + groceries",
+  steps: [
+    { id: "s1", description: "Read calendar", toolId: "calendar.read", params: {}, reversible: false },
+    { id: "s2", description: "Propose focus blocks", toolId: "planner.propose", params: { blocks: 3 }, reversible: true },
+    { id: "s3", description: "Create events", toolId: "calendar.write", params: { items: [] }, reversible: true }
+  ],
+  requiredScopes: ["calendar.read", "calendar.write"],
+  riskLevel: "medium",
+  approvalsRequired: 1,
+  state: "PendingApproval"
+};
+
+ledger.append({
+  id: "evt_plan_created",
+  timestamp: new Date().toISOString(),
+  payload: { type: "PlanCreated", planId: plan.id, state: plan.state }
+});
+
+plan.state = "Approved";
+ledger.append({
+  id: "evt_plan_approved",
+  timestamp: new Date().toISOString(),
+  payload: { type: "ApprovalGranted", planId: plan.id }
+});
+
+// Simulate step execution
+plan.steps[0].status = "Executed";
+ledger.append({
+  id: "evt_step1_executed",
+  timestamp: new Date().toISOString(),
+  payload: { type: "StepExecuted", planId: plan.id, stepId: "s1" }
+});
+
+// …continue for other steps, previews, rollbacks as needed
+// Resonance demo: activate profile + suggest memory
+const profile: Profile = {
+  id: "prof_work_pillar",
+  name: "Work—Pillar",
+  style: { tone: "formal", pacing: "deliberate", formality: "high", symbolism: "low" },
+  triggers: ["weekday_morning", "work_channel"],
+  active: true
+};
+
+const memory: MemoryItem = {
+  id: "mem_meeting_notes",
+  content: "Action items from last Thursday's sync…",
+  tags: ["work", "meeting"],
+  sensitivity: "medium",
+  visibilityTier: "Personal",
+  createdAt: new Date().toISOString()
+};
+
+ledger.append({
+  id: "evt_profile_activated",
+  timestamp: new Date().toISOString(),
+  payload: { type: "ProfileActivated", profileId: profile.id }
+});
+
+ledger.append({
+  id: "evt_memory_suggested",
+  timestamp: new Date().toISOString(),
+  payload: { type: "MemorySuggested", memoryId: memory.id, profileId: profile.id }
+});
+// Integrity demo: beacon + anomaly + owner confirmation
+const beacon: IntegrityBeacon = {
+  deviceId: "device_abc",
+  time: new Date().toISOString(),
+  attestationToken: "attest_xyz",
+  healthFlags: ["ok"],
+  networkSig: "wifi_home"
+};
+
+ledger.append({
+  id: "evt_beacon_received",
+  timestamp: new Date().toISOString(),
+  payload: { type: "BeaconReceived", deviceId: beacon.deviceId }
+});
+
+const anomaly: Anomaly = {
+  type: "sim_swap",
+  severity: "high",
+  signals: ["sim_changed", "unlock_failures"],
+  firstSeen: new Date().toISOString()
+};
+
+ledger.append({
+  id: "evt_anomaly_detected",
+  timestamp: new Date().toISOString(),
+  payload: { type: "AnomalyDetected", deviceId: beacon.deviceId, anomalyType: anomaly.type }
+});
+
+// Owner confirms theft
+ledger.append({
+  id: "evt_owner_confirmed",
+  timestamp: new Date().toISOString(),
+  payload: { type: "OwnerConfirmed", deviceId: beacon.deviceId }
+});
+
+// Generate report (placeholder)
+ledger.append({
+  id: "evt_report_generated",
+  timestamp: new Date().toISOString(),
+  payload: { type: "ReportGenerated", deviceId: beacon.deviceId, reportId: "report_123" }
+});
