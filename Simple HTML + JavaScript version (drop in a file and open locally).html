@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Quantum Bidirectional State Completion (QBSC) Demo</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    code { background: #f4f4f4; padding: 0.1rem 0.3rem; }
+    .log { margin-top: 1rem; white-space: pre; background: #111; color: #0f0; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>QBSC Demo</h1>
+  <p>Input bit x (0 or 1):</p>
+  <input id="inputX" type="number" min="0" max="1" value="0">
+  <button id="runBtn">Run Transaction</button>
+
+  <div class="log" id="log"></div>
+
+  <script>
+    function randomBit() {
+      return Math.random() < 0.5 ? 0 : 1;
+    }
+
+    function simulateQBSC(x) {
+      // 1. Encode
+      var encodeFlip = (x === 0) ? 0 : 1;
+
+      // 2. Sender base randomness
+      var r = randomBit();
+
+      // 3. Sender measurement (front)
+      var m = r ^ encodeFlip;
+
+      // 4. Receiver back state (correlated)
+      var b = x ^ m;
+
+      // 5. Reconstruct
+      var y = m ^ b;
+
+      return { x: x, r: r, m: m, b: b, y: y };
+    }
+
+    document.getElementById('runBtn').onclick = function () {
+      var x = parseInt(document.getElementById('inputX').value, 10);
+      if (x !== 0 && x !== 1) {
+        alert('x must be 0 or 1');
+        return;
+      }
+      var result = simulateQBSC(x);
+      var log = [
+        'Input x:        ' + result.x,
+        'Base random r:  ' + result.r,
+        'Front measure m:' + result.m,
+        'Back state b:   ' + result.b,
+        'Output y:       ' + result.y,
+        '',
+        'Check: y == x ? ' + (result.y === result.x)
+      ].join('\n');
+      document.getElementById('log').textContent = log;
+    };
+  </script>
+</body>
+</html>
