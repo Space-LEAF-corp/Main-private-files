@@ -1,0 +1,8 @@
+{
+  "id": "uuid",
+  "electionId": "2026-ocala-municipal",
+  "type": "BALLOT_CAST | TALLY_PUBLISHED | SEAL_ISSUED",
+  "timestamp": "ISO8601",
+  "payloadHash": "sha256-of-related-data",
+  "prevEntryHash": "sha256-of-previous-entry"
+}
