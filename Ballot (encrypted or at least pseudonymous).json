@@ -1,0 +1,10 @@
+{
+  "id": "uuid",
+  "electionId": "2026-ocala-municipal",
+  "choices": { "mayor": "CANDIDATE_A", "measure1": "YES" },
+  "castAt": "ISO8601",
+  "districtId": "FL-05-001",
+  "method": "in-person | mail | early",
+  "demographicBucket": "18-29",
+  "hash": "sha256-of-normalized-ballot"
+}
