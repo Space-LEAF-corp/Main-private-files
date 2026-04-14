@@ -1,0 +1,12 @@
+{
+  "id": "2026-ocala-municipal",
+  "name": "Ocala Municipal 2026",
+  "status": "open | closed",
+  "createdAt": "ISO8601",
+  "seal": {
+    "schemaVersion": "1.0",
+    "resultsHash": "sha256-...",
+    "ballotSetHash": "sha256-...",
+    "signature": "optional-detached-sig"
+  }
+}
