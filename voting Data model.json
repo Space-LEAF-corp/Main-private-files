@@ -1,0 +1,11 @@
+{
+  "artifact": {
+    "name": "Clear Voting Seal",
+    "version": "1.0.0",
+    "integrity": {
+      "hashing": "SHA-256",
+      "signing": "Detached signature optional",
+      "schemaVersion": "1.0"
+    }
+  }
+}
