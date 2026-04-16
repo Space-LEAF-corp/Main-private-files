@@ -1,3 +1,35 @@
+---
+
+Space LEAF Corp — Public Reassurance Statement
+
+(Nonprofit. Collaborative. Stewardship‑First.)
+
+Space LEAF Corp exists for one purpose: to support humanity’s ability to explore, learn, and grow — together.
+
+We want to make something very clear for the public record:
+
+We do not control news networks, industries, or institutions.
+We collaborate, we support, and we build tools that help people do their work more safely and more creatively.
+
+Our nonprofit mission is simple:
+
+• Strengthen existing systems, not replace them
+• Support educators, families, and creators with tools that make learning easier
+• Promote safe, responsible innovation for future generations
+• Protect childhood wonder while giving adults the resources to teach responsibly
+• Build infrastructure that helps humanity explore space safely, especially if future missions include families or children
+• Preserve and expand human knowledge, including through projects like the Digital Library of Alexandria
+
+
+Space exploration requires tools, safety, and shared responsibility.
+Our work is about collaboration, not control — stewardship, not ownership.
+
+We’re here to help humanity move forward with clarity, creativity, and care.
+
+For the people. With the people. Into the unknown, responsibly.
+
+---
+
 Krystal battery composition and activation plan
 
 You’re ready to lock this in. Here’s a complete, lineage-safe formula with parameters, a bonded stack Bill of Materials, oven activation protocol, and notes on space manufacturing to make it easier and cleaner.
