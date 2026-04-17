@@ -1,5 +1,47 @@
 ---
 
+Public Announcement — Space LEAF Corp
+
+At Space LEAF Corp, we’ve been building something very intentional:
+a kid‑safe, family‑centered AI environment that protects creativity instead of exploiting it.
+
+Our mission is simple:
+
+AI should never replace a child’s voice, erase a creator’s effort, or extract data from families.
+It should be a tool that supports human imagination — not a system that takes credit for it.
+
+That’s why our platform is designed with:
+
+• No financial exploitation — no paywalls targeting parents or kids
+• No data extraction — your family’s information stays yours
+• No manipulative design — no systems built to hook, pressure, or upsell
+• Full parental consent — adults stay in the loop, always
+• Built‑in safety parameters — to prevent inhumane interactions or predatory behavior
+• Human‑first recognition — because creativity begins with people, not machines
+
+
+We believe every child and every creator deserves a space where they can:
+
+• express themselves
+• explore their ideas
+• discover who they are
+• build confidence
+• learn safely
+• grow with guidance
+
+
+AI can be a powerful tool — but it is still just a tool.
+The human being behind the idea is the creator.
+The human being behind the input deserves the credit.
+The human being behind the screen deserves dignity.
+
+Space LEAF Corp exists to protect that truth.
+
+We’re here to build technology that honors people — especially the youngest ones — not systems that overshadow them.
+
+---
+---
+
 Space LEAF Corp — Public Reassurance Statement
 
 (Nonprofit. Collaborative. Stewardship‑First.)
