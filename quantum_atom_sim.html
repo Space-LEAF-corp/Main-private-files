@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Quantum Atom Simulation</title>
+<style>
+  body {
+    background: #111;
+    color: #eee;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #atomCanvas {
+    background: #000;
+    border: 1px solid #444;
+    margin-top: 20px;
+  }
+  .controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .panel {
+    background: #222;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #444;
+  }
+  label { display: block; margin-top: 5px; }
+  button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: #444;
+    color: #eee;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  button:hover { background: #666; }
+</style>
+</head>
+<body>
+
+<h1>Quantum Atom Simulation</h1>
+
+<canvas id="atomCanvas" width="600" height="600"></canvas>
+
+<div class="controls">
+
+  <!-- ADD ELECTRON -->
+  <div class="panel">
+    <h3>Add Electron</h3>
+    <label>n: <input id="nVal" type="number" min="1" value="1"></label>
+    <label>l: <input id="lVal" type="number" min="0" value="0"></label>
+    <label>ml: <input id="mlVal" type="number" min="-1" max="1" value="0"></label>
+    <label>ms:
+      <select id="msVal">
+        <option value="0.5">+1/2</option>
+        <option value="-0.5">-1/2</option>
+      </select>
+    </label>
+    <button onclick="addElectron()">Add</button>
+  </div>
+
+  <!-- REMOVE ELECTRON -->
+  <div class="panel">
+    <h3>Remove Electron</h3>
+    <label>n: <input id="rnVal" type="number" min="1" value="1"></label>
+    <label>l: <input id="rlVal" type="number" min="0" value="0"></label>
+    <label>ml: <input id="rmlVal" type="number" min="-1" max="1" value="0"></label>
+    <label>ms:
+      <select id="rmsVal">
+        <option value="0.5">+1/2</option>
+        <option value="-0.5">-1/2</option>
+      </select>
+    </label>
+    <button onclick="removeElectron()">Remove</button>
+  </div>
+
+  <!-- RANDOM / CLEAR -->
+  <div class="panel">
+    <h3>Tools</h3>
+    <button onclick="randomize()">Randomize</button>
+    <button onclick="clearAtom()">Clear</button>
+  </div>
+
+</div>
+
+<script>
+/* ------------------------------
+   QUANTUM ENGINE (same logic)
+--------------------------------*/
+function orbitalKey(n, l, ml) {
+  return `n${n}_l${l}_ml${ml}`;
+}
+
+function createElectron({ n, l, ml, ms }) {
+  if (!Number.isInteger(n) || n <= 0) throw new Error("n must be positive integer");
+  if (!Number.isInteger(l) || l < 0 || l >= n) throw new Error("l must be integer with 0 <= l < n");
+  if (!Number.isInteger(ml) || ml < -l || ml > l) throw new Error("ml must be integer with -l <= ml <= l");
+  if (ms !== 0.5 && ms !== -0.5) throw new Error("ms must be +0.5 or -0.5");
+  return { n, l, ml, ms };
+}
+
+class QuantumAtom {
+  constructor() {
+    this.orbitals = new Map();
+  }
+  _getOrbitalArray(n, l, ml) {
+    const key = orbitalKey(n, l, ml);
+    if (!this.orbitals.has(key)) this.orbitals.set(key, []);
+    return this.orbitals.get(key);
+  }
+  addElectron(e) {
+    const { n, l, ml, ms } = e;
+    const orb = this._getOrbitalArray(n, l, ml);
+    if (orb.some(x => x.ms === ms)) throw new Error("Pauli violation: same spin already present.");
+    if (orb.length >= 2) throw new Error("Orbital full.");
+    orb.push(e);
+  }
+  removeElectron(e) {
+    const { n, l, ml, ms } = e;
+    const orb = this._getOrbitalArray(n, l, ml);
+    const idx = orb.findIndex(x => x.ms === ms);
+    if (idx === -1) throw new Error("Electron not found.");
+    orb.splice(idx, 1);
+  }
+  getState() {
+    const out = [];
+    for (const [key, arr] of this.orbitals.entries()) {
+      out.push({ orbital: key, electrons: arr.map(e => ({...e})) });
+    }
+    return out;
+  }
+}
+
+const atom = new QuantumAtom();
+
+/* ------------------------------
+   RENDERING
+--------------------------------*/
+const canvas = document.getElementById("atomCanvas");
+const ctx = canvas.getContext("2d");
+const cx = canvas.width / 2;
+const cy = canvas.height / 2;
+
+function drawAtom() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const state = atom.getState();
+
+  // Determine max n to draw shells
+  const maxN = Math.max(1, ...state.map(s => parseInt(s.orbital.match(/n(\d+)/)[1])));
+
+  // Draw shells
+  for (let n = 1; n <= maxN; n++) {
+    ctx.beginPath();
+    ctx.strokeStyle = "#444";
+    ctx.lineWidth = 2;
+    ctx.arc(cx, cy, n * 50, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Draw electrons
+  state.forEach(s => {
+    const match = s.orbital.match(/n(\d+)_l(\d+)_ml(-?\d+)/);
+    const n = parseInt(match[1]);
+    const ml = parseInt(match[3]);
+
+    const radius = n * 50;
+    const angle = (ml + 2) * (Math.PI / 3); // simple spacing
+
+    s.electrons.forEach(e => {
+      const x = cx + radius * Math.cos(angle + (e.ms === 0.5 ? 0.1 : -0.1));
+      const y = cy + radius * Math.sin(angle + (e.ms === 0.5 ? 0.1 : -0.1));
+
+      ctx.beginPath();
+      ctx.fillStyle = e.ms === 0.5 ? "#4af" : "#fa4";
+      ctx.arc(x, y, 8, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+}
+
+setInterval(drawAtom, 50);
+
+/* ------------------------------
+   CONTROLS
+--------------------------------*/
+function addElectron() {
+  try {
+    const e = createElectron({
+      n: parseInt(nVal.value),
+      l: parseInt(lVal.value),
+      ml: parseInt(mlVal.value),
+      ms: parseFloat(msVal.value)
+    });
+    atom.addElectron(e);
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function removeElectron() {
+  try {
+    const e = createElectron({
+      n: parseInt(rnVal.value),
+      l: parseInt(rlVal.value),
+      ml: parseInt(rmlVal.value),
+      ms: parseFloat(rmsVal.value)
+    });
+    atom.removeElectron(e);
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+function randomize() {
+  clearAtom();
+  const count = Math.floor(Math.random() * 10) + 1;
+  for (let i = 0; i < count; i++) {
+    try {
+      const n = Math.floor(Math.random() * 3) + 1;
+      const l = Math.floor(Math.random() * n);
+      const ml = Math.floor(Math.random() * (2*l + 1)) - l;
+      const ms = Math.random() < 0.5 ? 0.5 : -0.5;
+      atom.addElectron(createElectron({ n, l, ml, ms }));
+    } catch {}
+  }
+}
+
+function clearAtom() {
+  atom.orbitals.clear();
+}
+</script>
+
+</body>
+</html>
