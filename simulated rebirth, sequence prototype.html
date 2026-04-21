@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simulated Rebirth Sequence — Mission</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #05060a;
+      --card: #0f1118;
+      --accent: #7dd3fc;
+      --accent-soft: rgba(125, 211, 252, 0.12);
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border-subtle: #1f2933;
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                   "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #020617 0, #020617 40%, #000 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .shell {
+      max-width: 880px;
+      width: 100%;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #020617 0%, #020617 40%, #020617 100%);
+      border-radius: 18px;
+      border: 1px solid var(--border-subtle);
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(148, 163, 184, 0.05);
+      padding: 28px 28px 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(59, 130, 246, 0.10), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .card-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: var(--text-soft);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(125, 211, 252, 0.9);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 26px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #f9fafb;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      font-size: 14px;
+      color: var(--text-soft);
+      max-width: 540px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+    }
+
+    .pill--accent {
+      border-color: rgba(125, 211, 252, 0.7);
+      background: var(--accent-soft);
+      color: #e0f2fe;
+    }
+
+    .body-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+
+    .body-text p {
+      margin: 0 0 10px;
+    }
+
+    .body-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      font-size: 11px;
+      color: var(--text-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 22px 18px 20px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .subtitle {
+        font-size: 13px;
+      }
+
+      .body-text {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="card" aria-labelledby="srs-title">
+      <div class="card-inner">
+        <div class="eyebrow">
+          <span class="eyebrow-dot" aria-hidden="true"></span>
+          <span>Mission Block</span>
+        </div>
+
+        <h1 id="srs-title">
+          Simulated Rebirth <span>Sequence</span>
+        </h1>
+
+        <p class="subtitle">
+          A digital rehearsal of human development, designed to explore restorative genetic corrections entirely in simulation.
+        </p>
+
+        <div class="pill-row" aria-hidden="true">
+          <div class="pill pill--accent">Digital Developmental Twin</div>
+          <div class="pill">Risk in Simulation</div>
+          <div class="pill">Restorative, Not Redesign</div>
+        </div>
+
+        <div class="body-text">
+          <p>
+            The <span class="highlight">Simulated Rebirth Sequence</span> is our digital rehearsal of human development—a safe, software‑based environment where a genome can be replayed, studied, and gently corrected without touching any real embryos.
+          </p>
+          <p>
+            By modeling how early tissues form and where harmful mutations disrupt that process, we identify restorative corrections that stabilize development inside the simulation.
+          </p>
+          <p>
+            This approach shifts all risk into the digital twin, ensuring that only well‑understood, medically grounded corrections move forward for real‑world consideration.
+          </p>
+          <p>
+            Our mission is simple: restore healthy developmental trajectories through precision simulation, never redesigning the human form.
+          </p>
+        </div>
+
+        <div class="footer-note">
+          SIMULATION FIRST · ETHICAL BY DESIGN · MEDICAL PURPOSE ONLY
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
