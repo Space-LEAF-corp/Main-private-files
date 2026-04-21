@@ -1,0 +1,281 @@
+---
+
+🜁 1. FULL INTERACTION FLOW
+
+Every tap, gesture, and transition — mapped like a real UI system.
+
+A. Entry Sequence — “The Gate of Beginning”
+
+User Action: Opens the dojo
+System Response:
+
+• Screen fades from black to soft seasonal color
+• Floating leaf drifts into frame
+• Space LEAF Corp sigil pulses once
+• Word appears: ENTER
+
+
+Tap ENTER → Transition:
+
+• Screen inhales (brightness rises)
+• Leaf dissolves into particles
+• Dojo loads into the current season’s state
+
+
+---
+
+B. Seasonal Home — “The Mind Wheel”
+
+User Action: Swipes left/right
+System Response:
+
+• Wheel rotates with a soft breath‑timed motion
+• Seasonal preview animates in miniature
+• Ambient sound shifts subtly
+
+
+Tap a Season → Transition:
+
+• Wheel contracts into a glowing circle
+• Circle expands into full dojo environment
+• Season‑specific leaf animation begins
+
+
+---
+
+C. Inside a Season — “The Hall of Practice”
+
+Each season has the same structure, but different emotional tone.
+
+Primary Interactions
+
+• Tap a module → module opens with a soft zoom
+• Swipe down → return to seasonal home
+• Long‑press → reveals a ceremonial line
+• Double‑tap center stage → activates “Still Mode” (ambient only)
+
+
+Micro‑Interactions
+
+• If user hesitates → a leaf drifts by with a whisper
+• If user rushes → the dojo slows animations to guide pacing
+• If user becomes still → environment brightens slightly
+
+
+---
+
+D. Practice Module Flow
+
+Tap a module →
+
+• Title appears in calligraphy
+• A single instruction appears (never more than one)
+• A soft chime marks the beginning
+
+
+During practice:
+
+• UI fades away
+• Only the environment remains
+• Subtle cues guide timing (light, sound, motion)
+
+
+End of practice:
+
+• A lantern floats upward
+• A reflection prompt appears:
+“What changed?”
+• User can type or skip
+
+
+---
+
+E. Exiting the Dojo
+
+Swipe from left edge →
+
+• A soft wind animation
+• A small leaf appears with the word “Return”
+• Tap → fade to black → home screen
+
+
+---
+
+🜂 2. ANIMATION SYSTEM FOR SEASONAL SHIFTS
+
+The dojo transforms like a living mind.
+
+A. Transition Philosophy
+
+No hard cuts.
+No sudden jumps.
+Everything moves like breath.
+
+Inhale → brighten
+Exhale → shift environment
+
+---
+
+B. Spring → Summer
+
+• Greens warm into gold
+• Budding branch blossoms then dissolves into sunlight
+• Mist clears into crisp shadows
+• Ambient sound shifts from chimes to heartbeat drums
+
+
+Symbolic meaning:
+Curiosity becomes commitment.
+
+---
+
+C. Summer → Autumn
+
+• Sunbeams soften
+• Shadows lengthen
+• Leaves begin to fall and dissolve
+• Bamboo pillars darken into aged wood
+
+
+Symbolic meaning:
+Heat becomes wisdom.
+
+---
+
+D. Autumn → Winter
+
+• Warm tones drain into silver
+• Falling leaves slow until they freeze mid‑air
+• Scroll wall fades into frosted windows
+• Breath becomes visible
+
+
+Symbolic meaning:
+Reflection becomes clarity.
+
+---
+
+E. Winter → Spring
+
+• Frost melts into dew
+• Candle flame becomes morning light
+• Frozen leaves thaw and drift upward
+• Colors bloom into jade and sky blue
+
+
+Symbolic meaning:
+Stillness becomes openness.
+
+---
+
+🜃 3. SOUND DESIGN SYSTEM
+
+A ceremonial soundscape that teaches without speaking.
+
+A. Global Sound Principles
+
+• Never intrusive
+• Always breathable
+• Responds to user pace
+• Seasonal, emotional, and symbolic
+
+
+---
+
+B. Seasonal Sound Profiles
+
+🌱 Spring — Beginner’s Mind
+
+• Soft wind chimes
+• Light water ripples
+• Occasional lantern bell
+• Whisper cue: “Begin with softness.”
+
+
+☀️ Summer — Focused Mind
+
+• Warm drum heartbeat
+• Bamboo clicks
+• Sharp but gentle accents
+• Whisper cue: “Focus is a form of respect.”
+
+
+🍂 Autumn — Reflective Mind
+
+• Slow flute
+• Falling leaf rustle
+• Ink brush strokes
+• Whisper cue: “Let go of what no longer serves.”
+
+
+❄️ Winter — Still Mind
+
+• Deep silence
+• Low hum like distant snow
+• Single candle crackle
+• Whisper cue: “Stillness is the strongest stance.”
+
+
+---
+
+C. Interaction Sounds
+
+• Tap: soft wood knock
+• Swipe: wind pass
+• Long‑press: low bell
+• Module complete: lantern chime ascending
+
+
+---
+
+🜄 4. DISCIPLINE POSTER VARIANTS
+
+Minimal, ceremonial, emotionally true.
+
+Variant 1 — The Classic
+
+DISCIPLINE
+The quiet work that makes everything else possible.
+SPACE LEAF CORP
+
+---
+
+Variant 2 — The Seasonal Cycle
+
+DISCIPLINE
+Open. Commit. Understand. Become.
+SPACE LEAF CORP
+
+---
+
+Variant 3 — The Teacher’s Line
+
+DISCIPLINE
+Do it with intention, not emotion.
+SPACE LEAF CORP
+
+---
+
+Variant 4 — The Cosmic Deadpan
+
+DISCIPLINE
+Even gravity practices.
+SPACE LEAF CORP
+
+---
+
+Variant 5 — The Child‑Safe Wonder
+
+DISCIPLINE
+Every small action shapes your world.
+SPACE LEAF CORP
+
+---
+
+Variant 6 — The Captain’s Edition
+
+DISCIPLINE
+Remember who you said you want to be.
+SPACE LEAF CORP
+
+---
