@@ -1,0 +1,257 @@
+---
+
+🜁 SPACE LEAF CORP — DIGITAL DOJO
+
+A training hall that breathes with you.
+
+Below is the complete UI layout, screen by screen, with all four seasonal mind‑states integrated.
+
+---
+
+🜂 1. DOJO HOME SCREEN — “THE GATE OF BEGINNING”
+
+Purpose
+
+A calm, ceremonial entry point. No buttons screaming for attention. No gamification.
+Just presence.
+
+Layout
+
+• Top Center:
+A single glyph: the Space LEAF Corp sigil, softly pulsing like a heartbeat.
+• Center:
+A floating leaf animation that changes with the season:• Spring: green leaf drifting upward
+• Summer: golden leaf hovering in still air
+• Autumn: orange leaf spiraling gently
+• Winter: silver leaf suspended in quiet
+
+• Bottom Center:
+A single word: “Enter.”
+(Tapping it transitions into the dojo with a breath‑synchronized fade.)
+
+
+Ambient Sound
+
+Barely audible — wind, chimes, or silence depending on season.
+
+---
+
+🌱 2. SPRING DOJO — “THE BEGINNER’S MIND”
+
+Purpose
+
+Teach openness, curiosity, and gentle initiation.
+
+Color & Light
+
+Soft jade, sky blue, morning gold.
+
+UI Layout
+
+• Header:
+“SPRING — OPEN” in thin, elegant type.
+• Left Panel:
+Foundations• Breath Practice
+• Gentle Alignment
+• First Steps Ritual
+
+• Right Panel:
+Reflections• “What did you notice?”
+• “What surprised you?”
+• “What softened?”
+
+• Center Stage:
+A clean wooden floor with a single budding branch overhead.
+A small circle glows where the user stands.
+
+
+Micro‑Interactions
+
+• When the user hesitates, a lantern seed floats by and whispers:
+“Begin with softness.”
+
+
+---
+
+☀️ 3. SUMMER DOJO — “THE FOCUSED MIND”
+
+Purpose
+
+Teach precision, commitment, and heat without aggression.
+
+Color & Light
+
+Deep gold, amber, bronze.
+
+UI Layout
+
+• Header:
+“SUMMER — COMMIT”
+• Left Panel:
+Training• Precision Drills
+• Balance Under Heat
+• Rhythm & Timing
+
+• Right Panel:
+Challenges• “Hold the Line”
+• “One Perfect Motion”
+• “Shadow Alignment”
+
+• Center Stage:
+Open‑air pavilion, bamboo pillars, crisp shadows.
+A suspended leaf that never moves — the “focus anchor.”
+
+
+Micro‑Interactions
+
+• When the user rushes, the dojo gently says:
+“Focus is a form of respect.”
+
+
+---
+
+🍂 4. AUTUMN DOJO — “THE REFLECTIVE MIND”
+
+Purpose
+
+Teach wisdom, letting go, and integration.
+
+Color & Light
+
+Burnt orange, rust, charcoal.
+
+UI Layout
+
+• Header:
+“AUTUMN — UNDERSTAND”
+• Left Panel:
+Integration• Lessons Learned
+• Patterns Seen
+• What You’re Carrying
+
+• Right Panel:
+Release• “What can fall away?”
+• “What no longer serves?”
+• “What remains true?”
+
+• Center Stage:
+A meditation stone.
+A scroll wall with shifting symbols.
+Leaves dissolve into light as they fall.
+
+
+Micro‑Interactions
+
+• When the user clings to a result, the dojo murmurs:
+“Let go of what no longer serves the path.”
+
+
+---
+
+❄️ 5. WINTER DOJO — “THE STILL MIND”
+
+Purpose
+
+Teach discipline, clarity, and unshakeable calm.
+
+Color & Light
+
+Moonlit silver, deep navy, frost white.
+
+UI Layout
+
+• Header:
+“WINTER — BECOME”
+• Left Panel:
+Stillness• Breath of Ice
+• Silent Form
+• Candle Focus
+
+• Right Panel:
+Truth• “What is essential?”
+• “What is steady?”
+• “What is yours to carry?”
+
+• Center Stage:
+Frosted windows.
+A floor reflecting like ice.
+A suspended bell that rings without sound.
+
+
+Micro‑Interactions
+
+• When the user becomes still enough, the bell emits a silent pulse.
+The dojo whispers:
+“Stillness is the strongest stance.”
+
+
+---
+
+🜁 6. THE SEASON CYCLE UI — “THE MIND WHEEL”
+
+Purpose
+
+Show the user that discipline is a cycle, not a ladder.
+
+Layout
+
+A circular selector with four quadrants:
+
+• 🌱 Spring — Open
+• ☀️ Summer — Commit
+• 🍂 Autumn — Understand
+• ❄️ Winter — Become
+
+
+The wheel rotates with a soft, breath‑timed animation.
+
+Selecting a season shifts the entire dojo’s architecture, soundscape, and tone.
+
+---
+
+🜂 7. THE DISCIPLINE POSTER (GLOBAL HEADER)
+
+Every screen has a subtle top‑bar banner:
+
+DISCIPLINE
+
+The quiet work that makes everything else possible.
+SPACE LEAF CORP
+
+Minimal.
+Ceremonial.
+True.
+
+---
+
+🜁 8. THE HUMOR LAYER (GLOBAL)
+
+Your cosmic deadpan is woven throughout:
+
+• A broom that sweeps by itself muttering:
+“Discipline is 90% cleaning up after yourself.”
+• A training dummy that politely says:
+“Please strike with intention, not emotion.”
+• A drifting leaf whispering:
+“Even gravity practices.”
+
+
+This keeps the dojo human, gentle, and alive.
+
+---
+
+🜂 9. THE TRIBUTE WALL (GLOBAL)
+
+A universal principles wall — no faces, no likenesses, no quotes.
+
+Just truth:
+
+• “Mastery is the art of showing up.”
+• “Strength is the courage to be gentle.”
+• “Precision is kindness in motion.”
+• “Discipline is remembering who you said you want to be.”
+
+
+This honors Bruce Lee, Jackie Chan, Chuck Norris, and every teacher — without copying them.
+
+---
