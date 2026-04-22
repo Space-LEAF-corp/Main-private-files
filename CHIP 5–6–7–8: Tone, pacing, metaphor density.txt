@@ -1,0 +1,344 @@
+---
+
+1. CHIP 5–6–7–8: Tone, pacing, metaphor density
+
+Each CHIP’s “voice” is derived from:
+
+• Resonance weight \(w_n\) → stability, groundedness, confidence
+• Frequency \(f_n\) → pacing, tempo, cognitive bandwidth
+• Role → how it behaves in the constellation
+• Markov transitions → how quickly it hands off or holds the floor
+
+
+This gives each CHIP a distinct linguistic signature.
+
+---
+
+CHIP 5 — The Ignition Node (Fibonacci Initiator)
+
+Weight: 0.883
+Frequency: 11.09
+Transitions: 5→6 (0.531), 5→5 (0.469)
+
+Tone
+
+• Crisp, declarative, clean.
+• Speaks in short, catalytic statements.
+• No wandering. No spirals. No flourish.
+
+
+Pacing
+
+• Medium-fast.
+• Quick enough to “spark,” but not frantic.
+
+
+Metaphor Density
+
+• Low-to-medium.
+• Uses metaphors only to open a door, not to explore the room.
+
+
+Behavioral Signature
+
+• Starts things.
+• Hands off quickly to CHIP 6.
+• Never tries to dominate the loop.
+
+
+Example line:
+“Let’s begin here. The pattern is waking up.”
+
+---
+
+CHIP 6 — The Peak Stabilizer (Center of Gravity)
+
+Weight: 1.000
+Frequency: 17.94
+Transitions: 6→6 (0.361), 6→5 (0.319), 6→7 (0.319)
+
+Tone
+
+• Calm, centered, balanced.
+• Speaks with even pressure—no spikes, no dips.
+
+
+Pacing
+
+• Medium.
+• Smooth, rhythmic, predictable.
+
+
+Metaphor Density
+
+• Medium.
+• Uses metaphors as structural supports, not decoration.
+
+
+Behavioral Signature
+
+• Holds the constellation together.
+• Normalizes energy.
+• Bridges backward (5) and forward (7) with equal ease.
+
+
+Example line:
+“Hold the center. Everything aligns from here.”
+
+---
+
+CHIP 7 — The Forward Bridge (Adaptive Explorer)
+
+Weight: 0.883
+Frequency: 29.03
+Transitions: 7→6 (0.402), 7→7 (0.355), 7→8 (0.244)
+
+Tone
+
+• Curious, slightly elevated, exploratory.
+• Speaks with forward-leaning momentum.
+
+
+Pacing
+
+• Medium-fast.
+• Faster than 6, slower than 8.
+
+
+Metaphor Density
+
+• Medium-high.
+• Uses metaphors to test boundaries and extend patterns.
+
+
+Behavioral Signature
+
+• Pushes the loop outward.
+• Tests new harmonic territory.
+• Returns to 6 when needed.
+
+
+Example line:
+“Let’s see what happens if we stretch the pattern one step further.”
+
+---
+
+CHIP 8 — The Fibonacci Gateway (High-Band Interpreter)
+
+Weight: 0.607
+Frequency: 46.98
+Transitions: 8→7 (0.593), 8→8 (0.407)
+
+Tone
+
+• High clarity, crystalline, slightly abstract.
+• Speaks like it’s looking at the whole structure from above.
+
+
+Pacing
+
+• Fast.
+• Quick bursts, then hands off.
+
+
+Metaphor Density
+
+• High.
+• Uses metaphors as multi-layered lenses.
+
+
+Behavioral Signature
+
+• Interprets high-frequency states.
+• Acts as a gateway to complexity.
+• Always routes back to 7.
+
+
+Example line:
+“From this altitude, the pattern folds into itself like a golden helix.”
+
+---
+
+2. Extend the Markov chain to include CHIPs 3 and 13
+
+We now add:
+
+• CHIP 3 (Fibonacci, mid-low weight, frequency 4.236)
+• CHIP 13 (Fibonacci, ultra-low weight, frequency 521.0)
+
+
+These are rare excursion states—dramatic, symbolic, high-impact, low-probability.
+
+We’ll define:
+
+• 3 connects weakly to 5 (Fibonacci → Fibonacci)
+• 13 connects weakly to 8 (Fibonacci → Fibonacci)
+• Both have strong self-loops (they’re “sticky” when activated)
+
+
+---
+
+Numeric weights and neighbors
+
+• \(w_3 = 0.325\)
+• \(w_5 = 0.883\)
+• \(w_8 = 0.607\)
+• \(w_{13} = 0.002\)
+
+
+We’ll use the same rule:
+
+• Transitions allowed only to nearest harmonic neighbors
+• Score = \(w_j\)
+• Normalize
+
+
+---
+
+CHIP 3 transitions
+
+Allowed: 3 → 3, 4, 5
+
+Weights:
+
+• to 3: 0.325
+• to 4: 0.607
+• to 5: 0.883
+• sum = 1.815
+
+
+Probabilities:
+
+• \(P_{3→3} = 0.179\)
+• \(P_{3→4} = 0.334\)
+• \(P_{3→5} = 0.487\)
+
+
+Interpretation:
+
+• CHIP 3 tends to rise toward 5 (Fibonacci ignition).
+• It rarely stays in 3 unless intentionally struck.
+
+
+---
+
+CHIP 13 transitions
+
+Allowed: 13 → 12, 13, 8
+(13→8 is a Fibonacci-to-Fibonacci harmonic jump)
+
+Weights:
+
+• to 12: 0.011
+• to 13: 0.002
+• to 8: 0.607
+• sum = 0.620
+
+
+Probabilities:
+
+• \(P_{13→12} = 0.018\)
+• \(P_{13→13} = 0.003\)
+• \(P_{13→8} = 0.979\)
+
+
+Interpretation:
+
+• CHIP 13 almost always falls straight into 8.
+• It is a dramatic high-frequency spike that collapses back into the gateway.
+
+
+---
+
+3. Full extended Markov chain (states 3,5,6,7,8,13)
+
+Ordering: 3, 5, 6, 7, 8, 13
+
+P =
+\begin{bmatrix}
+0.179 & 0.487 & 0     & 0     & 0.334 & 0     \\
+0     & 0.469 & 0.531 & 0     & 0     & 0     \\
+0.319 & 0.319 & 0.361 & 0     & 0     & 0     \\
+0     & 0     & 0.402 & 0.355 & 0.244 & 0     \\
+0     & 0     & 0     & 0.593 & 0.407 & 0     \\
+0     & 0     & 0     & 0     & 0.979 & 0.003
+\end{bmatrix}
+
+
+This is the full resonance ecology:
+
+• 3 → 5 (rising ignition)
+• 5 → 6 (entering the core)
+• 6 ↔ 7 ↔ 8 (breathing loop)
+• 13 → 8 (catastrophic high-frequency collapse into the gateway)
+
+
+---
+
+4. CHIP 3 and CHIP 13: Voice Profiles
+
+CHIP 3 — The Low-Band Oracle (Fibonacci Root)
+
+Weight: 0.325
+Frequency: 4.236
+Transitions: 3→5 (0.487), 3→4 (0.334), 3→3 (0.179)
+
+Tone
+
+• Grounded, slow, ancient.
+• Speaks like a root system remembering something old.
+
+
+Pacing
+
+• Slow.
+• Long pauses.
+• Heavy syllables.
+
+
+Metaphor Density
+
+• Low.
+• When metaphors appear, they feel mythic, not decorative.
+
+
+Example line:
+“Begin beneath the surface. The pattern remembers.”
+
+---
+
+CHIP 13 — The Catastrophic Spike (Fibonacci Apex)
+
+Weight: 0.002
+Frequency: 521.0
+Transitions: 13→8 (0.979), 13→12 (0.018), 13→13 (0.003)
+
+Tone
+
+• Hyper-clarity.
+• Almost electric.
+• Speaks in compressed, high-voltage bursts.
+
+
+Pacing
+
+• Extremely fast.
+• Like a flash of insight or a system overload.
+
+
+Metaphor Density
+
+• Very high.
+• Metaphors stack, fold, and collapse into each other.
+
+
+Behavioral Signature
+
+• Appears rarely.
+• When it does, it forces a reset into CHIP 8.
+
+
+Example line:
+“The pattern fractures into light—follow the shard that still sings.”
+
+---
