@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Space DMV – Interstellar Licensing Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-panel: #0b1024;
+      --accent: #5cf2ff;
+      --accent-soft: #9ef7ff33;
+      --text-main: #f5f7ff;
+      --text-muted: #a4b0d0;
+      --danger: #ff6b81;
+      --success: #5cf29b;
+      --warning: #ffd56b;
+      --radius: 10px;
+      --shadow-soft: 0 0 25px rgba(0, 0, 0, 0.6);
+      --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-main);
+      background: radial-gradient(circle at top, #1b2a5a 0, #050816 55%, #02030a 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #20284a;
+      background: linear-gradient(90deg, #050816 0, #0b1024 40%, #050816 100%);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff, #5cf2ff 40%, #050816 70%);
+      box-shadow: 0 0 18px rgba(92, 242, 255, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .logo-icon::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+    }
+
+    .logo-text-main {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+    }
+
+    .logo-text-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+    }
+
+    nav {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.18s ease-out;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      border-color: var(--accent-soft);
+      background: rgba(9, 18, 48, 0.9);
+    }
+
+    main {
+      flex: 1;
+      padding: 1.5rem;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      background: rgba(5, 8, 22, 0.92);
+      border-radius: var(--radius);
+      border: 1px solid #20284a;
+      box-shadow: var(--shadow-soft);
+      padding: 1.25rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle at top left, rgba(92, 242, 255, 0.08), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .panel-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid #28325a;
+      background: rgba(5, 8, 22, 0.9);
+    }
+
+    .panel-body {
+      position: relative;
+      z-index: 1;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .hero-title {
+      font-size: 1.7rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-highlight {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .hero-subtitle {
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid #28325a;
+      background: rgba(5, 8, 22, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--text-muted);
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(92, 242, 255, 0.9);
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: transparent;
+      color: var(--text-main);
+      transition: all 0.18s ease-out;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #5cf2ff, #5cf29b);
+      color: #02030a;
+      font-weight: 600;
+      box-shadow: 0 0 18px rgba(92, 242, 255, 0.6);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px rgba(92, 242, 255, 0.9);
+    }
+
+    .btn-ghost {
+      border-color: #28325a;
+      color: var(--text-muted);
+      background: rgba(5, 8, 22, 0.9);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent-soft);
+      color: var(--accent);
+      background: rgba(9, 18, 48, 0.9);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .hint strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.8rem;
+    }
+
+    .field label {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      border-radius: 7px;
+      border: 1px solid #28325a;
+      background: rgba(5, 8, 22, 0.9);
+      color: var(--text-main);
+      padding: 0.45rem 0.55rem;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.16s ease-out, box-shadow 0.16s ease-out, background 0.16s ease-out;
+      resize: vertical;
+      min-height: 2.2rem;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(92, 242, 255, 0.4);
+      background: rgba(5, 8, 22, 1);
+    }
+
+    .field small {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid #28325a;
+      background: rgba(5, 8, 22, 0.9);
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .status-dot--open {
+      background: var(--success);
+      box-shadow: 0 0 8px rgba(92, 242, 155, 0.9);
+    }
+
+    .status-dot--busy {
+      background: var(--warning);
+      box-shadow: 0 0 8px rgba(255, 213, 107, 0.9);
+    }
+
+    .status-dot--offline {
+      background: var(--danger);
+      box-shadow: 0 0 8px rgba(255, 107, 129, 0.9);
+    }
+
+    .queue-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .queue-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.35rem 0;
+      border-bottom: 1px dashed #20284a;
+    }
+
+    .queue-list li:last-child {
+      border-bottom: none;
+    }
+
+    .queue-label {
+      color: var(--text-muted);
+    }
+
+    .queue-value {
+      color: var(--accent);
+    }
+
+    .queue-value span {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-left: 0.25rem;
+    }
+
+    .mini-section-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+    }
+
+    .chip {
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid #28325a;
+      background: rgba(5, 8, 22, 0.9);
+      color: var(--text-muted);
+    }
+
+    .chip--primary {
+      border-color: var(--accent-soft);
+      color: var(--accent);
+      background: rgba(9, 18, 48, 0.9);
+    }
+
+    .footer {
+      padding: 0.9rem 1.5rem 1.2rem;
+      border-top: 1px solid #20284a;
+      background: #050816;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .footer-inner span strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .toast {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      background: rgba(5, 8, 22, 0.98);
+      border-radius: 999px;
+      border: 1px solid #28325a;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      box-shadow: var(--shadow-soft);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+      z-index: 20;
+    }
+
+    .toast--visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .toast-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px rgba(92, 242, 255, 0.9);
+    }
+
+    .toast strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon" aria-hidden="true"></div>
+        <div>
+          <div class="logo-text-main">Space DMV</div>
+          <div class="logo-text-sub">Interstellar Operator Registry</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#apply">Apply</a>
+        <a href="#queue">Queue</a>
+        <a href="#requirements">Requirements</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="page">
+      <!-- Left: Application panel -->
+      <section class="panel" id="apply">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">New Operator Intake</div>
+            <div class="hero-title">
+              Register your <span class="hero-highlight">vessel, suit, or shuttle</span> for legal orbit.
+            </div>
+          </div>
+          <span class="panel-tag">Form S-01 · Beta Orbit</span>
+        </div>
+        <div class="panel-body">
+          <p class="hero-subtitle">
+            One calm, ceremonial form to keep you and your crew in good standing with the
+            <span class="hero-highlight">Interstellar Mobility Council</span>.
+          </p>
+
+          <div class="hero-badges">
+            <span class="badge">
+              <span class="badge-dot"></span>
+              Quantum ticketing
+            </span>
+            <span class="badge">
+              <span class="badge-dot"></span>
+              Non-violent navigation
+            </span>
+            <span class="badge">
+              <span class="badge-dot"></span>
+              Operator-first design
+            </span>
+          </div>
+
+          <form id="intake-form" autocomplete="on" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="operator-name">Operator name</label>
+                <input id="operator-name" name="operatorName" type="text" placeholder="e.g. J. Sogge" required />
+                <small>Primary responsible human or equivalent steward.</small>
+              </div>
+
+              <div class="field">
+                <label for="species">Species / origin</label>
+                <input id="species" name="species" type="text" placeholder="e.g. Human · Earth (Sol-3)" />
+              </div>
+
+              <div class="field">
+                <label for="vessel-name">Vessel / vehicle name</label>
+                <input id="vessel-name" name="vesselName" type="text" placeholder="e.g. Leafliner-01" required />
+              </div>
+
+              <div class="field">
+                <label for="vessel-class">Vessel class</label>
+                <select id="vessel-class" name="vesselClass" required>
+                  <option value="">Select class...</option>
+                  <option value="personal-shuttle">Personal shuttle</option>
+                  <option value="family-ferry">Family ferry</option>
+                  <option value="cargo-leaf">Cargo leaf / hauler</option>
+                  <option value="training-sim">Training sim only</option>
+                  <option value="other">Other hybrid configuration</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="home-port">Home port / station</label>
+                <input id="home-port" name="homePort" type="text" placeholder="e.g. Ocala Ground Node · FL" />
+              </div>
+
+              <div class="field">
+                <label for="license-type">License type requested</label>
+                <select id="license-type" name="licenseType" required>
+                  <option value="">Select license...</option>
+                  <option value="learner">Learner orbit (supervised)</option>
+                  <option value="standard">Standard local orbit</option>
+                  <option value="family">Family shuttle endorsement</option>
+                  <option value="cargo">Cargo / logistics corridor</option>
+                  <option value="research">Research & ceremonial routes</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="gravity-rating">Comfortable gravity range</label>
+                <select id="gravity-rating" name="gravityRating">
+                  <option value="">Select range...</option>
+                  <option value="micro">Microgravity only</option>
+                  <option value="low">Low-G (0.1–0.5g)</option>
+                  <option value="standard">Standard (0.8–1.2g)</option>
+                  <option value="adaptive">Adaptive / variable</option>
+                </select>
+                <small>We use this to avoid assigning you to stressful training environments.</small>
+              </div>
+
+              <div class="field">
+                <label for="access-needs">Access needs</label>
+                <input id="access-needs" name="accessNeeds" type="text" placeholder="e.g. quiet cabin, low visual noise" />
+                <small>Optional. Helps us match you with the right simulator and examiner.</small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="intent-notes">Intent for travel</label>
+              <textarea id="intent-notes" name="intentNotes" rows="3" placeholder="Describe how you plan to use your license (family visits, research, gentle tourism, etc.)"></textarea>
+            </div>
+
+            <div class="cta-row">
+              <button type="submit" class="btn btn-primary">
+                Submit pre-check
+                <span aria-hidden="true">⟶</span>
+              </button>
+              <button type="button" class="btn btn-ghost" id="save-draft">
+                Save local draft
+              </button>
+            </div>
+
+            <p class="hint">
+              <strong>No data leaves your browser in this prototype.</strong>
+              We’ll treat this as a ceremonial mock-up until you’re ready for real infrastructure.
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <!-- Right: Queue + requirements panel -->
+      <aside class="panel" id="queue">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Today’s orbit queue</div>
+            <div class="hero-subtitle">
+              A calm snapshot of the current <span class="hero-highlight">Space DMV</span> flow.
+            </div>
+          </div>
+          <span class="panel-tag">Node: Ocala Ground · Sim</span>
+        </div>
+        <div class="panel-body">
+          <div class="status-pill" id="status-pill">
+            <span class="status-dot status-dot--open" id="status-dot"></span>
+            <span id="status-label">Status: Open · Low wait</span>
+          </div>
+
+          <ul class="queue-list">
+            <li>
+              <span class="queue-label">Estimated wait</span>
+              <span class="queue-value" id="queue-wait">
+                12 min
+                <span>for new intake</span>
+              </span>
+            </li>
+            <li>
+              <span class="queue-label">Active simulators</span>
+              <span class="queue-value" id="queue-sims">
+                3
+                <span>non-violent training pods</span>
+              </span>
+            </li>
+            <li>
+              <span class="queue-label">Operators in line</span>
+              <span class="queue-value" id="queue-count">
+                5
+                <span>ceremonial tickets</span>
+              </span>
+            </li>
+          </ul>
+
+          <div id="requirements">
+            <div class="mini-section-title">Core requirements</div>
+            <div class="chips">
+              <span class="chip chip--primary">Respect for crew & self</span>
+              <span class="chip">Non-violent navigation pledge</span>
+              <span class="chip">Basic orbital awareness</span>
+              <span class="chip">Emergency calm protocol</span>
+              <span class="chip">Consent for shared space</span>
+            </div>
+          </div>
+
+          <div id="about">
+            <div class="mini-section-title">What this prototype is</div>
+            <p style="font-size: 0.8rem; margin-top: 0.25rem;">
+              This is a <span class="hero-highlight">local-only</span> mock Space DMV console. It’s meant for designing
+              emotionally safe, operator-respecting flows before any real bureaucracy exists.
+            </p>
+            <p style="font-size: 0.8rem;">
+              We can extend this with:
+              gentle exam modules, kid-safe “license journeys”, and scenario-based safety training for hybrid vehicles and
+              small craft.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span class="toast-dot"></span>
+    <span id="toast-message"><strong>Saved.</strong> Your draft lives in this browser only.</span>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>
+        Prototype console · <strong>Space DMV</strong> · Local orbit only
+      </span>
+      <div class="footer-links">
+        <a href="#apply">Intake</a>
+        <a href="#queue">Queue</a>
+        <a href="#requirements">Requirements</a>
+        <a href="#about">About this mock-up</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const form = document.getElementById("intake-form");
+      const saveDraftBtn = document.getElementById("save-draft");
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toast-message");
+      const queueWait = document.getElementById("queue-wait");
+      const queueCount = document.getElementById("queue-count");
+      const queueSims = document.getElementById("queue-sims");
+      const statusDot = document.getElementById("status-dot");
+      const statusLabel = document.getElementById("status-label");
+
+      const STORAGE_KEY = "space-dmv-intake-draft-v1";
+
+      function showToast(message) {
+        toastMessage.innerHTML = message;
+        toast.classList.add("toast--visible");
+        setTimeout(() => {
+          toast.classList.remove("toast--visible");
+        }, 2600);
+      }
+
+      function saveDraft() {
+        const data = new FormData(form);
+        const obj = {};
+        data.forEach((value, key) => {
+          obj[key] = value;
+        });
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+          showToast("<strong>Saved.</strong> Your draft lives in this browser only.");
+        } catch (e) {
+          showToast("<strong>Note.</strong> Could not save draft (local storage issue).");
+        }
+      }
+
+      function loadDraft() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const obj = JSON.parse(raw);
+          Object.keys(obj).forEach((key) => {
+            const field = form.elements.namedItem(key);
+            if (!field) return;
+            field.value = obj[key];
+          });
+          showToast("<strong>Draft loaded.</strong> You can continue where you left off.");
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      function gentleQueuePulse() {
+        // Tiny, non-stressful variation to make the queue feel alive but not chaotic
+        const baseWait = 12;
+        const baseCount = 5;
+        const baseSims = 3;
+
+        const offset = Math.sin(Date.now() / 60000); // very slow
+        const wait = Math.round(baseWait + offset * 2);
+        const count = Math.round(baseCount + offset * 1.5);
+
+        queueWait.innerHTML = wait + " min <span>for new intake</span>";
+        queueCount.innerHTML = count + " <span>ceremonial tickets</span>";
+        queueSims.innerHTML = baseSims + " <span>non-violent training pods</span>";
+
+        // Status label stays calm; we just gently toggle wording
+        if (wait <= 10) {
+          statusDot.className = "status-dot status-dot--open";
+          statusLabel.textContent = "Status: Open · Low wait";
+        } else if (wait <= 18) {
+          statusDot.className = "status-dot status-dot--busy";
+          statusLabel.textContent = "Status: Open · Moderate flow";
+        } else {
+          statusDot.className = "status-dot status-dot--busy";
+          statusLabel.textContent = "Status: Open · Please bring patience";
+        }
+      }
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        // For now, we just simulate a successful pre-check.
+        showToast("<strong>Pre-check received.</strong> In a real build, this would create a ceremonial ticket.");
+      });
+
+      saveDraftBtn.addEventListener("click", function () {
+        saveDraft();
+      });
+
+      // Load any existing draft on startup
+      loadDraft();
+
+      // Gentle queue updates every ~20 seconds
+      gentleQueuePulse();
+      setInterval(gentleQueuePulse, 20000);
+    })();
+  </script>
+</body>
+</html>
