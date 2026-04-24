@@ -1,0 +1,289 @@
+---
+
+SPACE LEAF CORP — CANONICAL SPECIFICATION DOCUMENT
+
+Jellyfish King Suit — Defensive Architecture v1.0
+
+A Non‑Weaponizable Protective System for Civilian, Ceremonial, and Field Use
+
+---
+
+1. Mission Statement
+
+The Jellyfish King Suit is a defensive‑only, non‑weaponizable protective system designed under Space LEAF Corp’s stewardship principles:
+
+• Defense without harm
+• Perception without targeting
+• Movement without intimidation
+• Transparency without vulnerability
+• Energy recycling without extraction
+
+
+The suit is intended for civilian protection, ceremonial presence, and crisis mediation, not combat.
+It embodies the ethic:
+“Guard, do not strike.”
+
+---
+
+2. System Overview
+
+The suit consists of five integrated subsystems:
+
+1. SensoryHalo — 360° perception and anomaly detection
+2. MembraneField — dynamic soft armor with glow‑based signaling
+3. ReflexiveShielding — force redirection and cushioning
+4. CurrentFlowEngine — fluid, evasive locomotion
+5. StateCore — ethics, constraints, and system state management
+
+
+All modules operate under CERBEA (Cooperative Energy Recycling Binding Energy Architecture) constraints.
+
+---
+
+3. API Specification
+
+3.1 Top‑Level Interface
+
+interface JellyfishKingSuit {
+  readonly id: "JELLYFISH_KING";
+  state: SuitState;
+  sensors: SensoryHalo;
+  membrane: MembraneField;
+  defense: ReflexiveShielding;
+  motion: CurrentFlowEngine;
+
+  cycle(env: EnvironmentSnapshot): SuitStatus;
+  overrideMode(mode: OverrideMode): void;
+}
+
+
+3.2 Suit States
+
+type SuitState = "CALM" | "ALERT" | "IMPACT" | "RECOVER";
+
+
+3.3 Override Modes
+
+type OverrideMode =
+  | "CEREMONIAL"   // display, glow, presence
+  | "FIELD"        // full defensive stack
+  | "LOW_POWER";   // minimal sensing, passive membrane
+
+
+---
+
+4. Subsystem APIs
+
+4.1 SensoryHalo
+
+interface SensoryHalo {
+  collect(env: EnvironmentSnapshot): SensoryPacket;
+  assessRisk(packet: SensoryPacket): number; // 0.0–1.0
+  status(): SensoryStatus;
+}
+
+
+Principle:
+Detect deviation, not hostility. No targeting.
+
+---
+
+4.2 MembraneField
+
+interface MembraneField {
+  opacity: number;
+  chargeLevel: number;
+  stiffness: number;
+
+  update(risk: number): void;
+  status(): MembraneStatus;
+}
+
+
+Principle:
+Glow is communication, not intimidation.
+
+---
+
+4.3 ReflexiveShielding
+
+interface ReflexiveShielding {
+  active: boolean;
+  deflectionVector: Vector3 | null;
+
+  activate(risk: number, packet: SensoryPacket): void;
+  deactivate(): void;
+  status(): DefenseStatus;
+}
+
+
+Principle:
+Redirect, absorb, cushion. Never return force.
+
+---
+
+4.4 CurrentFlowEngine
+
+interface CurrentFlowEngine {
+  vector: Vector3;
+
+  adjust(packet: SensoryPacket, risk: number): void;
+  status(): MotionStatus;
+}
+
+
+Principle:
+Move like water. Evade, don’t pursue.
+
+---
+
+5. Ethics Guard (Non‑Weaponization Layer)
+
+The following method classes are forbidden and cannot be added:
+
+• emitProjectile
+• focusBeam
+• lockTarget
+• amplifyImpact
+
+
+Any attempt to implement them must fail at compile‑time or runtime.
+
+type EthicsGuard = (methodName: string) => never;
+
+
+Principle:
+The suit cannot be corrupted into a weapon.
+
+---
+
+6. Hardware Architecture
+
+6.1 Sensor Layer
+
+• Pressure mesh: piezoelectric hydro‑lattice
+• EM sensing: graphene strips
+• Motion sensing: IMUs + soft LIDAR/sonar
+• Affect sensing: behavioral pattern recognition (symbolic)
+
+
+---
+
+6.2 Membrane Layers
+
+1. Outer membrane: transparent hydrogel + photonic fibers
+2. Impact dispersion: non‑Newtonian hex‑pockets
+3. Inner shell: breathable, temperature‑regulated fabric
+4. Nerve ring: central processing node at upper back/neck
+
+
+---
+
+6.3 Power System
+
+• Primary: flexible solid‑state battery arrays
+• Secondary:• kinetic harvesting
+• thin‑film solar
+• inductive reef‑charging
+
+
+
+Power priority:
+
+1. Life support
+2. Sensors
+3. Membrane
+4. Glow
+
+
+---
+
+7. Visual Schematic (Textual)
+
+Outside → Inside
+
+1. Luminous membrane (glow, transparency, signaling)
+2. Sensor mesh (pressure, EM, motion, affect)
+3. Impact dispersion matrix (force spreading)
+4. Structural rings (power + movement actuators)
+5. Inner comfort shell (haptic cues, grounding)
+6. Nerve ring (core logic + CERBEA constraints)
+
+
+---
+
+8. Ceremonial Protocols
+
+8.1 Oath of Stewardship
+
+Before activation, the wearer states:
+
+“I accept the current, not the crown. I guard, I do not rule.”
+
+8.2 Ceremonial Mode
+
+• Membrane fully transparent
+• Glow reflects emotional field of the room
+• No evasive movement unless danger is imminent
+• Presence is calming, not commanding
+
+
+8.3 Crisis Mode
+
+• Membrane thickens
+• Glow intensifies
+• Suit positions wearer between danger and civilians
+• ReflexiveShielding redirects debris and shockwaves into safe vectors
+
+
+8.4 Mythic Frame
+
+The Jellyfish King is the one who:
+
+• absorbs the first impact
+• returns no harm
+• stands between danger and the people
+• glows with truth, not dominance
+
+
+---
+
+9. Simulation Loop (Canonical)
+
+def simulate(suit, environments, steps=100):
+    history = {name: [] for name in environments.keys()}
+
+    for name, env_fn in environments.items():
+        suit.overrideMode("FIELD")
+        for t in range(steps):
+            env = env_fn(t)
+            status = suit.cycle(env)
+            history[name].append(status)
+
+    return history
+
+
+Environment Profiles
+
+• Calm Ocean: drift, low glow, no defense
+• Crowded City: gentle evasions, medium glow, cushioning
+• Impact Storm: full membrane, redirection, anchor‑and‑shield behavior
+
+
+---
+
+10. Canonical Summary
+
+The Jellyfish King Suit is:
+
+• A defensive system, not armor for war
+• A ceremonial presence, not a symbol of dominance
+• A steward’s tool, not a soldier’s tool
+• A living interface between human intention and environmental truth
+
+
+It is the embodiment of Space LEAF Corp’s principle:
+
+“Protection without harm. Presence without fear.”
+
+---
