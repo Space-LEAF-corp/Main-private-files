@@ -1,0 +1,185 @@
+{
+  "profile_cartridge_library_version": "1.0.0",
+  "profiles": [
+    {
+      "id": "DS-SWARM.v1",
+      "name": "Deep Space Swarm Mode",
+      "role": "defensive",
+      "description": "Micro-impact survival and debris-field navigation.",
+      "environment": {
+        "vacuum": true,
+        "dense_particulate": true,
+        "emp_heavy": false,
+        "confined": false,
+        "atmospheric": false
+      },
+      "subsystem_priorities": {
+        "shields": "micro_pulse_high_freq",
+        "impact_absorption": "hyper_reactive",
+        "nanites": "tri_cohort_rotation",
+        "thrusters": "short_burst_evasive",
+        "sensors": "debris_mapping_predictive",
+        "offense": "reduced"
+      },
+      "constraints": {
+        "max_power_draw": 0.8,
+        "nanite_fatigue_ceiling": 0.7
+      }
+    },
+    {
+      "id": "EMP-THEATER.v3",
+      "name": "EMP-Heavy Theater Mode",
+      "role": "defensive",
+      "description": "Electronic warfare and ion-storm survival.",
+      "environment": {
+        "vacuum": true,
+        "dense_particulate": false,
+        "emp_heavy": true,
+        "confined": false,
+        "atmospheric": false
+      },
+      "subsystem_priorities": {
+        "shields": "emp_hardened",
+        "impact_absorption": "standard",
+        "nanites": "shielded_slow",
+        "thrusters": "moderate",
+        "sensors": "staggered_reboot_analog_fallback",
+        "offense": "moderate"
+      },
+      "constraints": {
+        "max_power_draw": 0.85,
+        "nanite_fatigue_ceiling": 0.6
+      }
+    },
+    {
+      "id": "VP-ENDURE.v2",
+      "name": "Void-Pressure Endurance Mode",
+      "role": "endurance",
+      "description": "Long-duration vacuum exposure and radiation drift.",
+      "environment": {
+        "vacuum": true,
+        "dense_particulate": false,
+        "emp_heavy": false,
+        "confined": false,
+        "atmospheric": false
+      },
+      "subsystem_priorities": {
+        "shields": "radiation_tuned",
+        "impact_absorption": "moderate",
+        "nanites": "low_power_regen",
+        "thrusters": "minimal_orientation_only",
+        "sensors": "low_rate",
+        "offense": "minimal"
+      },
+      "constraints": {
+        "max_power_draw": 0.6,
+        "nanite_fatigue_ceiling": 0.5
+      }
+    },
+    {
+      "id": "CQ-BREACH.v1",
+      "name": "Close-Quarters Breach Mode",
+      "role": "assault",
+      "description": "Confined interior combat and hull-breach operations.",
+      "environment": {
+        "vacuum": true,
+        "dense_particulate": false,
+        "emp_heavy": false,
+        "confined": true,
+        "atmospheric": true
+      },
+      "subsystem_priorities": {
+        "shields": "localized",
+        "impact_absorption": "joint_reinforced",
+        "nanites": "stress_point_focus",
+        "thrusters": "micro_vectoring",
+        "sensors": "ultrasonic_echo_mapping",
+        "offense": "high_melee"
+      },
+      "constraints": {
+        "max_power_draw": 0.9,
+        "nanite_fatigue_ceiling": 0.75
+      }
+    },
+    {
+      "id": "PF-ENTRY.v4",
+      "name": "Planetfall Atmospheric Entry Mode",
+      "role": "transit",
+      "description": "High-heat atmospheric descent.",
+      "environment": {
+        "vacuum": false,
+        "dense_particulate": false,
+        "emp_heavy": false,
+        "confined": false,
+        "atmospheric": true
+      },
+      "subsystem_priorities": {
+        "shields": "thermal_buffer",
+        "impact_absorption": "high_thermal",
+        "nanites": "post_entry_only",
+        "thrusters": "vector_stabilization",
+        "sensors": "hull_stress_monitoring",
+        "offense": "disabled"
+      },
+      "constraints": {
+        "max_power_draw": 0.7,
+        "nanite_fatigue_ceiling": 0.4
+      }
+    },
+    {
+      "id": "GHOST-RECON.v2",
+      "name": "Stealth Recon Ghost Mode",
+      "role": "stealth",
+      "description": "Zero-signature infiltration and recon.",
+      "environment": {
+        "vacuum": true,
+        "dense_particulate": false,
+        "emp_heavy": false,
+        "confined": true,
+        "atmospheric": true
+      },
+      "subsystem_priorities": {
+        "shields": "minimal_signature",
+        "impact_absorption": "quiet",
+        "nanites": "low_visibility",
+        "thrusters": "silent_low_thrust",
+        "sensors": "passive_only",
+        "offense": "low"
+      },
+      "constraints": {
+        "max_power_draw": 0.5,
+        "nanite_fatigue_ceiling": 0.5
+      }
+    },
+    {
+      "id": "FS-WARFRAME.v1",
+      "name": "Full-Spectrum Warframe Mode",
+      "role": "overdrive",
+      "description": "Maximum output, all systems amplified.",
+      "environment": {
+        "vacuum": true,
+        "dense_particulate": true,
+        "emp_heavy": true,
+        "confined": false,
+        "atmospheric": true
+      },
+      "subsystem_priorities": {
+        "shields": "full_dome_plus_micro",
+        "impact_absorption": "max",
+        "nanites": "high_speed_high_fatigue",
+        "thrusters": "high_agility",
+        "sensors": "full_spectrum_active",
+        "offense": "maximum"
+      },
+      "constraints": {
+        "max_power_draw": 1.0,
+        "nanite_fatigue_ceiling": 0.9
+      }
+    }
+  ],
+  "selector_policies": {
+    "default_profile": "VP-ENDURE.v2",
+    "allow_auto_switch": true,
+    "transition_cost_model": "power_and_fatigue"
+  }
+}
