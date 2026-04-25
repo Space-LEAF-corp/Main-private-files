@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>justinspace.spc – Profile Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050816;
+      --bg-alt: #0b1020;
+      --card: #111827;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --radius: 12px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: radial-gradient(circle at top, #1d243b 0, #050816 45%, #020617 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .frame {
+      width: 100%;
+      max-width: 1120px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+    }
+
+    @media (max-width: 900px) {
+      .frame {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .left {
+      padding: 24px 24px 20px;
+      border-right: 1px solid var(--border);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%);
+    }
+
+    .right {
+      padding: 24px 24px 20px;
+      background: radial-gradient(circle at top right, rgba(129, 140, 248, 0.12), transparent 55%);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-orbit {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 2px solid rgba(56, 189, 248, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.5);
+    }
+
+    .logo-orbit::before {
+      content: "";
+      position: absolute;
+      width: 52px;
+      height: 52px;
+      border-radius: 999px;
+      border: 1px dashed rgba(56, 189, 248, 0.35);
+      opacity: 0.8;
+    }
+
+    .logo-orbit-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #38bdf8;
+    }
+
+    .logo-text-main {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
+      font-size: 15px;
+    }
+
+    .logo-text-sub {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .mode-pill {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .mode-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+    }
+
+    .profile-card {
+      margin-top: 8px;
+      padding: 18px 16px 16px;
+      border-radius: var(--radius);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-card::after {
+      content: "orbit profile";
+      position: absolute;
+      right: 14px;
+      top: 12px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(148, 163, 184, 0.6);
+    }
+
+    .profile-header {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 30% 20%, #38bdf8, #1d4ed8);
+      border: 2px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.7);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar::after {
+      content: "👾";
+      position: absolute;
+      font-size: 32px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .profile-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .handle {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .handle span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .tagline {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .stat-pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-pill strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .section-title {
+      margin-top: 18px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 18px;
+      height: 1px;
+      background: linear-gradient(to right, rgba(148, 163, 184, 0.8), transparent);
+    }
+
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .link-card {
+      padding: 8px 9px;
+      border-radius: 10px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      cursor: pointer;
+      transition: border 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease,
+        background 0.15s ease;
+    }
+
+    .link-card:hover {
+      border-color: rgba(56, 189, 248, 0.8);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.9);
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.98));
+    }
+
+    .link-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .link-value {
+      font-size: 12px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stickers-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .sticker {
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .sticker span {
+      font-size: 12px;
+    }
+
+    .sticker-ghost {
+      border-style: dashed;
+      opacity: 0.7;
+    }
+
+    .right-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .right-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .right-title {
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .right-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .view-toggle button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .view-toggle button.active {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--text);
+    }
+
+    .panel {
+      padding: 12px 12px 10px;
+      border-radius: var(--radius);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(31, 41, 55, 0.95);
+      margin-bottom: 10px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .panel-badge {
+      font-size: 10px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--muted);
+    }
+
+    .playlist-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .playlist-item {
+      padding: 7px 8px;
+      border-radius: 9px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .playlist-main {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .playlist-name {
+      font-weight: 500;
+    }
+
+    .playlist-meta {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .playlist-tag {
+      font-size: 10px;
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.12);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+    }
+
+    .embed-frame {
+      margin-top: 6px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: #020617;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .embed-frame span {
+      color: #38bdf8;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 700px) {
+      .grid-two {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .activity-item {
+      padding: 6px 8px;
+      border-radius: 9px;
+      border: 1px dashed rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .activity-label {
+      color: var(--muted);
+    }
+
+    .activity-value {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .footer {
+      margin-top: 6px;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(55, 65, 81, 0.9);
+      font-size: 10px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .footer span {
+      opacity: 0.9;
+    }
+
+    .footer strong {
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .pill-small {
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .pill-small span {
+      color: #38bdf8;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <!-- LEFT: PROFILE + LINKS + STICKERS -->
+    <div class="left">
+      <div class="brand">
+        <div class="logo">
+          <div class="logo-orbit">
+            <div class="logo-orbit-dot"></div>
+          </div>
+          <div>
+            <div class="logo-text-main">justinspace.spc</div>
+            <div class="logo-text-sub">personal orbit hub</div>
+          </div>
+        </div>
+        <div class="mode-pill">
+          <div class="mode-dot"></div>
+          live profile
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="avatar"></div>
+          <div class="profile-meta">
+            <div class="handle">
+              @cosmic.justin
+              <span>public · earth orbit</span>
+            </div>
+            <div class="tagline">
+              building tiny universes with playlists, pixels, and late‐night code.
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-pill">
+            <strong>128</strong> connections
+          </div>
+          <div class="stat-pill">
+            <strong>7</strong> linked platforms
+          </div>
+          <div class="stat-pill">
+            <strong>3</strong> active playlists
+          </div>
+        </div>
+
+        <div class="section-title">linked platforms</div>
+        <div class="links-grid">
+          <button class="link-card" onclick="alert('Open Spotify profile (placeholder)')">
+            <div class="link-label">music</div>
+            <div class="link-value">Spotify · @justin‐in‐space</div>
+          </button>
+          <button class="link-card" onclick="alert('Open Apple Music profile (placeholder)')">
+            <div class="link-label">music</div>
+            <div class="link-value">Apple Music · orbit.mix</div>
+          </button>
+          <button class="link-card" onclick="alert('Open TikTok (placeholder)')">
+            <div class="link-label">social</div>
+            <div class="link-value">TikTok · /justinspace</div>
+          </button>
+          <button class="link-card" onclick="alert('Open Instagram (placeholder)')">
+            <div class="link-label">social</div>
+            <div class="link-value">Instagram · @visual‐static</div>
+          </button>
+        </div>
+
+        <div class="section-title">stickers & vibes</div>
+        <div class="stickers-row">
+          <div class="sticker">
+            <span>🎧</span> night drive core
+          </div>
+          <div class="sticker">
+            <span>🛰️</span> low‐orbit lo‐fi
+          </div>
+          <div class="sticker">
+            <span>🌌</span> synth nebula
+          </div>
+          <div class="sticker sticker-ghost">
+            + add sticker
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: PLAYLISTS + EMBEDS + ACTIVITY -->
+    <div class="right">
+      <div class="right-top">
+        <div class="right-title-block">
+          <div class="right-title">public signal</div>
+          <div class="right-subtitle">
+            your music, socials, and digital creations in one orbit‐clean profile.
+          </div>
+        </div>
+        <div class="view-toggle">
+          <button id="viewProfile" class="active" onclick="setView('profile')">profile</button>
+          <button id="viewEdit" onclick="setView('edit')">edit mock</button>
+        </div>
+      </div>
+
+      <!-- PROFILE VIEW -->
+      <div id="viewProfilePanel">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">featured playlist</div>
+            <div class="panel-badge">connected · spotify</div>
+          </div>
+          <div class="playlist-list">
+            <div class="playlist-item">
+              <div class="playlist-main">
+                <div class="playlist-name">midnight orbit // v3</div>
+                <div class="playlist-meta">42 tracks · 2 hr 37 min · updated this week</div>
+              </div>
+              <div class="playlist-tag">primary</div>
+            </div>
+          </div>
+          <div class="embed-frame">
+            <div>
+              <div>Embed your <span>Spotify</span> or <span>Apple Music</span> playlist iframe here.</div>
+              <div style="margin-top:4px;">(In this demo, it’s a placeholder box.)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-two">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">extra playlists</div>
+              <div class="panel-badge">queue</div>
+            </div>
+            <div class="playlist-list">
+              <div class="playlist-item">
+                <div class="playlist-main">
+                  <div class="playlist-name">sunrise reboot</div>
+                  <div class="playlist-meta">indie · soft electronic · 28 tracks</div>
+                </div>
+                <div class="playlist-tag">soft</div>
+              </div>
+              <div class="playlist-item">
+                <div class="playlist-main">
+                  <div class="playlist-name">debugging the universe</div>
+                  <div class="playlist-meta">instrumental · focus · 35 tracks</div>
+                </div>
+                <div class="playlist-tag">focus</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">digital creations</div>
+              <div class="panel-badge">gallery</div>
+            </div>
+            <div class="embed-frame">
+              drop in:
+              <br />• art portfolio link
+              <br />• code sandbox
+              <br />• 3D viewer
+              <br /><br />
+              this box is a neutral embed zone.
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">activity & presence</div>
+            <div class="panel-badge">signal</div>
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-label">now playing</div>
+              <div class="activity-value">“satellite static” · neon echoes</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-label">status</div>
+              <div class="activity-value">coding a new sticker pack</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-label">last sync</div>
+              <div class="activity-value">3 min ago · auto</div>
+            </div>
+          </div>
+          <div class="footer">
+            <span>profile id: <strong>justinspace‐0001</strong></span>
+            <span class="pill-small">mode: <span>public orbit</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT VIEW (MOCK) -->
+      <div id="viewEditPanel" class="hidden">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">quick edit</div>
+            <div class="panel-badge">local demo</div>
+          </div>
+          <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">
+            This is a mock “edit” mode to show how fields could be wired later.
+          </div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-label">display name</div>
+              <div class="activity-value" contenteditable="true">cosmic.justin</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-label">tagline</div>
+              <div class="activity-value" contenteditable="true">
+                building tiny universes with playlists, pixels, and late‐night code.
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-label">featured playlist url</div>
+              <div class="activity-value" contenteditable="true">
+                https://open.spotify.com/playlist/your‐playlist‐id
+              </div>
+            </div>
+          </div>
+          <div class="footer">
+            <span>changes here are not saved yet – pure front‐end mock.</span>
+            <span class="pill-small"><span>next step:</span> wire to real data</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setView(mode) {
+      const profilePanel = document.getElementById("viewProfilePanel");
+      const editPanel = document.getElementById("viewEditPanel");
+      const btnProfile = document.getElementById("viewProfile");
+      const btnEdit = document.getElementById("viewEdit");
+
+      if (mode === "profile") {
+        profilePanel.classList.remove("hidden");
+        editPanel.classList.add("hidden");
+        btnProfile.classList.add("active");
+        btnEdit.classList.remove("active");
+      } else {
+        profilePanel.classList.add("hidden");
+        editPanel.classList.remove("hidden");
+        btnProfile.classList.remove("active");
+        btnEdit.classList.add("active");
+      }
+    }
+  </script>
+</body>
+</html>
