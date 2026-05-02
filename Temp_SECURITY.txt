@@ -1,0 +1,19 @@
+# Space LEAF Corp Security Contact File
+# Follows RFC 9116 (security.txt standard)
+
+Contact: mailto:security@spaceleafcorp.org
+Contact: mailto:safety@spaceleafcorp.org
+
+# Optional encryption key (if you publish one later)
+# Encryption: https://spaceleafcorp.org/pgp-key.txt
+
+Preferred-Languages: en
+Canonical: https://spaceleafcorp.org/.well-known/security.txt
+
+Policy: https://github.com/SpaceLeafCorp/SafeMove/blob/main/SECURITY.md
+Hiring: https://spaceleafcorp.org/careers
+
+# Acknowledgments page (optional)
+# Acknowledgments: https://spaceleafcorp.org/security/hall-of-thanks
+
+Expires: 2027-01-01T00:00:00Z
