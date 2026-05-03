@@ -1,0 +1,206 @@
+//////////////////////////////////////////////////////////////
+// LUNAR IMPACT ORIGIN TRACKER 1.0
+// Pipeline: Impact → Backward Integration → Orbital Elements
+//////////////////////////////////////////////////////////////
+
+//-----------------------------
+// 1. INPUTS (EVENT LEVEL)
+//-----------------------------
+INPUT:
+    impact_lat_deg          // lunar latitude of impact point
+    impact_lon_deg          // lunar longitude of impact point
+    impact_time_utc         // timestamp of impact
+    impact_speed_est        // estimated impact speed [km/s]
+    impact_azimuth_deg      // direction along surface (from North, clockwise)
+    impact_elevation_deg    // angle above local horizon (0° = tangent, 90° = straight down)
+
+    moon_radius_km          // mean lunar radius or local radius from topo model
+    GM_moon                 // lunar gravitational parameter
+    GM_earth                // Earth GM
+    GM_sun                  // Sun GM
+    ephemeris_provider      // function giving positions of Moon, Earth, Sun vs time
+
+//-----------------------------
+// 2. BUILD INITIAL STATE VECTOR
+//   (SELENOCENTRIC FRAME)
+//-----------------------------
+
+FUNCTION build_initial_state():
+    // 2.1 Convert impact lat/lon to 3D position in Moon-fixed frame
+    r_surface = moon_radius_km
+    lat = deg2rad(impact_lat_deg)
+    lon = deg2rad(impact_lon_deg)
+
+    // Moon-fixed Cartesian (x_mf, y_mf, z_mf)
+    x_mf = r_surface * cos(lat) * cos(lon)
+    y_mf = r_surface * cos(lat) * sin(lon)
+    z_mf = r_surface * sin(lat)
+
+    // 2.2 Build local tangent frame at impact point (N, E, U)
+    // U = outward radial unit vector
+    U = normalize( [x_mf, y_mf, z_mf] )
+
+    // Choose arbitrary North/East consistent with lat/lon
+    // N = derivative of position wrt latitude, projected and normalized
+    N_temp = [ -sin(lat)*cos(lon), -sin(lat)*sin(lon), cos(lat) ]
+    N = normalize(N_temp)
+
+    // E = U × N (right-handed)
+    E = normalize( cross(U, N) )
+
+    // 2.3 Convert impact direction (azimuth, elevation) into local velocity vector
+    az  = deg2rad(impact_azimuth_deg)
+    el  = deg2rad(impact_elevation_deg)
+
+    // Local components in (N, E, U)
+    v_local_N = impact_speed_est * cos(el) * cos(az)
+    v_local_E = impact_speed_est * cos(el) * sin(az)
+    v_local_U = -impact_speed_est * sin(el)   // negative because direction is downward
+
+    v_vec_mf = v_local_N * N + v_local_E * E + v_local_U * U
+
+    // 2.4 Transform Moon-fixed to inertial (simplified: assume rotation small near impact)
+    // In a full system, apply Moon rotation matrix at impact_time_utc
+    R_mf_to_inertial = get_moon_rotation_matrix(impact_time_utc)
+    r0 = R_mf_to_inertial * [x_mf, y_mf, z_mf]
+    v0 = R_mf_to_inertial * v_vec_mf
+
+    RETURN (r0, v0)
+
+END FUNCTION
+
+//-----------------------------
+// 3. BACKWARD TIME INTEGRATION
+//-----------------------------
+
+FUNCTION propagate_backward(r0, v0, impact_time_utc):
+    dt = -10.0   // time step in seconds (negative = backward)
+    t  = impact_time_utc
+
+    state = (r0, v0)
+
+    WHILE not stop_condition(state, t):
+        // 3.1 Get positions of Moon, Earth, Sun in inertial frame at time t
+        moon_pos  = ephemeris_provider("Moon",  t)
+        earth_pos = ephemeris_provider("Earth", t)
+        sun_pos   = ephemeris_provider("Sun",   t)
+
+        // 3.2 Compute accelerations from Moon, Earth, Sun
+        a_moon  = grav_accel(state.r, moon_pos,  GM_moon)
+        a_earth = grav_accel(state.r, earth_pos, GM_earth)
+        a_sun   = grav_accel(state.r, sun_pos,   GM_sun)
+
+        a_total = a_moon + a_earth + a_sun
+
+        // 3.3 Integrate one step backward (e.g., simple symplectic or RK4)
+        state = integrator_step(state, a_total, dt)
+
+        t = t + dt
+
+    RETURN (state, t)
+
+END FUNCTION
+
+// Helper: gravitational acceleration from body at body_pos
+FUNCTION grav_accel(r_obj, r_body, GM_body):
+    r_rel = r_obj - r_body
+    dist  = norm(r_rel)
+    a     = -GM_body * r_rel / (dist^3)
+    RETURN a
+END FUNCTION
+
+//-----------------------------
+// 4. STOP CONDITION
+//   (WHEN TO STOP REWINDING)
+//-----------------------------
+
+FUNCTION stop_condition(state, t):
+    // Example criteria:
+    // 1) Object is clearly outside Moon’s Hill sphere → now in Earth/Sun-dominated regime
+    // 2) Rewind duration exceeds some max (e.g., 1 year)
+    // 3) Distance from Earth or Sun reaches target radius for orbit extraction
+
+    max_rewind_seconds = 365 * 24 * 3600  // 1 year
+    if (impact_time_utc - t) > max_rewind_seconds:
+        RETURN TRUE
+
+    // Example: stop when distance from Earth is between 0.9 and 1.1 AU
+    earth_pos = ephemeris_provider("Earth", t)
+    r_rel_earth = state.r - earth_pos
+    dist_earth  = norm(r_rel_earth)
+
+    if dist_earth > 0.9*AU and dist_earth < 1.1*AU:
+        RETURN TRUE
+
+    RETURN FALSE
+END FUNCTION
+
+//-----------------------------
+// 5. TRANSFORM TO HELIOCENTRIC
+//-----------------------------
+
+FUNCTION to_heliocentric(state, t):
+    earth_pos = ephemeris_provider("Earth", t)
+    earth_vel = ephemeris_provider("Earth_vel", t)
+
+    // Object position/velocity relative to Sun
+    r_helio = state.r   // if ephemeris is already heliocentric
+    v_helio = state.v
+
+    // If state is geocentric, then:
+    // r_helio = earth_pos + state.r
+    // v_helio = earth_vel + state.v
+
+    RETURN (r_helio, v_helio)
+END FUNCTION
+
+//-----------------------------
+// 6. ORBITAL ELEMENTS FROM STATE
+//-----------------------------
+
+FUNCTION compute_orbital_elements(r_helio, v_helio, GM_sun):
+    r = r_helio
+    v = v_helio
+
+    h = cross(r, v)                 // specific angular momentum
+    n = cross([0,0,1], h)           // node vector
+    e_vec = ( (cross(v, h) / GM_sun) - (r / norm(r)) )
+    e = norm(e_vec)                 // eccentricity
+
+    energy = (norm(v)^2)/2 - GM_sun / norm(r)
+    a = -GM_sun / (2 * energy)      // semi-major axis
+
+    i = acos( h_z / norm(h) )       // inclination
+
+    Ω = atan2( n_y, n_x )           // longitude of ascending node
+
+    ω = angle_between(n, e_vec)     // argument of periapsis (with sign from cross products)
+    ν = angle_between(e_vec, r)     // true anomaly
+
+    RETURN (a, e, i, Ω, ω, ν)
+END FUNCTION
+
+//-----------------------------
+// 7. MAIN PIPELINE
+//-----------------------------
+
+MAIN:
+    (r0, v0) = build_initial_state()
+
+    (state_back, t_back) = propagate_backward(r0, v0, impact_time_utc)
+
+    (r_helio, v_helio) = to_heliocentric(state_back, t_back)
+
+    (a, e, i, Ω, ω, ν) = compute_orbital_elements(r_helio, v_helio, GM_sun)
+
+    OUTPUT:
+        "Estimated pre-impact heliocentric orbit:"
+        semi_major_axis_a      = a
+        eccentricity_e         = e
+        inclination_i          = i
+        RAAN_Omega             = Ω
+        arg_periapsis_omega    = ω
+        true_anomaly_nu        = ν
+
+    // Optional: compare (a, e, i, Ω, ω) to known meteor streams / NEO families
+END MAIN
