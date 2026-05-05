@@ -1,0 +1,172 @@
+---
+
+1. Feature Roadmap (v0.1 → v1.0)
+
+v0.1 — Core Stabilization Layer
+
+• Drift detection (wrong words, random insertions, hallucinations)
+• Identity Lock (names, pronouns, user‑specific vocabulary)
+• One‑tap correction suggestions
+• Noise Immunity Layer (filters background misreads)
+• “Raw vs Clean” dual‑view toggle
+• Local processing priority (privacy‑first)
+
+
+v0.2 — Personal Style Engine
+
+• Learns user’s tone, slang, pacing
+• Auto‑corrects only when confident
+• “Don’t change my voice” mode
+• Phrase memory (common expressions)
+
+
+v0.3 — Context Awareness
+
+• Detects when dictation is a message, note, caption, or post
+• Adjusts correction style accordingly
+• Smart punctuation and formatting
+
+
+v0.5 — Multi‑App Integration
+
+• Works across messaging apps
+• Works inside MicroTech Chat modules
+• Clipboard auto-clean mode
+
+
+v1.0 — Full Release
+
+• Real‑time correction overlay
+• Offline mode
+• Developer API
+• Accessibility mode (for speech differences)
+• “Stabilize Entire Paragraph” batch tool
+
+
+---
+
+2. UI Mockup Description (Text‑Based Wireframe)
+
+Main Screen
+
++------------------------------------------------+
+| MicroTech Chat: Dictation Stabilizer           |
++------------------------------------------------+
+| RAW INPUT                                      |
+| "I went by plane. I was there for you..."      |
+|                                                |
+| CLEAN OUTPUT                                   |
+| "I went by the store. I was there for you..."  |
++------------------------------------------------+
+| [Flagged Issues]                               |
+| - "plane" → "store" (background noise)         |
+| - "her" → "him" (identity lock)                |
++------------------------------------------------+
+| [Accept All]   [Review]   [Ignore]             |
++------------------------------------------------+
+
+
+Correction Review Panel
+
++------------------------------------------------+
+| Correction Review                               |
++------------------------------------------------+
+| Issue 1: "plane"                                |
+| Suggested: "store"                               |
+| [Accept] [Reject]                                |
++------------------------------------------------+
+| Issue 2: "her"                                   |
+| Suggested: "him"                                 |
+| [Accept] [Reject]                                |
++------------------------------------------------+
+
+
+Settings
+
++------------------------------------------------+
+| Settings                                        |
++------------------------------------------------+
+| Identity Lock: ON                               |
+| Noise Immunity: HIGH                            |
+| Auto-Correct Confidence: MEDIUM                 |
+| Style Profile: LEIF                             |
++------------------------------------------------+
+
+
+---
+
+3. Developer Spec Sheet (v0.1)
+
+Module Name
+
+microtech.dictation.stabilizer
+
+Primary Objective
+
+Transform raw voice‑to‑text into stabilized, intent‑accurate text while preserving user identity and tone.
+
+Core Components
+
+• DriftDetector()
+Compares raw text to expected patterns, flags anomalies.
+• IdentityLock()
+Stores user‑defined pronouns, names, and vocabulary.
+Prevents gender/name drift.
+• NoiseFilter()
+Uses phonetic distance + context scoring to detect noise‑induced substitutions.
+• CorrectionEngine()
+Generates suggestions with confidence scores.
+• StyleProfile()
+Learns user’s phrasing patterns over time.
+
+
+Data Flow
+
+Voice Input → Apple Dictation → Raw Text
+Raw Text → DriftDetector → NoiseFilter → IdentityLock
+→ CorrectionEngine → Clean Output
+
+
+Privacy Model
+
+• Local‑first processing
+• No cloud storage
+• No external transmission
+• User‑controlled memory
+
+
+API Endpoints (v0.1)
+
+• stabilize(raw_text)
+• suggest(raw_text)
+• lock_identity(name, pronoun)
+• set_noise_level(level)
+• get_diff(raw, clean)
+
+
+---
+
+4. Public‑Facing Description (Launch‑Ready)
+
+Introducing MicroTech Chat: Dictation Stabilizer
+Your voice. Your words. Zero drift.
+
+Dictation shouldn’t rewrite who you are.
+So we built a stabilizer that cleans up voice‑to‑text without changing your tone, your style, or your identity.
+
+Whether your phone mishears you, fills in random words, or flips pronouns, Dictation Stabilizer catches the drift and fixes it instantly. You stay in control of your message — every time.
+
+Features
+
+• Drift detection for wrong words and hallucinations
+• Identity Lock for names and pronouns
+• Noise‑proof correction
+• One‑tap fixes
+• Raw vs Clean comparison
+• Privacy‑first, local‑first design
+
+
+Speak freely.
+We’ll keep your words steady.
+
+---
