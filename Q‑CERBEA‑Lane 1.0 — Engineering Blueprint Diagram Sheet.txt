@@ -1,0 +1,135 @@
+---
+
+Q‑CERBEA‑Lane 1.0 — Engineering Blueprint Diagram Sheet
+
+(Monochrome / Line‑Art Edition)
+
+---
+
+1. System Overview (Orthographic Layout)
+
++-----------------------------------------------------------------------+
+|                           SOURCE RESERVOIR                            |
+|                 (High-density energy / particle supply)               |
++-----------------------------------------------------------------------+
+                                 |
+                                 |
+                                 v
++-----------------------------------------------------------------------+
+|                         QUANTIZED CHANNEL                             |
+|       (M discrete lanes; each lane has Tn, Rn, Sn parameters)         |
++-----------------------------------------------------------------------+
+                                 |
+                                 |
+                                 v
++-----------------------------------------------------------------------+
+|                            DRAIN RESERVOIR                            |
+|                 (Lower-density energy / particle sink)                |
++-----------------------------------------------------------------------+
+
+
+---
+
+2. Lane Structure (Per-Mode Blueprint Block)
+
+                 Incoming Flow
+                       |
+                       v
++---------------------------------------------------------------+
+|                           LANE  n                             |
+|                                                               |
+|   +-------------+   +-------------+   +-------------+         |
+|   | TRANSMIT    |   | REFLECT     |   | STORE       |         |
+|   |   (Tn)      |   |   (Rn)      |   |   (Sn)      |         |
+|   +------^------+   +------^------+   +------^------+         |
+|          |                 |                 |                |
+|          |                 |                 |                |
+|   Forward Output     Backscatter        CERBEA Ledger         |
++---------------------------------------------------------------+
+
+Constraint:  Tn + Rn + Sn = 1
+
+
+---
+
+3. Multi‑Lane Channel (Front Elevation)
+
++-----------------------------+
+|         LANE 1              |
+|     T1 | R1 | S1            |
++-----------------------------+
+|         LANE 2              |
+|     T2 | R2 | S2            |
++-----------------------------+
+|         LANE 3              |
+|     T3 | R3 | S3            |
++-----------------------------+
+|         LANE M              |
+|     TM | RM | SM            |
++-----------------------------+
+
+Effective Conductance:
+G_eff = G0 * Σ (Tn + α·Sn)
+
+
+---
+
+4. CERBEA Ledger (Recycling Subsystem)
+
++---------------------------------------------------------------+
+|                        CERBEA LEDGER                          |
+|                                                               |
+|   • Aggregates all Sn from all lanes                          |
+|   • Stores energy/information for redeployment                |
+|   • Returns α·Sn back into effective transport                |
+|                                                               |
+|   Functions:                                                  |
+|     - Buffer                                                  |
+|     - Stabilizer                                              |
+|     - Cooperative Booster                                     |
++---------------------------------------------------------------+
+
+
+---
+
+5. Full Architecture (Blueprint Cross‑Section)
+
++-----------------------------------------------------------------------+
+|                           SOURCE RESERVOIR                            |
++-----------------------------------------------------------------------+
+                                 |
+                                 v
++-----------------------------------------------------------------------+
+|                     QUANTIZED TRANSPORT CHANNEL                       |
+|   Lanes: n = 1...M                                                   |
+|   Each lane: Tn → forward                                            |
+|               Rn → backscatter                                       |
+|               Sn → CERBEA storage                                    |
++-----------------------------------------------------------------------+
+                                 |
+                                 v
++-----------------------------------------------------------------------+
+|                            DRAIN RESERVOIR                            |
++-----------------------------------------------------------------------+
+
+                                 ^
+                                 |
++-----------------------------------------------------------------------+
+|                         CERBEA LEDGER (Sn)                            |
+|         Recycles α·Sn into effective conductance pathways             |
++-----------------------------------------------------------------------+
+
+
+---
+
+6. Symbol Legend (Blueprint Notation)
+
+Tn  = Transmit coefficient (forward)
+Rn  = Reflect coefficient (backscatter)
+Sn  = Store/recycle coefficient (CERBEA)
+G0  = Conductance quantum (2e^2 / h)
+α   = Recycling efficiency factor
+M   = Number of open lanes
+
+
+---
