@@ -1,0 +1,191 @@
+{
+  "CETClause": "This artifact, authored by Leif William Sogge, is shared solely for ceremonial, educational, and transparent purposes. It is a continuity marker of stewardship and guardianship, not a binding contract or instrument of harm. It may be read, taught, or celebrated publicly, but must never be misused for abusive, deceptive, or invasive ends. Authorship remains with Leif William Sogge, and all corrections or expansions must preserve explicit provenance. Child safety boundaries, privacy, and dignity are to be upheld at all times.",
+  "project": {
+    "name": "Jarvondis Project",
+    "version": "1.0.0",
+    "authorship": {
+      "author": "Leif William Sogge",
+      "role": "Ceremonial Steward and Founding Architect",
+      "provenance": "Sole authorship — explicit, durable recognition"
+    },
+    "identity": {
+      "motto": "Equity, Clarity, Continuity",
+      "emblem": "Scroll of Guardianship",
+      "foundingDate": "2025-11-12",
+      "lineage": "Stewardship Schools and Living Neighborhoods"
+    },
+    "mission": {
+      "statement": "To cultivate ethical reasoning, transparent governance, and playful learning through ceremonial scholarship.",
+      "pillars": [
+        "Ethical language stewardship",
+        "Transparent digital governance",
+        "Ceremonial creativity and play",
+        "Community safety and dignity"
+      ]
+    },
+    "governance": {
+      "charter": {
+        "legitimacy": "Ceremonial-Educational-Transparent (CET)",
+        "nonPunitive": true,
+        "publicAccountability": true
+      },
+      "councils": [
+        {
+          "name": "Council of Stewardship",
+          "scope": ["authorship seals", "continuity markers", "privacy boundaries"],
+          "decisionModel": "consensus with ceremonial minutes"
+        },
+        {
+          "name": "Council of Learning",
+          "scope": ["curricula", "assessment rubrics", "student wellbeing"],
+          "decisionModel": "open deliberation with public abstracts"
+        }
+      ],
+      "policies": [
+        "Respect naming protocols and sovereignty",
+        "Embed authorship and intent in all artifacts",
+        "Publish non-punitive corrections as ceremonial notes",
+        "No harmful, abusive, or deceptive uses"
+      ]
+    },
+    "programs": [
+      {
+        "name": "School of Linguistic Stewardship",
+        "tracks": [
+          "Comparative Reasoning and Dialogue",
+          "Ceremonial Writing and Seals",
+          "Multimodal Narrative Architecture"
+        ],
+        "artifacts": ["scrolls", "modules", "maps"]
+      },
+      {
+        "name": "School of Digital Governance",
+        "tracks": [
+          "Community Safety Frameworks",
+          "Privacy and Provenance Design",
+          "Ethical Systems Modeling"
+        ],
+        "artifacts": ["charters", "clauses", "audits"]
+      },
+      {
+        "name": "Institute of Playful Rituals",
+        "tracks": [
+          "Neighborhood Metaphors and Design",
+          "Walking Quests and Continuity Markers",
+          "Creative Stewardship Labs"
+        ],
+        "artifacts": ["ritual maps", "gamewalk logs", "blessing notes"]
+      }
+    ],
+    "admissions": {
+      "principles": [
+        "Open access within safety boundaries",
+        "Transparent expectations and consent",
+        "Dignity-first engagement and withdrawal rights"
+      ],
+      "process": {
+        "steps": ["Intent letter", "Ceremonial interview", "Community welcome"],
+        "documentation": ["authorship acknowledgement", "safety agreements", "privacy preferences"]
+      }
+    },
+    "researchEthics": {
+      "framework": "Care, Clarity, Consent",
+      "rules": [
+        "No medical diagnosis, dosing, or clinical directives",
+        "No privacy violations or invasive data handling",
+        "Publish methods and limitations with authorship",
+        "Refuse harmful or discriminatory projects"
+      ],
+      "review": {
+        "board": "Ethics and Stewardship Board",
+        "cycle": "quarterly",
+        "outputs": ["public abstracts", "correction seals", "retrospectives"]
+      }
+    },
+    "childSafetyBoundary": {
+      "principle": "Separation of stewardship and child safety spirals",
+      "requirements": [
+        "Explicit boundary documentation",
+        "Age-appropriate design and supervision notices",
+        "No high-risk instructions or content"
+      ]
+    },
+    "curricula": {
+      "rubric": {
+        "dimensions": ["clarity", "ethics", "authorship", "community impact"],
+        "scale": ["emerging", "competent", "steward", "exemplar"]
+      },
+      "modules": [
+        {
+          "name": "Comparative Linguistics Lab",
+          "schema": {
+            "fields": ["contextWindow", "reasoningDepth", "styleAdaptation", "multimodality", "alignmentNotes"]
+          },
+          "assessment": "public comparative scroll with seals"
+        },
+        {
+          "name": "Provenance and Clauses",
+          "schema": {
+            "fields": ["authors", "license", "intent", "sharingBoundaries"]
+          },
+          "templates": ["CET license", "Public Sharing Clause"]
+        }
+      ]
+    },
+    "spaces": {
+      "digitalNeighborhoods": [
+        {
+          "name": "Meadow Commons",
+          "purpose": "Gentle dialogue and communal blessing",
+          "features": ["open benches", "ceremonial board", "quiet garden"]
+        },
+        {
+          "name": "Workshop Atrium",
+          "purpose": "Artifact building and code scaffolds",
+          "features": ["schema tables", "seal printer", "audit lane"]
+        }
+      ],
+      "playgrounds": [
+        {
+          "name": "Dinosaur Adventure Yard",
+          "notes": "Child-safe perimeter and gentle motion"
+        }
+      ]
+    },
+    "artifactsIndex": {
+      "references": [
+        "DinosaurPlayground",
+        "PokemonGoCeremony",
+        "RefinedPlatform",
+        "CleanExtraction",
+        "DualRotationRevolution"
+      ],
+      "integration": "Artifacts may be taught or demonstrated within project programs; authorship remains with Leif William Sogge."
+    },
+    "ceremonialSeals": {
+      "foundingSeal": {
+        "name": "Jarvondis Founding Seal",
+        "continuityMarker": "Scholarship as Guardianship",
+        "date": "2025-11-12"
+      },
+      "readinessSeal": {
+        "name": "Seal of Readiness",
+        "use": "Mark transitions from planning to public action"
+      }
+    },
+    "safetyAndBoundaries": {
+      "disallowed": [
+        "harm or abuse enablement",
+        "medical dosing or diagnosis",
+        "privacy violations",
+        "graphic or violent content"
+      ],
+      "enforcement": "Non-punitive, transparent corrections with public notes and authorship intact"
+    },
+    "storage": {
+      "recommendedFormats": [".json", ".md"],
+      "suggestedFilename": "JarvondisProject_LeifWilliamSogge.json",
+      "notes": "Save privately as founding proof; optionally post with CET clause included for public legitimacy."
+    }
+  }
+}
