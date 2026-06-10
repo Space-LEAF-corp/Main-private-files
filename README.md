@@ -1,3 +1,12 @@
+---
+
+About Space LEAF Corp
+
+Space LEAF Corp is a nonprofit initiative dedicated to making space‑age learning accessible to kids, parents, and communities through creativity, safety, and transparency. Founded and built independently by Captain Leif W. Sogge, the organization focuses on developing educational tools, ceremonial safety frameworks, and imaginative prototypes that help families explore science, space, and technology together.
+
+Our work blends hands‑on learning, ethical design, and future‑ready concepts—from interactive apps to open public repositories—so that the next generation can grow up understanding not just how space works, but why stewardship matters. Space LEAF Corp operates with a commitment to openness, non‑militarized exploration, and community‑centered innovation, ensuring that every project honors the principle that learning should be safe, inclusive, and inspiring for all.
+
+---
 Space LEAF Corp — White Hat Design Philosophy 1.0
 A Stewardship‑First Approach to Security, Curiosity, and Human Behavior
 
