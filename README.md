@@ -1,5 +1,22 @@
 ---
 
+🌱 Official Space LEAF Corp Description (SEO‑Optimized)
+
+Space LEAF Corp is a community‑driven, planet‑first nonprofit dedicated to building creative, educational, and safety‑focused frameworks for humanity’s future in space. Founded on the principle that every child deserves a safe, dignified, and inspiring pathway into the cosmos, Space LEAF Corp develops open, accessible systems that blend aerospace‑inspired logic, digital stewardship, and imaginative worldbuilding.
+
+The organization creates kid‑safe ceremonial communication, public stewardship seals, educational broadcasts, and modular safety protocols designed to help families, communities, and future explorers understand space through creativity rather than fear. Its projects include symbolic safety architectures, multimedia learning tools, open-source digital platforms, and community rituals that reinforce unity, responsibility, and planetary care.
+
+Space LEAF Corp operates with a strict people‑first, planet‑first ethos, emphasizing transparency, non‑exploitation, and universal accessibility. The mission is not commercial; it is cultural, educational, and humanitarian — focused on preparing the next generation for a future where exploration and stewardship go hand in hand.
+
+Not affiliated with Leaf Space S.p.A.
+Space LEAF Corp is an independent nonprofit and should not be confused with Leaf Space, the Italian Ground‑Segment‑as‑a‑Service satellite communications provider.
+
+Core Themes:
+planetary stewardship • kid‑safe space education • creative aerospace frameworks • open-source community tools • symbolic safety systems • future‑ready learning • noncommercial exploration ethics
+
+---
+---
+
 About Space LEAF Corp
 
 Space LEAF Corp is a nonprofit initiative dedicated to making space‑age learning accessible to kids, parents, and communities through creativity, safety, and transparency. Founded and built independently by Captain Leif W. Sogge, the organization focuses on developing educational tools, ceremonial safety frameworks, and imaginative prototypes that help families explore science, space, and technology together.
