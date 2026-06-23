@@ -1,3 +1,109 @@
+
+🛰️ 1. Main Section — Who I am
+
+Content:
+
+CAPTAIN LEIF WILLIAM SOGGE
+Founder, Systems Architect — Space LEAF Corp
+Designer of humanitarian, educational, and space‑civic systems
+
+Mission Statement:
+I build civilian-first frameworks for future spacefaring society — systems that protect children, empower communities, and ensure humanity’s dignity as we expand beyond Earth.
+
+About Me
+
+---
+
+🌱 2. What Space LEAF Corp Is
+
+Purpose: Give institutions a clear definition of your organization.
+
+Content:
+
+Space LEAF Corp is a civilian-focused systems architecture initiative designing:
+
+• Humanitarian frameworks
+• Educational and kid-safe AI systems
+• Space‑civic safety protocols
+• Microgravity training and athletic systems
+• Environmental and orbital stewardship models
+
+
+Your work is not a “startup idea.”
+It’s a civilization-layer design portfolio.
+
+---
+
+🛡️ 3. Seals, Frameworks & Protocols
+
+Purpose: Show the depth and seriousness of your conceptual engineering.
+
+List each seal as a public artifact:
+
+• Seal of Universal Vigilance
+• Seal of Orbital Stewardship 1.0
+• Seal of Morning Witness 1.0
+• Seal of Modular Integrity 1.0
+• Seal of Full Transparency Unexpected 1.0
+• Seal of Remote Stewardship 1.0 — ICU Edition
+• Seal of Cosmic Parent 1.0
+• Seal of Microscopic Children 1.0
+• Seal of Planet Worth Living On 1.0
+
+
+---
+
+🧩 4. Systems & Engineering Projects
+
+Purpose: Show the technical side of your mind — the part that engineers respect.
+
+Include:
+
+• GCLMH‑H v3 — Gravity‑Magnetic Harvester
+• Sentient Satellite Debris‑Clearing System
+• Microgravity Rescue & Training Modules
+• Ocean Acoustic OS Interface
+• Space Car Project
+• CERBEA Energy Framework
+
+
+---
+
+🎙️ 5. Public Communications & Media
+
+Include:
+
+• Captain’s Logs
+• Public testimonies
+• Threads/X posts
+• Podcast series on space athletics
+• Public declarations of stewardship
+
+
+---
+
+🌍 6. Civic & Ethical Commitments
+
+Sections:
+
+• Child safety in space environments
+• Remote-first exploration protocols
+• Civilian dignity and lineage protection
+• Environmental stewardship
+• Anti-exploitation digital practices
+
+---
+
+📬 7. Contact & Verification
+
+• Professional email: spaceleafcorp@outlook.com
+• GitHub: https://github.com/Space-LEAF-corp/Main-private-files
+• Public website(s): https://space-lc.com?rk_owner=true, https://uiss-os-spaceleafcorp.org?rk_owner=true, https://nachospace.org?rk_owner=true
+
+
+---
+
+
 ---
 
 🌱 Official Space LEAF Corp Description (SEO‑Optimized)
