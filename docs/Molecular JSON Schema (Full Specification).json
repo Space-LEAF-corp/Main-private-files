@@ -1,0 +1,42 @@
+{
+  "molecule_name": "string",
+  "version": "1.0",
+  "metadata": {
+    "description": "string",
+    "origin": "PCF-SEA Seed Library",
+    "lineage_marker": "optional string",
+    "recommended_class": "I | II | III | IV"
+  },
+
+  "atoms": [
+    {
+      "element": "C | Si | O | Al | Fe | ...",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "charge": 0,
+      "color_override": "optional hex color"
+    }
+  ],
+
+  "bonds": [
+    {
+      "a": 0,
+      "b": 1,
+      "order": 1
+    }
+  ],
+
+  "growth_parameters": {
+    "preferred_depth_km": 10,
+    "preferred_internal_pressure_gpa": 2.0,
+    "supersaturation_target": 0.6,
+    "material_constant_K_override": null
+  },
+
+  "visualization": {
+    "atom_scale": 1.0,
+    "bond_scale": 1.0,
+    "rotation_speed": 0.01
+  }
+}
