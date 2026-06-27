@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PCF-SEA Simulation Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; }
+  header { background: #0b1b33; color: #fff; padding: 10px 20px; }
+  h1 { margin: 0; }
+  nav { background: #14284d; display: flex; }
+  nav button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: #14284d;
+    color: #fff;
+    cursor: pointer;
+  }
+  nav button.active { background: #1f3b70; }
+  main { padding: 20px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .slider-row { margin: 8px 0; }
+  .label { width: 120px; display: inline-block; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+  th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+  th { background: #f0f0f0; }
+  .output-box { border: 1px solid #ccc; padding: 10px; margin-top: 10px; max-width: 420px; }
+  canvas { border: 1px solid #ccc; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PCF-SEA Simulation Dashboard</h1>
+  <p>Pressurized Crystal Forge – Sea Edition • Full System View</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showView('overview')">Overview</button>
+  <button onclick="showView('builder')">Composition & Recipe</button>
+  <button onclick="showView('simulator')">Pressure & Growth</button>
+  <button onclick="showView('molecular')">Molecular Editor & 3D</button>
+  <button onclick="showView('catalog')">Catalog & Logs</button>
+</nav>
+
+<main>
+  <!-- Overview -->
+  <section id="overview" class="view active">
+    <h2>System Overview</h2>
+    <div class="output-box">
+      <p><b>Current Material K:</b> <span id="dash_K">–</span></p>
+      <p><b>Effective Pressure (GPa):</b> <span id="dash_Peff">–</span></p>
+      <p><b>Estimated Growth Time (months):</b> <span id="dash_T">–</span></p>
+      <p><b>Predicted Crystal Class:</b> <span id="dash_class">–</span></p>
+    </div>
+    <p>Use the tabs above to define composition, simulate growth, edit molecules, and manage recipes.</p>
+  </section>
+
+  <!-- Composition & Recipe -->
+  <section id="builder" class="view">
+    <h2>Composition & Recipe Builder</h2>
+
+    <div class="slider-row">
+      <span class="label">Carbon (C):</span>
+      <input type="range" min="0" max="100" value="10" id="C" oninput="updateAll()">
+      <span id="C_val">10%</span>
+    </div>
+    <div class="slider-row">
+      <span class="label">Silicon (Si):</span>
+      <input type="range" min="0" max="100" value="30" id="Si" oninput="updateAll()">
+      <span id="Si_val">30%</span>
+    </div>
+    <div class="slider-row">
+      <span class="label">Oxygen (O):</span>
+      <input type="range" min="0" max="100" value="40" id="O" oninput="updateAll()">
+      <span id="O_val">40%</span>
+    </div>
+    <div class="slider-row">
+      <span class="label">Aluminum (Al):</span>
+      <input type="range" min="0" max="100" value="10" id="Al" oninput="updateAll()">
+      <span id="Al_val">10%</span>
+    </div>
+    <div class="slider-row">
+      <span class="label">Iron (Fe):</span>
+      <input type="range" min="0" max="100" value="10" id="Fe" oninput="updateAll()">
+      <span id="Fe_val">10%</span>
+    </div>
+
+    <canvas id="compositionChart" width="300" height="300"></canvas>
+  </section>
+
+  <!-- Pressure & Growth -->
+  <section id="simulator" class="view">
+    <h2>Pressure & Growth Simulator</h2>
+
+    <div class="slider-row">
+      <span class="label">Depth (km):</span>
+      <input type="range" min="1" max="11" value="10" id="depth" oninput="updateAll()">
+      <span id="depth_val">10 km</span>
+    </div>
+    <div class="slider-row">
+      <span class="label">Internal P (GPa):</span>
+      <input type="range" min="0" max="5" value="2" step="0.1" id="internalP" oninput="updateAll()">
+      <span id="internalP_val">2.0 GPa</span>
+    </div>
+    <div class="slider-row">
+      <span class="label">Supersaturation (S):</span>
+      <input type="range" min="0.1" max="1" value="0.6" step="0.05" id="S" oninput="updateAll()">
+      <span id="S_val">0.60</span>
+    </div>
+
+    <div class="output-box">
+      <p><b>Material Constant K:</b> <span id="K_out"></span></p>
+      <p><b>Ambient Pressure:</b> <span id="P_ambient_out"></span> GPa</p>
+      <p><b>Effective Pressure:</b> <span id="P_eff_out"></span> GPa</p>
+      <p><b>Estimated Growth Time:</b> <span id="T_out"></span> months</p>
+      <p><b>Predicted Crystal Class:</b> <span id="class_out"></span></p>
+    </div>
+
+    <h3>Growth Timeline</h3>
+    <button onclick="generateGrowthTimeline(12)">Generate 12‑Month Timeline</button>
+    <button onclick="startGrowthAnimation()">Play Growth Animation</button>
+    <button onclick="stopGrowthAnimation()">Stop</button>
+  </section>
+
+  <!-- Molecular Editor & 3D -->
+  <section id="molecular" class="view">
+    <h2>Molecular Editor & 3D View</h2>
+
+    <div style="margin-bottom: 10px;">
+      <label><b>Select Element:</b></label>
+      <select id="elementSelect">
+        <option value="C">Carbon (C)</option>
+        <option value="O">Oxygen (O)</option>
+        <option value="Si">Silicon (Si)</option>
+        <option value="Al">Aluminum (Al)</option>
+        <option value="Fe">Iron (Fe)</option>
+      </select>
+      <button onclick="addAtom()">Add Atom</button>
+      <button onclick="generateLattice(3,1.5,'Si')">Generate Silicate Lattice</button>
+    </div>
+
+    <h3>Atoms</h3>
+    <table id="atomTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Element</th>
+          <th>X</th>
+          <th>Y</th>
+          <th>Z</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3>Bonds</h3>
+    <div>
+      <label>Atom A:</label>
+      <input id="bondA" type="number" min="0" style="width: 60px;">
+      <label>Atom B:</label>
+      <input id="bondB" type="number" min="0" style="width: 60px;">
+      <label>Order:</label>
+      <select id="bondOrder">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+      <button onclick="addBond()">Add Bond</button>
+    </div>
+
+    <table id="bondTable" style="margin-top: 10px;">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>A</th>
+          <th>B</th>
+          <th>Order</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3>Import / Export Molecule</h3>
+    <button onclick="exportMolecule()">Export Molecule JSON</button>
+    <input type="file" accept="application/json" onchange="importMolecule(event)">
+
+    <h3>3D Molecular View</h3>
+    <button onclick="toggleAnimation()">Toggle Rotation</button>
+    <canvas id="moleculeCanvas" width="400" height="300"></canvas>
+  </section>
+
+  <!-- Catalog & Logs -->
+  <section id="catalog" class="view">
+    <h2>Recipe Catalog & Deployment Logs</h2>
+
+    <button onclick="saveRecipe()">Save Current Recipe</button>
+    <button onclick="exportRecipes()">Export Recipes (JSON)</button>
+    <input type="file" accept="application/json" onchange="importRecipes(event)">
+    <br><br>
+
+    <table id="catalogTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>C%</th>
+          <th>Si%</th>
+          <th>O%</th>
+          <th>Al%</th>
+          <th>Fe%</th>
+          <th>Depth (km)</th>
+          <th>Eff P (GPa)</th>
+          <th>K</th>
+          <th>Time (months)</th>
+          <th>Class</th>
+          <th>Seed</th>
+          <th>Deployment Log</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+let recipes = [];
+let moleculeData = { atoms: [], bonds: [] };
+let animationEnabled = true;
+let angle = 0;
+let growthFrame = 0;
+let growthTimeline = [];
+let growthAnimating = false;
+
+const seedLibrary = {
+  "Class I — Ocean-Born Hybrid": {
+    molecule_name: "Hybrid Seed I",
+    atoms: [
+      { element: "C", x: 0, y: 0, z: 0 },
+      { element: "O", x: 1, y: 0, z: 0 },
+      { element: "Si", x: -1, y: 0, z: 0 }
+    ],
+    bonds: [
+      { a: 0, b: 1, order: 1 },
+      { a: 0, b: 2, order: 1 }
+    ]
+  },
+  "Class II — High-Pressure Inorganic": {
+    molecule_name: "Inorganic Seed II",
+    atoms: [
+      { element: "Si", x: 0, y: 0, z: 0 },
+      { element: "O", x: 1, y: 1, z: 0 },
+      { element: "O", x: -1, y: -1, z: 0 },
+      { element: "O", x: 1, y: -1, z: 0 },
+      { element: "O", x: -1, y: 1, z: 0 }
+    ],
+    bonds: [
+      { a: 0, b: 1, order: 1 },
+      { a: 0, b: 2, order: 1 },
+      { a: 0, b: 3, order: 1 },
+      { a: 0, b: 4, order: 1 }
+    ]
+  },
+  "Class III — Lineage / Premium Core": {
+    molecule_name: "Lineage Seed III",
+    atoms: [
+      { element: "C", x: 0, y: 0, z: 0 },
+      { element: "C", x: 1, y: 1, z: 1 },
+      { element: "C", x: -1, y: -1, z: -1 },
+      { element: "O", x: 2, y: 0, z: 0 }
+    ],
+    bonds: [
+      { a: 0, b: 1, order: 2 },
+      { a: 0, b: 2, order: 2 },
+      { a: 0, b: 3, order: 1 }
+    ]
+  }
+};
+
+function showView(id) {
+  document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(btn => {
+    if (btn.textContent.toLowerCase().includes(id)) btn.classList.add('active');
+  });
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function updateAll() {
+  const C = parseInt(document.getElementById("C").value);
+  const Si = parseInt(document.getElementById("Si").value);
+  const O = parseInt(document.getElementById("O").value);
+  const Al = parseInt(document.getElementById("Al").value);
+  const Fe = parseInt(document.getElementById("Fe").value);
+
+  const depth = parseFloat(document.getElementById("depth").value);
+  const internalP = parseFloat(document.getElementById("internalP").value);
+  const S = parseFloat(document.getElementById("S").value);
+
+  document.getElementById("C_val").innerText = C + "%";
+  document.getElementById("Si_val").innerText = Si + "%";
+  document.getElementById("O_val").innerText = O + "%";
+  document.getElementById("Al_val").innerText = Al + "%";
+  document.getElementById("Fe_val").innerText = Fe + "%";
+  document.getElementById("depth_val").innerText = depth + " km";
+  document.getElementById("internalP_val").innerText = internalP.toFixed(1) + " GPa";
+  document.getElementById("S_val").innerText = S.toFixed(2);
+
+  const P_ambient = 0.01 * depth;
+  const P_eff = P_ambient + internalP;
+
+  const K =
+    C * 0.8 +
+    Si * 1.2 +
+    O * 0.5 +
+    Al * 1.0 +
+    Fe * 1.5;
+
+  const T = (P_eff > 0 && S > 0) ? K / (P_eff * S) : 0;
+
+  let crystalClass = "Class I — Ocean-Born Hybrid";
+  if (P_eff > 1 && P_eff <= 3) crystalClass = "Class II — High-Pressure Inorganic";
+  if (P_eff > 3) crystalClass = "Class III — Lineage / Premium Core";
+
+  document.getElementById("K_out").innerText = K.toFixed(2);
+  document.getElementById("P_ambient_out").innerText = P_ambient.toFixed(2);
+  document.getElementById("P_eff_out").innerText = P_eff.toFixed(2);
+  document.getElementById("T_out").innerText = T.toFixed(2);
+  document.getElementById("class_out").innerText = crystalClass;
+
+  document.getElementById("dash_K").innerText = K.toFixed(2);
+  document.getElementById("dash_Peff").innerText = P_eff.toFixed(2);
+  document.getElementById("dash_T").innerText = T.toFixed(2);
+  document.getElementById("dash_class").innerText = crystalClass;
+
+  drawCompositionChart([C, Si, O, Al, Fe]);
+}
+
+function drawCompositionChart(values) {
+  const canvas = document.getElementById("compositionChart");
+  const ctx = canvas.getContext("2d");
+  const colors = ["#444", "#888", "#bbb", "#cc6600", "#663300"];
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const total = values.reduce((a,b)=>a+b,0) || 1;
+  let startAngle = 0;
+  values.forEach((v, i) => {
+    const slice = (v / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(150, 150);
+    ctx.arc(150, 150, 120, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    startAngle += slice;
+  });
+}
+
+function addAtom() {
+  const element = document.getElementById("elementSelect").value;
+  moleculeData.atoms.push({ element, x: 0, y: 0, z: 0 });
+  renderAtoms();
+  renderBonds();
+  drawMolecule();
+}
+
+function deleteAtom(index) {
+  moleculeData.atoms.splice(index, 1);
+  moleculeData.bonds = moleculeData.bonds.filter(b => b.a !== index && b.b !== index);
+  renderAtoms();
+  renderBonds();
+  drawMolecule();
+}
+
+function renderAtoms() {
+  const tbody = document.querySelector("#atomTable tbody");
+  tbody.innerHTML = "";
+  moleculeData.atoms.forEach((atom, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${i}</td>
+      <td>${atom.element}</td>
+      <td><input type="number" value="${atom.x}" step="0.1" onchange="updateAtom(${i}, 'x', this.value)"></td>
+      <td><input type="number" value="${atom.y}" step="0.1" onchange="updateAtom(${i}, 'y', this.value)"></td>
+      <td><input type="number" value="${atom.z}" step="0.1" onchange="updateAtom(${i}, 'z', this.value)"></td>
+      <td><button onclick="deleteAtom(${i})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateAtom(i, field, value) {
+  moleculeData.atoms[i][field] = parseFloat(value);
+  drawMolecule();
+}
+
+function addBond() {
+  const a = parseInt(document.getElementById("bondA").value);
+  const b = parseInt(document.getElementById("bondB").value);
+  const order = parseInt(document.getElementById("bondOrder").value);
+  if (isNaN(a) || isNaN(b) || a === b) {
+    alert("Invalid atom indices");
+    return;
+  }
+  moleculeData.bonds.push({ a, b, order });
+  renderBonds();
+  drawMolecule();
+}
+
+function deleteBond(index) {
+  moleculeData.bonds.splice(index, 1);
+  renderBonds();
+  drawMolecule();
+}
+
+function renderBonds() {
+  const tbody = document.querySelector("#bondTable tbody");
+  tbody.innerHTML = "";
+  moleculeData.bonds.forEach((bond, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${i}</td>
+      <td>${bond.a}</td>
+      <td>${bond.b}</td>
+      <td>${bond.order}</td>
+      <td><button onclick="deleteBond(${i})">X</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function exportMolecule() {
+  const blob = new Blob([JSON.stringify(moleculeData, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "molecule.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importMolecule(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      moleculeData = JSON.parse(e.target.result);
+      renderAtoms();
+      renderBonds();
+      drawMolecule();
+    } catch {
+      alert("Invalid JSON");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function atomColor(el) {
+  return {
+    C: "#333",
+    O: "#cc0000",
+    Si: "#888",
+    Al: "#cc6600",
+    Fe: "#663300"
+  }[el] || "#0077cc";
+}
+
+function drawMolecule() {
+  const canvas = document.getElementById("moleculeCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const scale = 60;
+
+  const projected = moleculeData.atoms.map(a => ({
+    x: cx + a.x * scale,
+    y: cy - a.y * scale - a.z * 10,
+    element: a.element
+  }));
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  moleculeData.bonds.forEach(b => {
+    const a1 = projected[b.a];
+    const a2 = projected[b.b];
+    ctx.beginPath();
+    ctx.moveTo(a1.x, a1.y);
+    ctx.lineTo(a2.x, a2.y);
+    ctx.stroke();
+  });
+
+  projected.forEach(p => {
+    ctx.beginPath();
+    ctx.fillStyle = atomColor(p.element);
+    ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+}
+
+function toggleAnimation() {
+  animationEnabled = !animationEnabled;
+}
+
+function animateMolecule() {
+  if (!animationEnabled) {
+    requestAnimationFrame(animateMolecule);
+    return;
+  }
+  angle += 0.01;
+  drawMoleculeAnimated();
+  requestAnimationFrame(animateMolecule);
+}
+
+function drawMoleculeAnimated() {
+  const canvas = document.getElementById("moleculeCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const baseScale = 60;
+  const cosA = Math.cos(angle);
+  const sinA = Math.sin(angle);
+
+  const projected = moleculeData.atoms.map(a => {
+    const xRot = a.x * cosA - a.z * sinA;
+    const zRot = a.x * sinA + a.z * cosA;
+    const x = cx + xRot * baseScale;
+    const y = cy - a.y * baseScale - zRot * 10;
+    return { x, y, element: a.element };
+  });
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  moleculeData.bonds.forEach(b => {
+    const a1 = projected[b.a];
+    const a2 = projected[b.b];
+    ctx.beginPath();
+    ctx.moveTo(a1.x, a1.y);
+    ctx.lineTo(a2.x, a2.y);
+    ctx.stroke();
+  });
+
+  projected.forEach(p => {
+    ctx.beginPath();
+    ctx.fillStyle = atomColor(p.element);
+    ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+}
+
+function generateLattice(size = 3, spacing = 1.5, element = "Si") {
+  const atoms = [];
+  const bonds = [];
+  for (let x = 0; x < size; x++) {
+    for (let y = 0; y < size; y++) {
+      for (let z = 0; z < size; z++) {
+        atoms.push({
+          element,
+          x: (x - size / 2) * spacing,
+          y: (y - size / 2) * spacing,
+          z: (z - size / 2) * spacing
+        });
+      }
+    }
+  }
+  const index = (x, y, z) => x * size * size + y * size + z;
+  for (let x = 0; x < size; x++) {
+    for (let y = 0; y < size; y++) {
+      for (let z = 0; z < size; z++) {
+        const i = index(x, y, z);
+        if (x + 1 < size) bonds.push({ a: i, b: index(x + 1, y, z), order: 1 });
+        if (y + 1 < size) bonds.push({ a: i, b: index(x, y + 1, z), order: 1 });
+        if (z + 1 < size) bonds.push({ a: i, b: index(x, y, z + 1), order: 1 });
+      }
+    }
+  }
+  moleculeData = { atoms, bonds };
+  renderAtoms();
+  renderBonds();
+  drawMolecule();
+}
+
+function generateGrowthTimeline(months = 12) {
+  const K = parseFloat(document.getElementById("K_out").innerText);
+  const P_eff = parseFloat(document.getElementById("P_eff_out").innerText);
+  const S = parseFloat(document.getElementById("S_val").innerText);
+  const alpha = 1 / K;
+  const frames = months * 30;
+  growthTimeline = [];
+  for (let f = 0; f < frames; f++) {
+    const t = f / 30;
+    const scale = 1 + alpha * P_eff * S * t;
+    growthTimeline.push(scale);
+  }
+}
+
+function startGrowthAnimation() {
+  growthAnimating = true;
+  growthFrame = 0;
+  animateGrowth();
+}
+
+function stopGrowthAnimation() {
+  growthAnimating = false;
+}
+
+function animateGrowth() {
+  if (!growthAnimating) return;
+  const scale = growthTimeline[growthFrame] || 1;
+  drawMoleculeGrowth(scale);
+  growthFrame++;
+  if (growthFrame < growthTimeline.length) {
+    requestAnimationFrame(animateGrowth);
+  } else {
+    growthAnimating = false;
+  }
+}
+
+function drawMoleculeGrowth(scale) {
+  const canvas = document.getElementById("moleculeCanvas");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const baseScale = 60 * scale;
+
+  const projected = moleculeData.atoms.map(a => {
+    const x = cx + a.x * baseScale;
+    const y = cy - a.y * baseScale - a.z * 10;
+    return { x, y, element: a.element };
+  });
+
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 2;
+  moleculeData.bonds.forEach(b => {
+    const a1 = projected[b.a];
+    const a2 = projected[b.b];
+    ctx.beginPath();
+    ctx.moveTo(a1.x, a1.y);
+    ctx.lineTo(a2.x, a2.y);
+    ctx.stroke();
+  });
+
+  projected.forEach(p => {
+    ctx.beginPath();
+    ctx.fillStyle = atomColor(p.element);
+    ctx.arc(p.x, p.y, 8, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+}
+
+function suggestSeedFromRecipe(recipe) {
+  const { C, Si, O, Fe } = recipe;
+  if (Si + O > 60 && Fe < 10) return "Class II — High-Pressure Inorganic";
+  if (C > 40 && O > 20) return "Class III — Lineage / Premium Core";
+  return "Class I — Ocean-Born Hybrid";
+}
+
+function attachSeedToRecipe(recipe) {
+  const className = suggestSeedFromRecipe(recipe);
+  recipe.suggestedClass = className;
+  recipe.seedMolecule = seedLibrary[className];
+}
+
+function saveRecipe() {
+  const name = prompt("Name this recipe:");
+  if (!name) return;
+
+  const C = parseInt(document.getElementById("C").value);
+  const Si = parseInt(document.getElementById("Si").value);
+  const O = parseInt(document.getElementById("O").value);
+  const Al = parseInt(document.getElementById("Al").value);
+  const Fe = parseInt(document.getElementById("Fe").value);
+
+  const depth = parseFloat(document.getElementById("depth").value);
+  const internalP = parseFloat(document.getElementById("internalP").value);
+  const S = parseFloat(document.getElementById("S").value);
+
+  const P_ambient = 0.01 * depth;
+  const P_eff = P_ambient + internalP;
+  const K =
+    C * 0.8 +
+    Si * 1.2 +
+    O * 0.5 +
+    Al * 1.0 +
+    Fe * 1.5;
+  const T = (P_eff > 0 && S > 0) ? K / (P_eff * S) : 0;
+
+  let crystalClass = "Class I — Ocean-Born Hybrid";
+  if (P_eff > 1 && P_eff <= 3) crystalClass = "Class II — High-Pressure Inorganic";
+  if (P_eff > 3) crystalClass = "Class III — Lineage / Premium Core";
+
+  const recipe = { name, C, Si, O, Al, Fe, depth, P_eff, K, T, crystalClass };
+  attachSeedToRecipe(recipe);
+  recipes.push(recipe);
+  persistRecipes();
+  renderCatalog();
+}
+
+function renderCatalog() {
+  const tbody = document.querySelector("#catalogTable tbody");
+  tbody.innerHTML = "";
+  recipes.forEach((r, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.name}</td>
+      <td>${r.C}</td>
+      <td>${r.Si}</td>
+      <td>${r.O}</td>
+      <td>${r.Al}</td>
+      <td>${r.Fe}</td>
+      <td>${r.depth}</td>
+      <td>${r.P_eff.toFixed(2)}</td>
+      <td>${r.K.toFixed(2)}</td>
+      <td>${r.T.toFixed(2)}</td>
+      <td>${r.crystalClass}</td>
+      <td><button onclick="loadSeedForRecipe(${idx})">View Seed</button></td>
+      <td><button onclick="generateDeploymentLog(${idx})">Log</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function loadSeedForRecipe(idx) {
+  const r = recipes[idx];
+  const seed = r.seedMolecule;
+  if (!seed) return;
+  moleculeData = { atoms: seed.atoms, bonds: seed.bonds };
+  renderAtoms();
+  renderBonds();
+  drawMolecule();
+}
+
+function persistRecipes() {
+  localStorage.setItem("pcf_sea_recipes", JSON.stringify(recipes));
+}
+
+function loadRecipes() {
+  const data = localStorage.getItem("pcf_sea_recipes");
+  if (data) {
+    recipes = JSON.parse(data);
+    renderCatalog();
+  }
+}
+
+function exportRecipes() {
+  const blob = new Blob([JSON.stringify(recipes, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "pcf_sea_recipes.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importRecipes(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        recipes = imported;
+        persistRecipes();
+        renderCatalog();
+      }
+    } catch {
+      alert("Invalid JSON");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function generateDeploymentLog(idx) {
+  const r = recipes[idx];
+  const log = `
+PCF-SEA Deployment Log
+----------------------
+Recipe Name: ${r.name}
+Depth (km): ${r.depth}
+Effective Pressure (GPa): ${r.P_eff.toFixed(2)}
+Material Constant K: ${r.K.toFixed(2)}
+Estimated Growth Time (months): ${r.T.toFixed(2)}
+Predicted Crystal Class: ${r.crystalClass}
+Seed Molecule: ${r.seedMolecule ? r.seedMolecule.molecule_name : "None"}
+
+Seal: Abyssal Stewardship 1.0
+`;
+  alert(log);
+}
+
+loadRecipes();
+updateAll();
+animateMolecule();
+</script>
+
+</body>
+</html>
