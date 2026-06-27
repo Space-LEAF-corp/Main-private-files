@@ -1,0 +1,65 @@
+{
+  "artifact": "Jarvondis.Core.Governance.ProofOfOrigin",
+  "version": "1.0.0",
+  "author": {
+    "name": "Leif William Sogge",
+    "role": "Origin Steward & Kernel Architect",
+    "jurisdiction": "Ocala, Florida, United States"
+  },
+  "binding": {
+    "target_artifact": "Jarvondis.Core.Security.RandomizationSeal",
+    "device_hint": "Personal Phone Archive",
+    "notes": [
+      "This module mathematically binds authorship to the original artifact saved locally.",
+      "Used to prove origin if authorship is ever challenged."
+    ]
+  },
+  "hash_scheme": {
+    "algorithm": "SHA-256",
+    "inputs": {
+      "files": [
+        "jarvondis_randomization_seal.json"
+      ],
+      "metadata": {
+        "author": "Leif William Sogge",
+        "created_at_iso8601": "2025-11-13T17:28:00-05:00",
+        "location": "Ocala, Florida, United States"
+      }
+    },
+    "output": {
+      "content_hash_hex": "TO-BE-COMPUTED",
+      "metadata_hash_hex": "TO-BE-COMPUTED",
+      "combined_hash_hex": "TO-BE-COMPUTED"
+    }
+  },
+  "attestation": {
+    "method": "local-only",
+    "steps": [
+      "Compute SHA-256 of the saved artifact on your phone.",
+      "Compute SHA-256 of the metadata block (author, timestamp, location).",
+      "Concatenate both hashes and hash again to get combined_hash_hex.",
+      "Store combined_hash_hex in both this module and your Captain's Log."
+    ],
+    "proof_fields": {
+      "origin_hash": "TO-BE-COMPUTED",
+      "artifact_filename": "jarvondis_randomization_seal.json",
+      "device_label": "Leif_Phone"
+    }
+  },
+  "verification": {
+    "procedure": [
+      "Re-hash the artifact and metadata.",
+      "Recompute combined_hash_hex.",
+      "Compare with origin_hash stored here and in Captain's Log.",
+      "If they match, authorship and integrity are proven."
+    ],
+    "fail_closed": true
+  },
+  "governance": {
+    "policies": [
+      "Origin hash must never be altered once inscribed.",
+      "Any change to the artifact requires a new Proof-of-Origin entry.",
+      "Authorship remains bound to 'Leif William Sogge' for this lineage."
+    ]
+  }
+}
