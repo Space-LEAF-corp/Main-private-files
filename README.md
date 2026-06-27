@@ -1,3 +1,256 @@
+---
+
+SPACE LEAF CORP — PRIVACY & DIGNITY PROTECTION SUITE
+
+README.md
+
+Directory: /private/systems/privacy/
+Version: 1.0
+Classification: INTERNAL — DO NOT DISTRIBUTE
+
+---
+
+1. Purpose
+
+The Privacy & Dignity Protection Suite is the core defensive architecture that ensures Space LEAF Corp devices — including ICU smart glasses, wearable systems, and future starship‑grade interfaces — operate with absolute respect for human dignity, consent, and safety.
+
+This suite prevents:
+
+• Non‑consensual recording
+• Bystander exposure
+• Child identification
+• Sensitive‑context leaks
+• Stealth surveillance
+• Unauthorized uploads
+
+
+It is the ethical firewall that protects the public from misuse and protects Space LEAF Corp from ever becoming a surveillance platform.
+
+---
+
+2. Philosophy
+
+The suite is built on five foundational principles:
+
+2.1 Dignity First
+
+No human becomes “content” without consent.
+
+2.2 Local‑First Processing
+
+All detection, classification, and anonymization occur on‑device, never in the cloud.
+
+2.3 Context Awareness
+
+The system adapts to schools, hospitals, gyms, homes, and other sensitive environments.
+
+2.4 Child Protection
+
+Children are never identifiable in captured media.
+
+2.5 Immutable Safety
+
+Certain rules cannot be overridden — not by the user, not by developers, not by external systems.
+
+---
+
+3. Architecture Overview
+
+The Privacy Suite consists of five integrated subsystems, each with its own SPEC.md and implementation directory.
+
+/private/systems/privacy
+│
+├── bystander_protection/
+├── consent_ledger/
+├── guardian_upload_gatekeeper/
+├── kid_safe_auto_blur/
+└── public_space_etiquette/
+
+
+Each subsystem is modular, testable, and independently enforceable.
+
+---
+
+4. Subsystem Summaries
+
+4.1 Bystander Protection Module
+
+Ensures no non‑consenting individual becomes identifiable in captured media.
+
+Key features:
+
+• Real‑time face detection
+• Automatic bystander blur
+• No raw frame storage
+• Context‑aware enforcement
+
+
+Spec file:
+/bystander_protection/SPEC.md
+
+---
+
+4.2 Consent Ledger (Identity‑Free)
+
+Stores proof of consent without storing identity.
+
+Key features:
+
+• Hash‑based content linking
+• No biometrics, no names, no GPS
+• Device‑signed entries
+• Expiry and context tagging
+
+
+Spec file:
+/consent_ledger/SPEC.md
+
+---
+
+4.3 Guardian Upload Gatekeeper
+
+The final decision layer before any media leaves the device.
+
+Key features:
+
+• Bystander presence checks
+• Minor detection
+• Sensitive context enforcement
+• Content safety scanning
+• Immutable hard‑block zones
+
+
+Spec file:
+/guardian_upload_gatekeeper/SPEC.md
+
+---
+
+4.4 Kid‑Safe Auto‑Blur Engine
+
+Ensures children are never identifiable.
+
+Key features:
+
+• Age‑range classification
+• Conservative UNKNOWN→CHILD fallback
+• Mandatory blur in sensitive contexts
+• No override allowed
+
+
+Spec file:
+/kid_safe_auto_blur/SPEC.md
+
+---
+
+4.5 Public‑Space Etiquette Protocol
+
+Defines how the device behaves socially in public.
+
+Key features:
+
+• Visible recording signals
+• Do‑Not‑Capture mode
+• Respect zones
+• Social scripts for users
+• Public‑facing etiquette charter
+
+
+Spec file:
+/public_space_etiquette/SPEC.md
+
+---
+
+5. Data Flow Summary
+
+Below is the high‑level flow of how media is processed:
+
+1. Capture Layer
+Raw frames → Bystander Protection Module
+2. Anonymization
+Bystanders blurred → Children blurred → Sensitive contexts enforced
+3. Consent Verification
+Consent Ledger checked for matching entries
+4. Upload Decision
+Guardian Upload Gatekeeper evaluates:• Bystanders
+• Minors
+• Context
+• Content type
+• Device integrity
+
+5. Final Action• Allow upload
+• Block upload
+• Require consent
+• Force Private Vault storage
+
+
+
+---
+
+6. Security Guarantees
+
+The Privacy Suite guarantees:
+
+• No raw frames stored
+• No cloud inference
+• No biometric templates
+• No stealth recording
+• No external override
+• No child exposure
+• No sensitive‑context uploads
+
+
+All metadata and decisions are signed by the device key.
+
+---
+
+7. Testing Requirements
+
+Each subsystem includes:
+
+• Unit tests
+• Scenario tests
+• Regression tests
+
+
+Additionally, the suite requires:
+
+• Cross‑module integration tests
+• Context‑sensitivity tests
+• Performance and latency tests
+• Tamper‑resistance tests
+
+
+---
+
+8. Public‑Facing Materials
+
+The suite includes a public document:
+
+“Space LEAF Corp Smart Glasses Etiquette Charter”
+
+This charter explains the ethical commitments of the system without revealing internal implementation details.
+
+---
+
+9. Contributing
+
+This directory is restricted to authorized Space LEAF Corp engineers and stewards.
+
+All changes must:
+
+• Pass full test suite
+• Maintain dignity‑first principles
+• Preserve local‑first processing
+• Uphold immutable safety rules
+
+
+---
+
+END OF README
+
+Space LEAF Corp — Internal Use Only
+
+---
 
 🛰️ 1. Main Section — Who I am
 
