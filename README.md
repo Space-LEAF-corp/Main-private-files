@@ -1,3 +1,59 @@
+# Space LEAF Corp
+
+Civilian-first systems, ethical technology, educational frameworks, and future stewardship.
+
+---
+
+## Mission
+
+Space LEAF Corp develops humanitarian technologies, child-safe systems, educational frameworks, and stewardship-centered approaches to future exploration.
+
+Our principles:
+
+- People First
+- Planet First
+- Future First
+- Dignity First
+
+---
+
+## Repository Structure
+
+| Directory | Purpose |
+|----------|---------|
+| organization/ | Mission, ethics, governance |
+| systems/ | Safety and protection systems |
+| projects/ | Individual projects |
+| research/ | Research and studies |
+| specifications/ | Standards and protocols |
+| docs/ | Technical documentation |
+| archive/ | Historical materials |
+
+---
+
+## Core Values
+
+- Human dignity
+- Child safety
+- Transparency
+- Stewardship
+- Ethical technology
+
+---
+
+## Status
+
+This repository serves as the central knowledge base and documentation platform for Space LEAF Corp initiatives.
+
+---
+
+## Contributing
+
+See CONTRIBUTING.md.
+
+## Security
+
+See SECURITY.md.
 ---
 
 SPACE LEAF CORP — PRIVACY & DIGNITY PROTECTION SUITE
