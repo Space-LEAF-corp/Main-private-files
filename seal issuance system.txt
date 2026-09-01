@@ -1,0 +1,256 @@
+1. Purpose and philosophy
+
+A seal in Space LEAF is not a sticker or badge—it’s a credential backed by an evidence chain.
+
+You already defined the core idea:
+
+“So the seal isn’t just an image.
+It’s a credential backed by a verifiable evidence chain.”
+
+The seal issuance system is the machinery that:
+
+• Decides when a seal can be issued.
+• Ensures it is backed by evidence.
+• Enforces SLEMS governance (safety, stewardship, guardian mode).
+• Keeps a traceable record of every seal ever granted.
+
+
+---
+
+2. Core objects
+
+2.1 `seals` (definition)
+
+Represents the type of seal, not an individual issuance.
+
+• seal_id: e.g. SL-SEAL-MODINT-001.
+• name: “Seal of Modular Integrity”.
+• description: what it represents.
+• domain: STEWARDSHIP, SAFETY, EXPLORATION, COMMUNITY, OFFICER_CONDUCT, etc.
+• requirements_ids: list of requirement IDs that must be satisfied.
+• capability_ids: optional capabilities tied to the seal.
+• evidence_policy_id: FK to an evidence policy (see below).
+• slems_policy_id: FK to a SLEMS policy (guardian mode, privacy tier, mission token constraints).
+• active: boolean.
+
+
+This is the “template” for a seal.
+
+2.2 `seal_evidence_policies`
+
+Defines what kind of evidence is required to issue a given seal.
+
+• id
+• seal_id
+• min_maturity_level: e.g. E3 or E4.
+• required_evidence_types: list (e.g. VRF, VLD, REV).
+• required_truth_boundary_classes: e.g. must be VERIFIED or PRODUCTION.
+• min_review_status: e.g. APPROVED.
+• require_independent_review: boolean.
+• require_no_failed_tests: boolean.
+• require_full_traceability: boolean (all linked requirements/capabilities must have evidence).
+
+
+This encodes:
+
+“Use levels: E0–E5.”
+“VERIFIED ≠ VALIDATED.”
+“Security claims should be especially strict.”
+
+2.3 `seal_slems_policies`
+
+Defines governance constraints for issuing the seal.
+
+• id
+• seal_id
+• guardian_required: boolean.
+• privacy_tier: enum (kid_safe, teen_safe, adult_safe, guardian_enhanced).
+• mission_token_required: boolean.
+• allowed_mission_tokens: list (optional).
+• dual_key_required: boolean (for high‑risk seals).
+• cadet_pathway_required: optional pathway ID (for Academy seals).
+
+
+This ties directly into SLEMS‑001:
+
+“SLEMS determines what is allowed.”
+
+2.4 `seal_issuances`
+
+Represents a specific seal granted to a specific person or system.
+
+• id: primary key.
+• seal_id: FK to seals.
+• recipient_type: enum (CADET, OFFICER, SYSTEM, MODULE, MISSION).
+• recipient_id: e.g. cadet ID, system ID.
+• issued_at: timestamp.
+• issued_by: actor ID (guardian, instructor, automated process).
+• status: enum (PENDING, ISSUED, REVOKED, EXPIRED).
+• evidence_snapshot_id: FK to a snapshot of the evidence chain at issuance time.
+• mission_token_id: optional FK.
+• slems_compliance_status: enum (COMPLIANT, NON_COMPLIANT, OVERRIDDEN).
+• revocation_reason: optional text.
+
+
+This is the “credential” itself.
+
+2.5 `seal_evidence_snapshots`
+
+Captures the state of the evidence chain at the moment of issuance.
+
+• id
+• seal_issuance_id
+• snapshot_data: JSON (list of evidence IDs, claims, requirements, tests, statuses, hashes).
+• created_at
+
+
+This ensures that even if evidence changes later, you know exactly what was true at issuance time.
+
+---
+
+3. Issuance workflow
+
+3.1 High‑level flow
+
+For a seal like Seal of Modular Integrity:
+
+SEAL OF MODULAR INTEGRITY
+│
+▼
+Competency / Requirement
+│
+▼
+Completed Work
+│
+▼
+Review
+│
+▼
+Evidence
+│
+▼
+Verified
+│
+▼
+Seal Issued
+
+The system implements this as:
+
+1. Identify candidate recipient (cadet, officer, system).
+2. Check requirements (linked requirements/capabilities satisfied).
+3. Gather evidence (from Evidence Vault via evidence_subject_links).
+4. Evaluate evidence policy (maturity, truth boundary, review status).
+5. Evaluate SLEMS policy (guardian mode, privacy tier, mission token, dual key).
+6. Create evidence snapshot.
+7. Issue seal (create seal_issuances record).
+8. Optionally generate a visual seal artifact (image, QR, etc.) tied to the issuance ID.
+
+
+3.2 Automated vs. manual
+
+• Automated issuance:
+When all policy conditions are met, the system can auto‑issue seals (e.g. cadet completes a mission simulation with verified evidence).
+• Manual issuance:
+Guardians/instructors can review and approve issuance requests, especially for high‑stakes seals (Officer Conduct, Stewardship).
+
+
+---
+
+4. Integration with Evidence Vault and Registry
+
+The seal issuance system is not standalone—it sits on top of:
+
+• Registry Engine:
+Requirements, capabilities, claims, tests, releases, credentials.
+• Evidence Vault:
+Evidence records, maturity, truth boundary, reviews, chains.
+• SLEMS Engine:
+Governance rules, privacy tiers, guardian mode, mission tokens.
+
+
+Key queries:
+
+• For a given seal template:• Fetch all linked requirements/capabilities.
+• Check each has sufficient evidence (evidence + evidence_subject_links).
+• Ensure evidence meets policy (maturity, truth boundary, review).
+
+• For a given recipient:• Fetch their completed work (missions, simulations, modules).
+• Map work to requirements/capabilities.
+• Evaluate whether they qualify for one or more seals.
+
+
+
+---
+
+5. Revocation and lifecycle
+
+Seals must be revocable and traceable.
+
+• seal_issuances.status can move from ISSUED → REVOKED or EXPIRED.
+• Revocation triggers:• Evidence invalidated (evidence status INVALIDATED).
+• Claim invalidated (claims.status = 'INVALIDATED').
+• SLEMS violation (safety breach, conduct issue).
+
+• Revocation records:• revocation_reason.
+• Optional link to incident evidence (INC type).
+
+
+
+This keeps seals honest and aligned with the truth boundary:
+
+“The Evidence Vault cannot make something true.”
+
+---
+
+6. UI and experience
+
+For a cadet or officer, the console might show:
+
+• Pathways:
+“You are 80% of the way to Seal of Stewardship.”
+• Evidence view:
+“These missions, tests, and reviews are contributing to your seal eligibility.”
+• Issuance event:
+“Seal of Modular Integrity issued on 2026‑09‑01, backed by evidence chain EVA‑000821, EVA‑000842, reviewed by Guardian‑001.”
+
+
+For an architect/guardian:
+
+• Seal policy editor:
+Define requirements, evidence policies, SLEMS policies.
+• Issuance dashboard:
+See pending, issued, revoked seals; filter by domain, recipient type, compliance status.
+
+
+---
+
+7. One concrete example
+
+Seal: Seal of Modular Integrity (SL-SEAL-MODINT-001)
+
+• Requirements:
+REQ-MOD-001 (modules must be independently testable),
+REQ-MOD-002 (interfaces must be versioned),
+REQ-MOD-003 (zero‑trust boundaries enforced).
+• Evidence policy:• min_maturity_level = E3
+• required_evidence_types = ['VRF', 'REV']
+• required_truth_boundary_classes = ['VERIFIED']
+• require_independent_review = true
+
+• SLEMS policy:• guardian_required = true (for cadets)
+• privacy_tier = 'kid_safe'
+• mission_token_required = true
+
+
+
+Issuance:
+
+1. Cadet completes a modular architecture project.
+2. Tests and reviews produce evidence records (SL-EVA-000901, SL-EVA-000902).
+3. Evidence reaches E4 maturity, VERIFIED truth boundary, with independent review.
+4. Guardian approves issuance.
+5. System creates seal_issuances record + evidence snapshot.
+6. Cadet receives Seal of Modular Integrity, backed by a verifiable chain.
+
+
+---
