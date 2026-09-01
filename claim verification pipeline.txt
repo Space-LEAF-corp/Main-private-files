@@ -1,0 +1,332 @@
+1. Purpose
+
+A claim in Space LEAF is something you say is true about a system.
+
+“A claim is something Space LEAF says is true about a system.”
+
+The claim verification pipeline is the machinery that turns:
+
+• Statements → into
+• Traceable, evidence‑backed statuses (UNSUPPORTED, PARTIALLY SUPPORTED, SUPPORTED, VERIFIED, INVALIDATED).
+
+
+It sits on top of:
+
+• LEAF‑ARC‑REG‑001 (registry),
+• LEAF‑EVA‑001 (Evidence Vault),
+• SLEMS‑001 (governance/safety).
+
+
+---
+
+2. Core objects
+
+2.1 `claims`
+
+Each claim:
+
+• claim_id: SL-CLM-001, SL-CLM-002, etc.
+• statement: text (e.g. “The local runtime can execute designated functions without cloud connectivity.”).
+• status: enum:• UNSUPPORTED
+• PARTIALLY_SUPPORTED
+• SUPPORTED
+• VERIFIED
+• INVALIDATED
+
+• linked_requirements: list of requirement IDs.
+• linked_architecture_ids: architecture decision / subsystem IDs.
+• linked_implementation_ids: implementation IDs.
+• linked_test_ids: test IDs.
+• linked_evidence_ids: evidence IDs (via Evidence Vault).
+• last_evaluated_at: timestamp.
+
+
+This is the central object the pipeline updates.
+
+2.2 Evidence and registry links
+
+The pipeline relies on:
+
+• requirements, capabilities, controls, subsystems, interfaces, implementations, tests.
+• evidence and evidence_subject_links (Vault).
+• traceability_links (graph).
+
+
+---
+
+3. Pipeline stages
+
+Think of the pipeline as a series of gates:
+
+CLAIM
+│
+├── Requirement
+├── Architecture
+├── Implementation
+├── Test
+└── Evidence
+
+We’ll formalize that into stages.
+
+Stage 0 — Claim registration
+
+Input: new claim statement.
+
+Actions:
+
+• Create claims record with:• status = 'UNSUPPORTED'.
+• linked_* fields empty or partial.
+
+• Optionally bind to:• mission objective,
+• subsystem,
+• capability.
+
+
+
+This is where “someone asserts something” (E0).
+
+---
+
+Stage 1 — Requirement linkage
+
+Goal: Every claim must be grounded in one or more requirements.
+
+Actions:
+
+• Architect/guardian links claim to:• requirements (e.g. SL-SR-002),
+• optionally capabilities, controls, threats.
+
+• traceability_links created:• SL-CLM-001 SUPPORTED_BY SL-SR-002.
+
+
+
+Checks:
+
+• If no requirements linked → claim remains UNSUPPORTED.
+• If requirements exist but no implementation/test/evidence yet → claim can move to PARTIALLY SUPPORTED at most.
+
+
+---
+
+Stage 2 — Architecture and implementation linkage
+
+Goal: Show that the system design and implementation actually address the requirement.
+
+Actions:
+
+• Link claim to:• architecture_decisions (ADR),
+• subsystems,
+• interfaces,
+• implementations.
+
+• traceability_links like:• SL-SR-002 SATISFIED_BY SYS-RTM-001.
+• SYS-RTM-001 IMPLEMENTED_BY IMP-RTM-LOCAL-001.
+
+
+
+Checks:
+
+• If requirements are linked and architecture/implementation exist, but no tests/evidence yet → claim can move to SUPPORTED (design‑level support), but not VERIFIED.
+
+
+---
+
+Stage 3 — Test linkage
+
+Goal: Ensure there is a repeatable test that exercises the claim.
+
+Actions:
+
+• Link claim to:• tests (e.g. SL-VT-001).
+
+• traceability_links:• IMP-RTM-LOCAL-001 TESTED_BY SL-VT-001.
+• SL-CLM-001 EXERCISED_BY SL-VT-001.
+
+
+
+Checks:
+
+• If tests exist and are executed, but evidence is not yet captured or reviewed → claim remains SUPPORTED (demonstrated, but not verified).
+
+
+---
+
+Stage 4 — Evidence capture and classification
+
+Goal: Bring the Evidence Vault into play.
+
+Actions:
+
+• Tests produce artifacts (logs, screenshots, reports, etc.).
+• Evidence records created in evidence:• type = 'VRF' or TST.
+• subject_links to:• requirement (SL-SR-002),
+• test (SL-VT-001),
+• claim (SL-CLM-001).
+
+
+• Evidence lifecycle:• CAPTURE → REGISTER → HASH → CLASSIFY → LINK.
+
+
+
+Checks:
+
+• Evidence must have:• canonical_hash set,
+• maturity_level >= E2 (demonstration/test),
+• truth_boundary_class at least DEMONSTRATED.
+
+
+
+At this point, the claim can be considered SUPPORTED with demonstrable evidence.
+
+---
+
+Stage 5 — Review and maturity
+
+Goal: Move from “demonstrated” to “verified.”
+
+Actions:
+
+• Reviewers (architects, guardians, independent parties) review evidence:• evidence_reviews records created.
+• review_status = 'APPROVED' for relevant evidence.
+
+• Evidence maturity updated:• E3 (repeatable test),
+• E4 (verified against requirement),
+• E5 (independently reviewed).
+
+
+
+Checks:
+
+• For claim to become VERIFIED, policy might require:• at least one VRF evidence at maturity_level >= E4,
+• truth_boundary_class = 'VERIFIED',
+• review_status = 'APPROVED',
+• no conflicting INC or INVALIDATED evidence.
+
+
+
+---
+
+Stage 6 — Claim status evaluation
+
+Goal: Compute the claim’s status from the graph.
+
+Algorithm (simplified):
+
+1. Gather linked objects:• requirements, architecture, implementations, tests, evidence.
+
+2. Check requirements:• if none → UNSUPPORTED.
+
+3. Check architecture/implementation:• if requirements linked but no implementation/test → PARTIALLY SUPPORTED.
+
+4. Check tests:• if implementation and tests exist, and tests have passed at least once → SUPPORTED.
+
+5. Check evidence:• if there is at least one VRF evidence with:• maturity_level >= E4,
+• truth_boundary_class = 'VERIFIED',
+• review_status = 'APPROVED',
+• no conflicting INVALIDATED evidence → VERIFIED.
+
+
+6. Check invalidation:• if any INC or REV evidence explicitly invalidates the claim, or requirement is superseded/failed → INVALIDATED.
+
+
+
+Update claims.status and last_evaluated_at.
+
+---
+
+4. Truth boundary integration
+
+You defined:
+
+“VERIFIED / CLAIMED / EXPERIMENTAL / SIMULATED / DEMONSTRATED / PRODUCTION.”
+
+The pipeline respects this by:
+
+• Looking at evidence.truth_boundary_class:• CLAIMED → no status upgrade.
+• EXPERIMENTAL / SIMULATED → at most SUPPORTED.
+• DEMONSTRATED → SUPPORTED.
+• VERIFIED → eligible for VERIFIED claim status.
+• PRODUCTION → claim can be VERIFIED and tied to releases.
+
+
+
+This prevents:
+
+“accidentally treating a vision, prototype, simulation, and production capability as the same thing.”
+
+---
+
+5. SLEMS governance hooks
+
+SLEMS‑001 can impose extra rules on certain claims, especially security claims:
+
+“Security claims should be especially strict.”
+
+For claims tagged as SECURITY:
+
+• Require:• threat model linked,
+• security controls linked,
+• security tests linked,
+• independent review evidence (E5),
+• SLEMS compliance (privacy tier, guardian mode, mission tokens).
+
+• Only then allow status = 'VERIFIED'.
+
+
+Governance service can:
+
+• Block status upgrades if SLEMS conditions aren’t met.
+• Flag claims as NON_COMPLIANT even if evidence exists.
+
+
+---
+
+6. Example: offline runtime claim
+
+Claim:
+
+• SL-CLM-001: “The local runtime can execute designated functions without cloud connectivity.”
+
+
+Pipeline:
+
+1. Requirement: SL-SR-002 (offline runtime requirement) linked.
+2. Architecture: SYS-RTM-001 (local runtime subsystem) linked.
+3. Implementation: IMP-RTM-LOCAL-001 linked.
+4. Test: SL-VT-001 (offline runtime verification test) linked.
+5. Evidence: SL-EVA-000821 (Offline Runtime Verification) created:• type VRF,
+• linked to SL-SR-002, SL-VT-001, SL-CLM-001,
+• maturity_level = E4,
+• truth_boundary_class = 'VERIFIED',
+• review_status = 'APPROVED'.
+
+6. Evaluation: pipeline sets SL-CLM-001.status = 'VERIFIED'.
+
+
+Now the system can say:
+
+“This is a verified claim, backed by evidence SL‑EVA‑000821, under configuration CFG‑004 and build 0.4.7.”
+
+---
+
+7. How it runs in practice
+
+You can implement the pipeline as:
+
+• A background job that periodically reevaluates claims.
+• A manual trigger (architect/guardian clicks “Evaluate claim”).
+• An event‑driven process:• when evidence changes,
+• when tests run,
+• when requirements are updated.
+
+
+
+Each evaluation:
+
+• Reads the graph,
+• Applies the rules,
+• Updates claim status,
+• Logs the decision (for audit).
+
+
+---
