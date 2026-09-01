@@ -1,0 +1,245 @@
+Overview
+
+Let’s treat the Evidence Vault as a governed, typed, cryptographically‑anchored layer that sits beside the registry—not as a generic “files” table.
+
+---
+
+1. Core concepts
+
+You already defined the logic:
+
+“No important claim is considered verified merely because someone says it is true.”
+
+“Registry = what exists and how things relate. Evidence Vault = proof supporting those relationships and claims.”
+
+The schema needs to encode:
+
+• Typed evidence objects (REQ, CAP, THR, CTL, ADR, IMP, INT, TST, VRF, VLD, OPS, INC, REV, CFG, REL, EDU).
+• Provenance (who, when, what version, which config, which commit).
+• Cryptographic integrity (hash, signature).
+• Maturity levels (E0–E5).
+• Lifecycle (CAPTURE → REGISTER → HASH → CLASSIFY → LINK → REVIEW → ACCEPT/REJECT → BASELINE → MONITOR → SUPERSEDE/RETIRE).
+• Chains and supersession (EVA‑00042 → SUPERSEDED BY → EVA‑00113).
+• Links to registry objects (requirements, capabilities, threats, controls, tests, claims, releases, seals).
+
+
+---
+
+2. Main tables
+
+2.1 `evidence`
+
+Purpose: One row per evidence record (SL‑EVA‑000001, etc.).
+
+Columns:
+
+• id: internal primary key (UUID or integer).
+• evidence_id: string, e.g. SL-EVA-000001 (unique).
+• type: enum (REQ, CAP, THR, CTL, ADR, IMP, INT, TST, VRF, VLD, OPS, INC, REV, CFG, REL, EDU).
+• title: short human‑readable title.
+• description: optional longer description.
+• status: enum (PROPOSED, CAPTURED, REGISTERED, REVIEWED, VERIFIED, BASELINED, SUPERSEDED, REJECTED).
+• maturity_level: enum (E0, E1, E2, E3, E4, E5).
+• truth_boundary_class: enum (CLAIMED, EXPERIMENTAL, SIMULATED, DEMONSTRATED, VERIFIED, PRODUCTION).
+• artifact_location: string (URI/path to the actual artifact—file store, object store, etc.).
+• artifact_type: enum (LOG, SCREENSHOT, VIDEO, DIAGRAM, SOURCE_COMMIT, DB_SNAPSHOT, BENCHMARK, CONFIG, REPORT, SIMULATION, INSPECTION, OTHER).
+• canonical_hash: string (e.g. SHA‑256).
+• signature: optional string (digital signature blob or reference).
+• created_by: user/actor ID.
+• created_at: timestamp.
+• system_version: string (e.g. 0.4.7).
+• configuration_id: FK to configurations (CFG‑###).
+• test_id: FK to tests (if applicable).
+• repository_id: FK to repositories (if applicable).
+• commit_id: FK to commits (if applicable).
+• reviewer_id: FK to users (optional).
+• review_status: enum (PENDING, APPROVED, REJECTED, NEEDS_REVISION).
+• reviewed_at: timestamp (optional).
+• retention_class: enum (SHORT_TERM, LONG_TERM, PERMANENT, LEGAL_HOLD).
+• superseded_by_id: FK to evidence (optional).
+
+
+This table is the heart of:
+
+“The Vault stores the metadata and cryptographic identity of that artifact.”
+
+---
+
+2.2 `evidence_subject_links`
+
+Purpose: Link evidence to the registry objects it supports.
+
+Columns:
+
+• id: primary key.
+• evidence_id: FK to evidence.
+• subject_type: enum (MISSION, REQUIREMENT, CAPABILITY, THREAT, CONTROL, SUBSYSTEM, INTERFACE, ARCHITECTURE_DECISION, IMPLEMENTATION, TEST, CLAIM, CONFIGURATION, RELEASE, SEAL, CREDENTIAL).
+• subject_id: string (e.g. SL-SR-002, SL-CAP-006, SL-CLM-001).
+• relationship: enum (SUPPORTS, VERIFIES, VALIDATES, MITIGATES, GENERATES, INVALIDATES, DERIVES_FROM).
+• created_at: timestamp.
+• created_by: user/actor ID.
+
+
+This is how you answer:
+
+“Show me every piece of evidence associated with SL-SR-002.”
+“Which capabilities have no verification evidence?”
+
+---
+
+2.3 `evidence_chain_links`
+
+Purpose: Represent chains and supersession explicitly.
+
+Columns:
+
+• id: primary key.
+• parent_evidence_id: FK to evidence.
+• child_evidence_id: FK to evidence.
+• relationship: enum (SUPERSEDED_BY, DERIVES_FROM, REFINES, CORRECTS, INVALIDATES).
+• created_at: timestamp.
+• created_by: user/actor ID.
+
+
+Implements:
+
+“Evidence Chain
+EVA‑0001 ↓ EVA‑0002 ↓ EVA‑0003 ↓ EVA‑0004”
+
+and:
+
+“No silent replacement.”
+
+---
+
+2.4 `claims` (Vault‑side view)
+
+You may already have claims in the registry; the Vault needs to see them.
+
+Key fields (in registry, but referenced heavily by Vault):
+
+• claim_id: SL-CLM-###.
+• statement: text.
+• status: enum (UNSUPPORTED, PARTIALLY_SUPPORTED, SUPPORTED, VERIFIED, INVALIDATED).
+
+
+The Vault doesn’t own this table, but its queries will join claims with evidence_subject_links and evidence to compute status.
+
+---
+
+2.5 `evidence_reviews`
+
+Purpose: Separate review events from the evidence record itself.
+
+Columns:
+
+• id: primary key.
+• evidence_id: FK to evidence.
+• reviewer_id: FK to users.
+• review_status: enum (APPROVED, REJECTED, NEEDS_REVISION).
+• comments: text.
+• created_at: timestamp.
+
+
+This supports:
+
+“Evidence Chain … Independent Review”
+
+and lets you reach E4/E5 maturity.
+
+---
+
+3. Lifecycle and integrity
+
+3.1 Lifecycle enforcement
+
+You can encode the lifecycle in the application logic, but the schema supports:
+
+• status transitions in evidence.status.
+• supersession via superseded_by_id and evidence_chain_links.
+• baseline via status = 'BASELINED' and truth_boundary_class = 'PRODUCTION'.
+
+
+3.2 Cryptographic integrity
+
+For each artifact:
+
+Artifact → Canonical representation → Cryptographic hash → Evidence ID → Signature → Registry reference
+
+The schema fields:
+
+• artifact_location
+• canonical_hash
+• signature
+• evidence_id
+• subject_links
+
+
+give you everything you need to:
+
+• detect changes (hash mismatch),
+• prove provenance (who/when/which version),
+• and tie it back to requirements, tests, and claims.
+
+
+---
+
+4. Maturity and truth boundary
+
+You defined:
+
+“Use levels: E0 — Claim … E5 — Independently Reviewed.”
+
+and:
+
+“VERIFIED ≠ VALIDATED”
+
+and:
+
+“VERIFIED / CLAIMED / EXPERIMENTAL / SIMULATED / DEMONSTRATED / PRODUCTION.”
+
+The schema encodes this via:
+
+• maturity_level (E0–E5).
+• truth_boundary_class (CLAIMED, EXPERIMENTAL, SIMULATED, DEMONSTRATED, VERIFIED, PRODUCTION).
+• status (PROPOSED, CAPTURED, REVIEWED, VERIFIED, BASELINED, SUPERSEDED, REJECTED).
+• review_status and evidence_reviews.
+
+
+This lets the engine say:
+
+“This capability exists at E2 maturity.”
+“This claim is DEMONSTRATED but not VERIFIED.”
+“This evidence is BASELINED and PRODUCTION‑grade.”
+
+---
+
+5. Example: one record end‑to‑end
+
+Imagine:
+
+“The AI operates offline.”
+
+becomes:
+
+• claims:• SL-CLM-001, statement, status SUPPORTED.
+
+• requirements:• SL-SR-002 (offline runtime requirement).
+
+• tests:• SL-VT-001 (offline runtime verification test).
+
+• evidence:• SL-EVA-000821, type VRF, title Offline Runtime Verification, status VERIFIED, maturity E4, truth_boundary_class VERIFIED, canonical_hash set.
+
+• evidence_subject_links:• SL-EVA-000821 → SL-SR-002 (VERIFIES).
+• SL-EVA-000821 → SL-VT-001 (GENERATES).
+• SL-EVA-000821 → SL-CLM-001 (SUPPORTS).
+
+• evidence_reviews:• reviewer approves, pushing maturity to E4 or E5.
+
+
+
+Now the Vault can answer:
+
+“Claim SL‑CLM‑001 is VERIFIED, supported by SL‑EVA‑000821, which verifies requirement SL‑SR‑002 via test SL‑VT‑001 under configuration CFG‑004 and build 0.4.7.”
+
+---
