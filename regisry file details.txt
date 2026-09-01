@@ -1,0 +1,301 @@
+LEAF Registry Engine design
+
+You’ve already defined the logic of the ecosystem—this is the concrete system that can carry it.
+
+---
+
+1. Core purpose and scope
+
+Goal:
+Build a local‑first, governed system of record that:
+
+• Stores all LEAF‑ARC‑REG‑001 objects (requirements, capabilities, threats, controls, systems, interfaces, commits, tests, etc.).
+• Links them via a formal traceability graph.
+• Connects to LEAF‑EVA‑001 evidence objects and chains.
+• Enforces SLEMS‑001 admission, safety, and stewardship rules.
+• Surfaces live assurance views (coverage, gaps, maturity, verification status).
+
+
+This is not “just a database”—it’s the nervous system of Space LEAF.
+
+---
+
+2. High‑level architecture
+
+2.1 Logical components
+
+• Registry Core (ARC Service):
+Manages all architectural objects and relationships.
+• Evidence Service (EVA Service):
+Manages evidence records, hashes, provenance, maturity levels, and chains.
+• Governance Service (SLEMS Service):
+Enforces admission rules, safety tiers, mission tokens, guardian mode, privacy tiers.
+• Traceability Engine:
+Maintains the graph of links (traceability_links) and runs impact, coverage, and gap analysis.
+• API Gateway:
+Single entry point for UI, tools, and future AI kernel integration.
+• Local‑First Runtime:
+Embedded database + sync layer (optional) so it can run on a laptop, server, or air‑gapped node.
+• Console UI:
+Web or desktop interface for architects, guardians, cadets, and auditors.
+
+
+---
+
+3. Data model (registry side)
+
+3.1 Core tables/entities
+
+• mission_objectives
+• requirements
+• capabilities
+• threats
+• controls
+• subsystems
+• interfaces
+• architecture_decisions
+• implementations
+• repositories
+• commits
+• tests
+• claims
+• evidence
+• evidence_links
+• reviews
+• incidents
+• configurations
+• releases
+• credentials
+• seals
+• traceability_links
+
+
+Each object gets:
+
+• ID: e.g. SL-REQ-002, SL-CAP-006, SL-CLM-001, SL-EVA-000821.
+• Type: requirement, capability, threat, control, etc.
+• Lifecycle status: PROPOSED, DEFINED, IMPLEMENTED, TESTED, PASSED, VERIFIED, VALIDATED, BASELINED, SUPERSEDED, FAILED, INVALIDATED.
+• Versioning: semantic or incremental, with created/updated timestamps.
+• Ownership: created_by, steward, guardian.
+
+
+3.2 Traceability links
+
+traceability_links:
+
+• source_id
+• source_type
+• relationship (SATISFIED_BY, IMPLEMENTED_BY, VERIFIED_BY, GENERATES, MITIGATED_BY, EXPOSES, etc.)
+• target_id
+• target_type
+• created_at
+• created_by
+• valid_from
+• valid_until
+• status (active, suspect, superseded)
+
+
+This is the graph that lets you ask:
+
+“Show me every piece of evidence associated with SL-SR-002.”
+“Show me every unverified security control.”
+“Which capabilities have no verification evidence?”
+
+---
+
+4. Evidence Vault integration (LEAF‑EVA‑001)
+
+4.1 Evidence objects
+
+evidence table:
+
+• evidence_id (e.g. SL-EVA-000001)
+• type (REQ, CAP, THR, CTL, ADR, IMP, INT, TST, VRF, VLD, OPS, INC, REV, CFG, REL, EDU)
+• subject_ids (linked requirements, capabilities, controls, tests, claims)
+• title
+• status (PROPOSED, CAPTURED, REVIEWED, VERIFIED, SUPERSEDED)
+• maturity_level (E0–E5)
+• artifact_ref (location pointer, not the artifact itself)
+• hash (cryptographic hash of canonical representation)
+• signature (optional digital signature)
+• created_by / created_at
+• reviewer / review_status
+• retention_class
+
+
+evidence_links:
+
+• parent_evidence_id
+• child_evidence_id
+• relationship (SUPERSEDED_BY, DERIVES_FROM, SUPPORTS, INVALIDATES)
+
+
+This implements:
+
+“EVA-00042 ↓ SUPERSEDED BY ↓ EVA-00113”
+
+and the Evidence Chain you described.
+
+4.2 Claim pipeline
+
+claims table:
+
+• claim_id (e.g. SL-CLM-001)
+• statement (“The local runtime can execute designated functions without cloud connectivity.”)
+• status (UNSUPPORTED, PARTIALLY SUPPORTED, SUPPORTED, VERIFIED, INVALIDATED)
+• linked_requirements
+• linked_architecture
+• linked_implementations
+• linked_tests
+• linked_evidence
+
+
+The Traceability Engine updates claim status based on evidence maturity and verification state.
+
+---
+
+5. Governance and SLEMS‑001
+
+5.1 Admission rules
+
+Governance Service enforces:
+
+• Guardian Mode:
+Certain objects (modules, capabilities, cadet pathways) require guardian approval to be admitted or changed.
+• Local‑First Guarantee:
+Modules declare offline/hybrid/cloud‑optional; registry enforces that claims about local runtime are backed by evidence.
+• Dual‑Key Validation:
+Communication or mission tokens require dual‑key approval; registry stores keys and validation events as evidence.
+• Planetary Skin Privacy Tier:
+Objects declare privacy tier (kid_safe, teen_safe, adult_safe, guardian_enhanced); UI and APIs respect these tiers.
+• Mission Tokens:
+Every capability/mission is bound to a mission token that constrains intended action surface.
+
+
+SLEMS rules are applied at:
+
+• Create / update time:
+Reject or flag objects that violate admission criteria.
+• Release time:
+Ensure only verified/validated capabilities reach PRODUCTION.
+
+
+---
+
+6. Runtime and deployment model
+
+6.1 Local‑first core
+
+• Embedded database:
+SQLite or Postgres (for richer graph queries) running locally.
+• Graph layer:
+Either:• Graph tables in SQL (traceability_links), or
+• A small embedded graph engine (e.g. Neo4j‑like, but local) if you want native graph queries.
+
+• Sync layer (optional):
+For future multi‑node setups, a sync service that can push/pull registry snapshots, but default mode is standalone, air‑gapped capable.
+
+
+6.2 Services
+
+• Language:
+Pick something you can live in for years (TypeScript/Node, Python, Go, Rust).
+• Pattern:
+Modular monolith to start:• ARC module
+• EVA module
+• SLEMS module
+• Traceability module
+• API module
+• UI module
+
+
+
+You can split into microservices later if needed, but you don’t have to now.
+
+---
+
+7. APIs and UI
+
+7.1 API design
+
+REST or GraphQL endpoints like:
+
+• GET /requirements/{id}
+• GET /capabilities/{id}/evidence
+• GET /claims/{id}/status
+• GET /controls/unverified
+• POST /evidence
+• POST /traceability-links
+• POST /claims/{id}/evaluate
+• GET /dashboard/assurance
+
+
+These are what your AI Kernel, cadet tools, and future consoles will talk to.
+
+7.2 Console views
+
+One core dashboard you described:
+
+• Requirements: total, implemented, verified, pending, failed.
+• Capabilities: total, demonstrated, verified.
+• Security Controls: total, implemented, verified.
+• Evidence: artifact count, integrity percentage.
+• Traceability: % fully linked, gaps.
+
+
+Plus:
+
+• Object detail pages (requirement, capability, claim, evidence).
+• Trace graph explorer (visual path from mission → requirement → capability → implementation → test → evidence → release).
+• Seal issuance view (show evidence chain behind each seal).
+
+
+---
+
+8. Truth boundary and philosophy
+
+Hard rule baked into the engine:
+
+The Evidence Vault cannot make something true.
+
+The engine can only:
+
+• Record what was claimed.
+• Record what was tested.
+• Record what artifact was produced.
+• Record what configuration was used.
+• Record who reviewed it.
+• Record whether the evidence was altered.
+• Record whether defined acceptance criteria were met.
+
+
+Verification ≠ validation is encoded in status fields and workflows:
+
+• Verification:
+“Did we build it according to its requirements?”
+• Validation:
+“Did we build the right thing for the mission?”
+
+
+---
+
+9. A practical first implementation slice
+
+If you want a concrete starting vertical slice:
+
+1. Implement:• requirements, capabilities, tests, evidence, traceability_links.
+
+2. Support one claim:
+SL-CLM-001 — local runtime offline execution.
+3. Wire a simple pipeline:• Create requirement SL-SR-002.
+• Link implementation and test.
+• Capture one evidence record with hash.
+• Mark claim as SUPPORTED/VERIFIED based on test + evidence.
+
+4. Build a small dashboard:
+Show that single claim’s chain end‑to‑end.
+
+
+From there, you expand to threats, controls, seals, and cadet pathways.
+
+---
