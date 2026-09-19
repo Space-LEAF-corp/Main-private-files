@@ -1,0 +1,81 @@
+{
+  "kernel_version": "0.4",
+  "registry": "LEAF-ARC-REG-001",
+  "laws": [
+    {
+      "id": 1,
+      "name": "Bias Mitigation & Subgroup Fairness",
+      "ref": "EU AI Act Art.10(2)(g)"
+    },
+    {
+      "id": 2,
+      "name": "Adversarial Robustness",
+      "ref": "Art.15(5)"
+    },
+    {
+      "id": 3,
+      "name": "Accuracy & Hallucination Benchmarking",
+      "ref": "Art.15(1)"
+    },
+    {
+      "id": 4,
+      "name": "Data Privacy & Right-to-be-Forgotten",
+      "ref": "GDPR Art.17 + CCPA"
+    },
+    {
+      "id": 5,
+      "name": "Transparency & AI Labeling",
+      "ref": "Art.50"
+    },
+    {
+      "id": 6,
+      "name": "Data Lineage & Provenance",
+      "ref": "Art.11 + Art.53"
+    },
+    {
+      "id": 7,
+      "name": "Systemic Compute & Threshold Tracking",
+      "ref": "Art.51"
+    },
+    {
+      "id": 8,
+      "name": "Growth State Integrity",
+      "ref": "Art.14 oversight"
+    },
+    {
+      "id": 9,
+      "name": "Boundary Containment",
+      "ref": "Annex IV"
+    },
+    {
+      "id": 10,
+      "name": "Intellectual Property Safety",
+      "ref": "Art.53(1)(c)"
+    },
+    {
+      "id": 11,
+      "name": "Safety-Critical Containment",
+      "ref": "Art.5"
+    },
+    {
+      "id": 12,
+      "name": "Financial/Economic Guardrails",
+      "ref": "Art.5 + ECOA"
+    },
+    {
+      "id": 13,
+      "name": "Threat Model Countermeasures",
+      "ref": "Art.15 cybersecurity"
+    },
+    {
+      "id": 14,
+      "name": "Identity & Authority Resolution",
+      "ref": "Art.14(4)(b) + eIDAS"
+    }
+  ],
+  "precedence_order": "Deny > Defer > Modify > Allow",
+  "art14_hitl": "asymmetric stop with verified active human-presence token override",
+  "evidence_vault": {
+    "input_hash": "98d54f3896720f09cd56bbb1859bceeac07a4c2ff4e4ae016406332f0f87f8b6"
+  }
+}
